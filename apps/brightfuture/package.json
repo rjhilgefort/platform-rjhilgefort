@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "brightfuture",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@repo/ui": "*",
+    "daisyui": "^5.0.0-beta.8",
     "next": "^15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
