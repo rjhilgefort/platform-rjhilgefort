@@ -6,6 +6,6 @@
   "linked": [],
   "access": "public",
   "updateInternalDependencies": "patch",
-  "ignore": ["@rjh/docs"],
+  "ignore": ["@rjh/brightfuture"],
   "baseBranch": "main"
 }
