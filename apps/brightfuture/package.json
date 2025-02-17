@@ -12,17 +12,20 @@
   "dependencies": {
     "@rjh/core": "*",
     "@rjh/utils": "*",
+    "@tailwindcss/postcss": "^4.0.6",
     "next": "^14.1.1",
+    "postcss": "^8.5.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.0.6"
   },
   "devDependencies": {
-    "@rjh/tsconfig": "*",
     "@next/eslint-plugin-next": "^14.1.1",
+    "@rjh/eslint-config": "*",
+    "@rjh/tsconfig": "*",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
-    "@rjh/eslint-config": "*",
     "typescript": "5.5.4"
   }
 }
