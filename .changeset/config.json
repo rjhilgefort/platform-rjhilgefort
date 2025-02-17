@@ -6,5 +6,6 @@
   "linked": [],
   "access": "public",
   "updateInternalDependencies": "patch",
-  "ignore": ["@rjh/docs"]
+  "ignore": ["@rjh/docs"],
+  "baseBranch": "main"
 }
