@@ -1,9 +1,28 @@
-export default function Page() {
+import { Metadata } from 'next'
+import FeaturedPost from '../components/FeaturedPost'
+import postMetadata from '../utils/postMetadata'
+import Hero from '../components/Hero'
+import NewsletterCard from '../components/NewsletterCard'
+import RecentBlogs from '../components/RecentBlogs'
+import TopArticles from '../components/TopArticles'
+
+export const metadata: Metadata = {
+  title: 'Ally Hilgefort',
+  description: 'Welcome To My Site!',
+}
+
+export default function Home() {
+  const metadata = postMetadata('content')
+
   return (
-    <main className="min-h-screen">
-      <div className="container mx-auto">
-        <h1 className="text-4xl font-bold">Ally Hilgefort</h1>
+    <div className="w-full">
+      <Hero />
+      <div className="px-5 xl:px-10">
+        <RecentBlogs posts={metadata} />
+        <FeaturedPost posts={metadata} />
+        <TopArticles posts={metadata} />
+        <NewsletterCard />
       </div>
-    </main>
+    </div>
   )
 }

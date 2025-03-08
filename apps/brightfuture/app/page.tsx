@@ -21,7 +21,7 @@ export default function Page() {
               Bright Future Preschool
             </h1>
             <p className="mb-8 text-xl text-bf-blue/90">
-              Where every child's potential shines bright. Nurturing minds,
+              Where every child&apos;s potential shines bright. Nurturing minds,
               inspiring hearts, and building the foundation for lifelong
               learning.
             </p>
@@ -106,7 +106,7 @@ export default function Page() {
                   <span className="text-bf-blue">Safe Environment</span>
                 </h3>
                 <p className="text-bf-blue/90">
-                  Your child's safety is our top priority, with secure
+                  Your child&apos;s safety is our top priority, with secure
                   facilities and strict health protocols.
                 </p>
               </div>
