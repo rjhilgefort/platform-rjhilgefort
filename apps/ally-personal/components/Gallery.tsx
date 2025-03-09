@@ -1,53 +1,39 @@
 'use client'
 
 import { pipe, Array } from 'effect'
-import Image from 'next/image'
 import { JSX, useEffect, useState } from 'react'
 import { Array_shuffle } from '../utils/Array_shuffle'
-
-const GalleryImage = ({ src, alt = '' }: { src: string; alt?: string }) => {
-  return (
-    <Image
-      className="h-auto max-w-full rounded-lg"
-      src={src}
-      alt={alt}
-      height={0}
-      width={250}
-      sizes="100vw"
-      style={{ width: '100%', height: 'auto' }}
-    />
-  )
-}
+import { GalleryImage } from './GalleryImage'
 
 const galleryImages = [
-  '/gallery/2023-09-30_145135517-EDIT.jpg',
-  '/gallery/AllyGirlsHike.jpeg',
-  '/gallery/IMG20240329164347.jpg',
-  '/gallery/IMG_0067.JPG',
-  '/gallery/IMG_0199.jpg',
-  '/gallery/IMG_0855.JPG',
-  '/gallery/IMG_1349.jpeg',
-  '/gallery/IMG_1676.jpeg',
-  '/gallery/IMG_2690.JPG',
-  '/gallery/IMG_3072.JPG',
-  '/gallery/IMG_3980.jpeg',
-  '/gallery/IMG_3984.jpeg',
-  '/gallery/IMG_4052.jpeg',
-  '/gallery/IMG_4119.jpeg',
-  '/gallery/IMG_4253.jpeg',
-  '/gallery/IMG_4319.JPG',
-  '/gallery/IMG_5990.jpeg',
-  '/gallery/IMG_6249 copy.jpeg',
-  '/gallery/IMG_7248.JPG',
-  '/gallery/IMG_8012.jpeg',
-  '/gallery/IMG_8923.JPG',
-  '/gallery/PXL_20230610_200008448.jpg',
-  '/gallery/PXL_20230709_224939449.jpg',
-  '/gallery/RaelinAllyPlaygroundLaugh.JPG',
-  '/gallery/bikeAllyRob.jpeg',
-  '/gallery/buchanan field girls ally.jpg',
-  '/gallery/glowdisc.JPG',
-  '/gallery/holidaywalkpic.jpeg',
+  '/gallery/backpacking-fourpassloop-buckskinpass-snowmassbackground-ally.JPG',
+  '/gallery/backpacking-fourpassloop-westmaroonpass-ally.JPG',
+  '/gallery/bike-trailsneighborhood-ally-rob.jpeg',
+  '/gallery/buchananfestival-ally-jesselin-raelin-rob-auntaly-miminormarashid.JPG',
+  '/gallery/campout-buchanan-ally-rob-jesselin.jpeg',
+  '/gallery/chilloutfest-amazingracefamily-buchanan-ally-rob.jpeg',
+  '/gallery/chilloutfest-amazingracefamily-hilgeforts-wilsons.JPG',
+  '/gallery/discgolf-buchanan-ally.jpeg',
+  '/gallery/easteregghunt-buchanan-ally-jesselin.jpg',
+  '/gallery/foothillsfourth-buchanan-ally-jesselin.jpeg',
+  '/gallery/foothillsfourth-buchanan-ally-raelin.JPG',
+  '/gallery/glowdisctourney-buchanan-ally-raelin.JPG',
+  '/gallery/hike-ally-jesselin-rob-raelin.jpeg',
+  '/gallery/hike-dedisse-ally-raelin.jpeg',
+  '/gallery/hike-naylorlake-ally-jesselin-raelin.jpeg',
+  '/gallery/holidaywalk-evergreen-all-jesselin-raelin-auntaimee.jpeg',
+  '/gallery/hopsdrops-ally-jesselin.jpg',
+  '/gallery/iceskate-evergreenlake-ally-jesselin-rob-raelin-grandmacarolynjump.jpeg',
+  '/gallery/kayak-ally-jesselin-raelin.jpeg',
+  '/gallery/oktoberfest-buchanan-ally-jesselin-raelin-friends.jpg',
+  '/gallery/ski-echo-ally.jpg',
+  '/gallery/stagecoachpark-raelin-birthday-ally.JPG',
+  '/gallery/sup-paddleboarding-evergreenlake-ally-jesselin.jpeg',
+  '/gallery/teardropcamp-ally-rob-jesselin-raelin.jpg',
+  '/gallery/treecutting-ally-rob-jesselin-raelin-torrey.jpeg',
+  '/gallery/tuscanytavern-ally-raelin.JPG',
+  '/gallery/walk-wahrun-trailsneighborhood-hilgeforts.jpg',
+  '/gallery/walkbike-trailsneighborhood-ally-raelin.JPG',
 ]
 
 const Gallery = () => {

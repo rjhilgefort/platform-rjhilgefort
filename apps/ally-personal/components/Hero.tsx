@@ -10,7 +10,7 @@ const Hero = () => {
           <h1 className="text-4xl md:text-5xl xl:text-7xl font-semibold leading-normal">
             I&apos;m <span className="text-primary">Ally,</span>
             <br />
-            Candidate For EPRD Board
+            EPRD Board Candidate
           </h1>
         </div>
 

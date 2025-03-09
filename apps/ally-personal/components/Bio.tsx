@@ -90,20 +90,21 @@ const Bio = () => {
       </p>
 
       <div
-        className="w-3/8 max-sm:float-none max-sm:w-full float-right mb-4 tooltip tooltip-bottom max-sm:flex max-sm:justify-center"
+        className="w-3/5 ml-6 max-sm:float-none max-sm:w-full float-right mb-4 tooltip tooltip-bottom max-sm:flex max-sm:justify-center"
         data-tip="📸 Raven's Nest Photography"
       >
         <Image
           src="/images/family-rocks.jpg"
           alt="Ally Hilgefort"
           className="rounded-lg shadow-xl"
-          width={300}
+          width={800}
           height={400}
         />
       </div>
 
       <p className="mb-4">As a board member, Ally will:</p>
-      <ul className="list-disc list-inside">
+
+      <ul className="list-disc list-inside mb-4">
         <li>
           Keep all Evergreen neighbors in mind when contemplating projects,
           classes, events, and other offerings
