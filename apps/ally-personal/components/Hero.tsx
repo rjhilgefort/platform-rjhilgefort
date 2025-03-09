@@ -1,10 +1,9 @@
 import Image from 'next/image'
 import React from 'react'
-import { instagramIcon, twitterIcon } from '../svgs'
 
 const Hero = () => {
   return (
-    <div className="hero p-0">
+    <div className="hero p-0 overflow-visible">
       <div className="w-full p-0 gap-0 flex flex-col justify-center items-center relative">
         <div className="text-center pt-10">
           <div className="badge badge-outline badge-lg mb-2">Hello!</div>
@@ -18,7 +17,7 @@ const Hero = () => {
         <Image
           src="/images/family-pic-sitting-outline.png"
           alt="Ally Family"
-          className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl absolute bottom-0 pb-14"
+          className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl absolute z-30 bottom-18 max-sm:bottom-25"
           height={2500}
           width={2700}
         />
@@ -32,30 +31,48 @@ const Hero = () => {
         />
 
         <div className="w-full bg-base-200 py-5 flex flex-col justify-center items-center z-40">
+          <p className="text-xl text-center">
+            Vote on Tuesday,{' '}
+            <span className="text-secondary text-2xl">May 6th</span>!
+            <br className="sm:hidden" />
+            <span className="text-accent">
+              {' '}
+              7am-7pm @{' '}
+              <a
+                href="https://maps.google.com/?q=32003+Ellingwood+Trail,+Evergreen,+CO+80439"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-accent-focus hover:cursor-pointer hover:text-secondary"
+              >
+                Buchanan
+              </a>
+              .
+            </span>
+          </p>
           {/* <h1 className="text-xl font-light">follow me on</h1> */}
-          <div className="flex justify-center lg:justify-start space-x-4 mt-4">
-            {/* <a
+          {/* <div className="flex justify-center lg:justify-start space-x-4 mt-4">
+            <a
               className="btn btn-circle btn-md"
               href="https://www.x.com"
               aria-label="twitter"
             >
-              {twitterIcon}
-            </a> */}
-            {/* <a
+              <FaXTwitter />
+            </a>
+            <a
               className="btn btn-circle btn-md"
               href="https://www.facebook.com"
               aria-label="facebook"
             >
-              {facebookIcon}
-            </a> */}
-            {/* <a
+              <FaFacebook />
+            </a>
+            <a
               className="btn btn-circle btn-md"
               href="https://www.instagram.com"
               aria-label="instagram"
             >
-              {instagramIcon}
-            </a> */}
-          </div>
+              <FaInstagram />
+            </a>
+          </div> */}
         </div>
       </div>
     </div>

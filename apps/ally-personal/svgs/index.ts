@@ -1,6 +1,0 @@
-export * from './facebookIcon'
-export * from './hamburgerIcon'
-export * from './instagramIcon'
-export * from './linkedInIcon'
-export * from './twitterIcon'
-export * from './youtubeIcon'

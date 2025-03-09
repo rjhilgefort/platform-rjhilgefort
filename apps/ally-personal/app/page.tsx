@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 // import postMetadata from '../utils/postMetadata'
 import Hero from '../components/Hero'
 import Bio from '../components/Bio'
+import Gallery from '../components/Gallery'
 
 export const metadata: Metadata = {
   title: 'Ally Hilgefort',
@@ -14,13 +15,14 @@ export default function Home() {
   return (
     <div className="w-full">
       <Hero />
-      <div className="px-5 xl:px-10">
-        <Bio />
-        {/* <RecentBlogs posts={metadata} /> */}
-        {/* <FeaturedPost posts={metadata} /> */}
-        {/* <TopArticles posts={metadata} /> */}
-        {/* <NewsletterCard /> */}
-      </div>
+      {/* <div className="px-5 xl:px-10"> */}
+      <Bio />
+      <Gallery />
+      {/* <RecentBlogs posts={metadata} /> */}
+      {/* <FeaturedPost posts={metadata} /> */}
+      {/* <TopArticles posts={metadata} /> */}
+      {/* <NewsletterCard /> */}
+      {/* </div> */}
     </div>
   )
 }

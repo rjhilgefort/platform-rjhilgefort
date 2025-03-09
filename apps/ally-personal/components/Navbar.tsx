@@ -4,7 +4,7 @@ import React from 'react'
 import { Array } from 'effect'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { hamburgerIcon } from '../svgs/hamburgerIcon'
+import { FaBars, FaEnvelope } from 'react-icons/fa6'
 
 type NavigationItem = {
   name: string
@@ -32,7 +32,7 @@ const Navbar = () => {
                 role="button"
                 className="btn btn-ghost lg:hidden"
               >
-                {hamburgerIcon}
+                <FaBars />
               </button>
             )}
             <ul className="menu dropdown-content menu-md z-1 mt-3 w-52 gap-2 rounded-box bg-base-100 p-2 shadow-sm">
@@ -59,7 +59,11 @@ const Navbar = () => {
             </nav>
           ))}
         </div>
-        <div className="navbar-end">{/* <ThemeToggle /> */}</div>
+        <div className="navbar-end">
+          <a href="mailto:ally.hilgefort@gmail.com" className="btn btn-primary">
+            <FaEnvelope /> Reach Out!
+          </a>
+        </div>
       </nav>
     </header>
   )

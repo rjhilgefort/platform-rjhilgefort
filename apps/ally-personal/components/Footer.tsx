@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import React from 'react'
 
 const Footer = () => {
@@ -21,18 +20,6 @@ const Footer = () => {
           </ul>
         </div>
       </nav> */}
-
-      <div className="contact-info">
-        <p>
-          Contact:{' '}
-          <a
-            href="mailto:ally.hilgefort@gmail.com"
-            className="text-primary hover:underline"
-          >
-            ally.hilgefort@gmail.com
-          </a>
-        </p>
-      </div>
     </footer>
   )
 }
