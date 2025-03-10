@@ -90,7 +90,7 @@ const Bio = () => {
       </p>
 
       <div
-        className="w-3/5 ml-6 max-sm:float-none max-sm:w-full float-right mb-4 tooltip tooltip-bottom max-sm:flex max-sm:justify-center"
+        className="w-3/5 ml-6 float-right mb-4 tooltip tooltip-bottom max-sm:float-none max-sm:w-full max-sm:flex max-sm:ml-0 max-sm:justify-center"
         data-tip="📸 Raven's Nest Photography"
       >
         <Image

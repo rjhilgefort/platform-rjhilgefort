@@ -5,5 +5,6 @@
 - [x] Make bio low picture bigger
 - [x] Setup down detector for `eprdally.com` and `ally.hilgefort.me`
 - [x] Properly name gallery images
+- [x] Share link preview image
 - [ ] 404 page
-- [ ] Optimize images
+- [ ] Optimize images (Cloudinary or something)

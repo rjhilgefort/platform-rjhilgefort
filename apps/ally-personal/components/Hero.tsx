@@ -3,7 +3,7 @@ import React from 'react'
 
 const Hero = () => {
   return (
-    <div className="hero p-0 overflow-visible">
+    <div className="hero p-0 overflow-x-hidden">
       <div className="w-full p-0 gap-0 flex flex-col justify-center items-center relative">
         <div className="text-center pt-10">
           <div className="badge badge-outline badge-lg mb-2">Hello!</div>
@@ -17,7 +17,7 @@ const Hero = () => {
         <Image
           src="/images/family-pic-sitting-outline.png"
           alt="Ally Family"
-          className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl absolute z-30 bottom-18 max-sm:bottom-25"
+          className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl absolute z-30 bottom-18 max-sm:bottom-25 overflow-hidden"
           height={2500}
           width={2700}
         />

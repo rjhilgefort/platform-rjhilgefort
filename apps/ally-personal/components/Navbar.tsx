@@ -4,6 +4,7 @@ import React from 'react'
 import { Array } from 'effect'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { FaBars, FaEnvelope } from 'react-icons/fa6'
 
 type NavigationItem = {
@@ -44,7 +45,8 @@ const Navbar = () => {
             </ul>
           </div>
           <Link className="btn btn-ghost text-xl" href="/">
-            ☀️ Ally Hilgefort
+            <Image src="/images/sun-icon.png" alt="" width={20} height={20} />
+            Ally Hilgefort
           </Link>
         </div>
         <div className="navbar-center hidden lg:flex">

@@ -1,4 +1,4 @@
-name: Build Ally Personal and push to DockerHub
+name: Ally Personal - Build and Deploy
 
 on:
   push:
@@ -26,10 +26,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push to DockerHub
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           file: ./apps/ally-personal/Dockerfile
           tags: rjhilgefort/ally-personal:latest
+
+      - name: Deploy to Portainer
+        uses: wirgen/portainer-stack-redeploy-action@v1.1
+        with:
+          portainerUrl: ${{ secrets.PORTAINER_URL }}
+          accessToken: ${{ secrets.PORTAINER_ACCESS_TOKEN }}
+          stackId: 49
+          # endpointId: 3

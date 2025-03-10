@@ -6,7 +6,14 @@ import Gallery from '../components/Gallery'
 
 export const metadata: Metadata = {
   title: 'Ally Hilgefort',
-  description: 'Welcome To My Site!',
+  description: 'EPRD Board Candidate',
+  openGraph: {
+    images: [
+      {
+        url: '/opengraph-image.png',
+      },
+    ],
+  },
 }
 
 export default function Home() {
