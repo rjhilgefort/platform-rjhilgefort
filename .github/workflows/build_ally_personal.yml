@@ -34,10 +34,11 @@ jobs:
           file: ./apps/ally-personal/Dockerfile
           tags: rjhilgefort/ally-personal:latest
 
-      - name: Deploy to Portainer
-        uses: wirgen/portainer-stack-redeploy-action@v1.1
-        with:
-          portainerUrl: '${{ secrets.PORTAINER_URL }}'
-          accessToken: '${{ secrets.PORTAINER_ACCESS_TOKEN }}'
-          stackId: 49
-          # endpointId: 3
+      # https://github.com/wirgen/portainer-stack-redeploy-action/tree/v1.1
+      # - name: Deploy to Portainer
+      #   uses: wirgen/portainer-stack-redeploy-action@v1.1
+      #   with:
+      #     portainerUrl: '${{ secrets.PORTAINER_URL }}'
+      #     accessToken: '${{ secrets.PORTAINER_ACCESS_TOKEN }}'
+      #     stackId: 49
+      #     # endpointId: 3
