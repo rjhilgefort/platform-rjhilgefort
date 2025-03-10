@@ -1,7 +1,7 @@
 'use client'
 
 import { pipe, Array } from 'effect'
-import { JSX, useEffect, useState } from 'react'
+// import { JSX, useEffect, useState } from 'react'
 import { Array_shuffle } from '../utils/Array_shuffle'
 import { GalleryImage } from './GalleryImage'
 
@@ -36,32 +36,47 @@ const galleryImages = [
   '/gallery/walkbike-trailsneighborhood-ally-raelin.JPG',
 ]
 
-const Gallery = () => {
-  const [masonry, setMasonry] = useState<Array<JSX.Element>>([])
-
-  useEffect(() => {
-    const chunks = pipe(
-      galleryImages,
-      Array_shuffle,
-      Array.chunksOf(7),
-      Array.map((chunk, index) => (
-        <div key={`gallery-chunk-${index}`} className="grid gap-4">
-          {chunk.map((image, index) => (
-            <div key={`gallery-image-${index}`}>
-              <GalleryImage src={image} />
-            </div>
-          ))}
+const galleryImagesShuffled = pipe(
+  galleryImages,
+  Array_shuffle,
+  Array.chunksOf(7),
+  Array.map((chunk, index) => (
+    <div key={`gallery-chunk-${index}`} className="grid gap-4">
+      {chunk.map((image, index) => (
+        <div key={`gallery-image-${index}`}>
+          <GalleryImage src={image} />
         </div>
-      )),
-    )
+      ))}
+    </div>
+  )),
+)
 
-    setMasonry(chunks)
-  }, [])
+const Gallery = () => {
+  // const [masonry, setMasonry] = useState<Array<JSX.Element>>([])
+
+  // useEffect(() => {
+  //   const galleryImagesShuffled = pipe(
+  //     galleryImages,
+  //     Array_shuffle,
+  //     Array.chunksOf(7),
+  //     Array.map((chunk, index) => (
+  //       <div key={`gallery-chunk-${index}`} className="grid gap-4">
+  //         {chunk.map((image, index) => (
+  //           <div key={`gallery-image-${index}`}>
+  //             <GalleryImage src={image} />
+  //           </div>
+  //         ))}
+  //       </div>
+  //     )),
+  //   )
+
+  //   setMasonry(galleryImagesShuffled)
+  // }, [])
 
   return (
     <div className="w-full bg-base-200 py-5 flex flex-col justify-center items-center z-40 pl-4 pr-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {masonry}
+        {galleryImagesShuffled}
         {/* <div className="grid gap-4">
           <div>
             <GalleryImage src="/images/gallery/ally-family-pic-1.png" />
