@@ -7,10 +7,12 @@ const Hero = () => {
       <div className="w-full p-0 gap-0 flex flex-col justify-center items-center relative">
         <div className="text-center pt-10">
           <div className="badge badge-outline badge-lg mb-2">Hello!</div>
-          <h1 className="text-4xl md:text-5xl xl:text-7xl font-semibold leading-normal">
+          <h1 className="text-4xl md:text-5xl xl:text-7xl font-semibold">
             I&apos;m <span className="text-primary">Ally,</span>
             <br />
-            EPRD Board Candidate
+            <span className="text-2xl md:text-3xl xl:text-5xl">
+              EPRD Board Candidate
+            </span>
           </h1>
         </div>
 

@@ -7,7 +7,7 @@ const Bio = () => {
       <h2 className="text-3xl font-bold mb-8 text-center">About Ally</h2>
 
       <div
-        className="w-2/5 float-left mr-6 mb-4 max-sm:w-1/2 tooltip tooltip-bottom"
+        className="w-2/5 float-left mr-6 mb-6 max-sm:w-1/2 tooltip tooltip-bottom"
         data-tip="📸 Raven's Nest Photography"
       >
         <Image
@@ -58,6 +58,19 @@ const Bio = () => {
         recreation.
       </p>
 
+      <div
+        className="w-3/5 ml-6 float-right mb-2 tooltip tooltip-bottom max-sm:float-none max-sm:w-full max-sm:flex max-sm:ml-0 max-sm:justify-center max-sm:mb-6"
+        data-tip="⛰️ Bergen Peak Hike Ally and Rob"
+      >
+        <Image
+          src="/images/bergenpeak-hike-ally-rob.png"
+          alt="Bergen Peak Hike Ally and Rob"
+          className="rounded-lg shadow-xl"
+          width={800}
+          height={400}
+        />
+      </div>
+
       <p className="mb-4">
         “Evergreen is a dream of a place in and of itself, with our natural
         surroundings seeming downright surreal on a daily basis. Anyone would
@@ -90,7 +103,7 @@ const Bio = () => {
       </p>
 
       <div
-        className="w-3/5 ml-6 float-right mb-4 tooltip tooltip-bottom max-sm:float-none max-sm:w-full max-sm:flex max-sm:ml-0 max-sm:justify-center"
+        className="w-3/5 mr-6 float-left mb-6 tooltip tooltip-bottom max-sm:float-none max-sm:w-full max-sm:flex max-sm:ml-0 max-sm:justify-center"
         data-tip="📸 Raven's Nest Photography"
       >
         <Image
