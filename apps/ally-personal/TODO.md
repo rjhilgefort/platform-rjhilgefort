@@ -10,3 +10,5 @@
 - [ ] 404 page
 - [ ] Figure out portainer deploy CI/CD
 - [ ] List in bio wrap should alight with top light indent
+- [ ] Modal for gallery images
+- [ ] Add flyer as a separate page
