@@ -1,5 +1,11 @@
 # @repo/ally-personal
 
+## 1.2.5
+
+### Patch Changes
+
+- bf7390c: 🐛 Fix gallery image caption cutting off last word of src
+
 ## 1.2.4
 
 ### Patch Changes
