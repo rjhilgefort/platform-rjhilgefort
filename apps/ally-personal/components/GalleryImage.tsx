@@ -7,10 +7,12 @@ export const GalleryImage = ({ src, alt }: { src: string; alt?: string }) => {
     alt ??
     pipe(
       src,
-      String.split('/'),
-      Array.last,
+      String.split('.'),
+      Array.dropRight(1),
+      Array.head,
+      Option.map(String.split('/')),
+      Option.flatMap(Array.last),
       Option.map(String.split('-')),
-      Option.map(Array.dropRight(1)),
       Option.map(Array.map(String_titleCase)),
       Option.map(Array.prepend('💬')),
       Option.map(Array.join(' ')),
