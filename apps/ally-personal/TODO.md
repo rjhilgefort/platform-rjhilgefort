@@ -8,3 +8,4 @@
 - [x] Share link preview image
 - [ ] 404 page
 - [ ] Optimize images (Cloudinary or something)
+- [ ] Figure out portainer deploy CI/CD
