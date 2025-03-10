@@ -16,4 +16,4 @@
 
 ### Patch Changes
 
-- 80688ce: 🚀 Ally personal site MVP, initial release
+- 80688ce: 🚀 Ally personal site MVP, initial release.
