@@ -1,5 +1,11 @@
 # @repo/ally-personal
 
+## 1.2.4
+
+### Patch Changes
+
+- a7ba019: 💪 gallery tooltip, additional bio image, condense hero title
+
 ## 1.2.3
 
 ### Patch Changes
