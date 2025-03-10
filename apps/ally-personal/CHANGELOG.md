@@ -1,5 +1,11 @@
 # @repo/ally-personal
 
+## 1.2.3
+
+### Patch Changes
+
+- cbf3a4f: 🔗 opengraph share image, fix side scroll, deploy to portainer in ci
+
 ## 1.2.2
 
 ### Patch Changes
