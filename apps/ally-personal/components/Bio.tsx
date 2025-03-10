@@ -11,12 +11,11 @@ const Bio = () => {
         data-tip="📸 Raven's Nest Photography"
       >
         <Image
-          src="/images/all-girls-closeup-ABOUT.jpg"
+          src="/images/all-girls-closeup-ABOUT.png"
           alt="Ally Hilgefort"
           className="rounded-lg shadow-xl"
           width={600}
           height={600}
-          quality={50}
         />
       </div>
 
@@ -95,12 +94,11 @@ const Bio = () => {
         data-tip="📸 Raven's Nest Photography"
       >
         <Image
-          src="/images/family-rocks.jpg"
+          src="/images/family-rocks.png"
           alt="Ally Hilgefort"
           className="rounded-lg shadow-xl"
           width={800}
           height={400}
-          quality={50}
         />
       </div>
 

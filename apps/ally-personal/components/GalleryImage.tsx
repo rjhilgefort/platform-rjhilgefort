@@ -23,7 +23,6 @@ export const GalleryImage = ({ src, alt }: { src: string; alt?: string }) => {
       width={250}
       sizes="100vw"
       style={{ width: '100%', height: 'auto' }}
-      quality={25}
     />
   )
 }

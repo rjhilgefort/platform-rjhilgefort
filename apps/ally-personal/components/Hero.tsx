@@ -20,7 +20,6 @@ const Hero = () => {
           className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl absolute z-30 bottom-18 max-sm:bottom-25 overflow-hidden"
           height={2500}
           width={2700}
-          quality={50}
         />
 
         <Image
