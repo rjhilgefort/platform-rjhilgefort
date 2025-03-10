@@ -1,7 +1,7 @@
 'use client'
 
 import { pipe, Array } from 'effect'
-// import { JSX, useEffect, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 import { Array_shuffle } from '../utils/Array_shuffle'
 import { GalleryImage } from './GalleryImage'
 
@@ -36,136 +36,31 @@ const galleryImages = [
   '/gallery/walkbike-trailsneighborhood-ally-raelin.JPG',
 ]
 
-const galleryImagesShuffled = pipe(
-  galleryImages,
-  Array_shuffle,
-  Array.chunksOf(7),
-  Array.map((chunk, index) => (
-    <div key={`gallery-chunk-${index}`} className="grid gap-4">
-      {chunk.map((image, index) => (
-        <div key={`gallery-image-${index}`}>
-          <GalleryImage src={image} />
-        </div>
-      ))}
-    </div>
-  )),
-)
-
 const Gallery = () => {
-  // const [masonry, setMasonry] = useState<Array<JSX.Element>>([])
+  const [masonry, setMasonry] = useState<Array<JSX.Element>>([])
 
-  // useEffect(() => {
-  //   const galleryImagesShuffled = pipe(
-  //     galleryImages,
-  //     Array_shuffle,
-  //     Array.chunksOf(7),
-  //     Array.map((chunk, index) => (
-  //       <div key={`gallery-chunk-${index}`} className="grid gap-4">
-  //         {chunk.map((image, index) => (
-  //           <div key={`gallery-image-${index}`}>
-  //             <GalleryImage src={image} />
-  //           </div>
-  //         ))}
-  //       </div>
-  //     )),
-  //   )
+  useEffect(() => {
+    const galleryImagesShuffled = pipe(
+      galleryImages,
+      Array_shuffle,
+      Array.chunksOf(7),
+      Array.map((chunk, index) => (
+        <div key={`gallery-chunk-${index}`} className="grid gap-4">
+          {chunk.map((image, index) => (
+            <div key={`gallery-image-${index}`}>
+              <GalleryImage src={image} />
+            </div>
+          ))}
+        </div>
+      )),
+    )
 
-  //   setMasonry(galleryImagesShuffled)
-  // }, [])
+    setMasonry(galleryImagesShuffled)
+  }, [])
 
   return (
     <div className="w-full bg-base-200 py-5 flex flex-col justify-center items-center z-40 pl-4 pr-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {galleryImagesShuffled}
-        {/* <div className="grid gap-4">
-          <div>
-            <GalleryImage src="/images/gallery/ally-family-pic-1.png" />
-          </div>
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-        </div>
-        <div className="grid gap-4">
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg"
-              alt=""
-            />
-          </div>
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg"
-              alt=""
-            />
-          </div>
-        </div>
-        <div className="grid gap-4">
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-7.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-8.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-        </div>
-        <div className="grid gap-4">
-          <div>
-            <Image
-              className="h-auto max-w-full rounded-lg"
-              src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-9.jpg"
-              alt=""
-              width={100}
-              height={100}
-            />
-          </div>
-        </div> */}
-      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{masonry}</div>
     </div>
   )
 }

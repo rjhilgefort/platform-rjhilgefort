@@ -16,6 +16,7 @@ const Bio = () => {
           className="rounded-lg shadow-xl"
           width={600}
           height={600}
+          quality={50}
         />
       </div>
 
@@ -99,6 +100,7 @@ const Bio = () => {
           className="rounded-lg shadow-xl"
           width={800}
           height={400}
+          quality={50}
         />
       </div>
 
