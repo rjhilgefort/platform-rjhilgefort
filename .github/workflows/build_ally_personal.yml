@@ -35,6 +35,7 @@ jobs:
           tags: rjhilgefort/ally-personal:latest
 
       # https://github.com/wirgen/portainer-stack-redeploy-action/tree/v1.1
+      # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.27.1#/stacks/StackUpdate
       # - name: Deploy to Portainer
       #   uses: wirgen/portainer-stack-redeploy-action@v1.1
       #   with:
