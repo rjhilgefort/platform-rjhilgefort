@@ -9,7 +9,6 @@ import {
   Either,
 } from 'effect'
 import { equals } from 'effect/Equal'
-const { log } = console
 
 const String_UrlHost = Schema.TemplateLiteral(
   Schema.Literal('https://', 'http://'),
@@ -40,7 +39,7 @@ const Effect_fetch = (url: string | URL | Request, options?: RequestInit) =>
   Effect.tryPromise({
     try: () => fetch(url, options),
     catch: (error) => {
-      log(error)
+      console.error(error)
       return error
     },
   })
@@ -50,13 +49,20 @@ const Effect_responseJson = (response: Response) =>
 
 const Effect_fetchJson = flow(Effect_fetch, Effect.flatMap(Effect_responseJson))
 
-log('⏳ Running Portainer Deploy Script...')
+const Effect_logString =
+  (message: string) =>
+  <T>(x: T) => {
+    console.log(message)
+    return Effect.succeed(x)
+  }
 
 export const portainerStackRedeploy = async (params: {
   host: string
   accessToken: string
   stackName: string
 }) => {
+  console.log('⏳ Running Portainer Deploy Script...')
+
   const host = pipe(
     params.host,
     String.trim,
@@ -64,7 +70,6 @@ export const portainerStackRedeploy = async (params: {
     Schema.decodeUnknownEither(String_UrlHost),
     Either.getOrThrow,
   )
-  log({ host })
 
   const stack = await pipe(
     Effect_fetchJson(`${host}/api/stacks`, {
@@ -79,8 +84,6 @@ export const portainerStackRedeploy = async (params: {
     Effect.runPromise,
   )
 
-  log(`${host}/api/stacks/${stack.Id}?endpointId=${stack.EndpointId}`)
-
   console.log('🔄 Deploying Stack...')
   await pipe(
     Effect_fetchJson(`${host}/api/stacks/${stack.Id}/file`, {
@@ -89,7 +92,7 @@ export const portainerStackRedeploy = async (params: {
     }),
     Effect.flatMap(Schema.decodeUnknown(StackFileResponse)),
     Effect.map(Struct.get('StackFileContent')),
-    Effect.tap(Effect.logDebug('Updating Stack...')),
+    Effect.tap(Effect_logString('💾 Updating Stack...')),
     Effect.flatMap((stackFile) =>
       Effect_fetchJson(
         `${host}/api/stacks/${stack.Id}?endpointId=${stack.EndpointId}`,
@@ -103,7 +106,8 @@ export const portainerStackRedeploy = async (params: {
         },
       ),
     ),
-    Effect.tap(Effect.log),
+    Effect.tap(Effect_logString('💾 Stack updated')),
+    Effect.tap(Effect_logString('🛑 Stopping Stack...')),
     Effect.flatMap(() =>
       Effect_fetchJson(
         `${host}/api/stacks/${stack.Id}/stop?endpointId=${stack.EndpointId}`,
@@ -113,7 +117,8 @@ export const portainerStackRedeploy = async (params: {
         },
       ),
     ),
-    Effect.tap(Effect.logDebug('Stack stopped')),
+    Effect.tap(Effect_logString('🛑 Stack stopped')),
+    Effect.tap(Effect_logString('🚀 Starting Stack...')),
     Effect.flatMap(() =>
       Effect_fetchJson(
         `${host}/api/stacks/${stack.Id}/start?endpointId=${stack.EndpointId}`,
@@ -123,9 +128,9 @@ export const portainerStackRedeploy = async (params: {
         },
       ),
     ),
-    Effect.tap(Effect.logDebug('Stack deployed')),
-    Effect.mapError(Effect.logError),
+    Effect.tap(Effect_logString('🚀 Stack deployed')),
     Effect.runPromise,
   )
+
   console.log('✅ Done!')
 }
