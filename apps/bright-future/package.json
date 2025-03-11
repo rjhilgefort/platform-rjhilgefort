@@ -1,6 +1,6 @@
 {
   "name": "@repo/bright-future",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3001 --turbopack",
