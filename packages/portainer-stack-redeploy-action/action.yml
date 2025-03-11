@@ -1,0 +1,18 @@
+name: Portainer Stack Redeploy
+author: Rob Hilgefort
+description: Action for request to Portainer API for redeploy stack with pull latest images.
+
+inputs:
+  host:
+    description: 'Portainer URL'
+    required: true
+  accessToken:
+    description: 'Portainer Access Token'
+    required: true
+  stackName:
+    description: 'Stack Name'
+    required: true
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

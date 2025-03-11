@@ -1,0 +1,28 @@
+{
+  "name": "@repo/portainer-stack-redeploy-action",
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./index.js": "./dist/index.js",
+    "./index.ts": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
+    "dev": "tsc --watch",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@repo/portainer-stack-redeploy": "*"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "eslint": "^9.20.0",
+    "typescript": "5.7.3"
+  }
+}
