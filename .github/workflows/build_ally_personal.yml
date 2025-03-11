@@ -9,7 +9,7 @@ on:
     #   - 'apps/ally-personal/**'
 
 jobs:
-  docker:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,12 +39,11 @@ jobs:
         run: |
           npm install
           npm run --workspace=@repo/portainer-stack-redeploy-action build
-          cp packages/portainer-stack-redeploy-action/action.yml packages/portainer-stack-redeploy-action/dist/
 
       # https://github.com/wirgen/portainer-stack-redeploy-action/tree/v1.1
       # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.27.1#/stacks/StackUpdate
       - name: Deploy to Portainer
-        uses: ./packages/portainer-stack-redeploy-action
+        uses: ./packages/portainer-stack-redeploy-action/dist
         with:
           host: '${{ secrets.PORTAINER_URL }}'
           accessToken: '${{ secrets.PORTAINER_ACCESS_TOKEN }}'
