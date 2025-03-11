@@ -43,7 +43,7 @@ jobs:
       # https://github.com/wirgen/portainer-stack-redeploy-action/tree/v1.1
       # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.27.1#/stacks/StackUpdate
       - name: Deploy to Portainer
-        uses: ./packages/portainer-stack-redeploy-action/dist
+        uses: ./packages/portainer-stack-redeploy-action
         with:
           host: '${{ secrets.PORTAINER_URL }}'
           accessToken: '${{ secrets.PORTAINER_ACCESS_TOKEN }}'
