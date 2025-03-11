@@ -35,7 +35,7 @@ const Hero = () => {
         <div className="w-full bg-base-200 py-5 flex flex-col justify-center items-center z-40">
           <p className="text-xl text-center">
             Vote on Tuesday,{' '}
-            <span className="text-secondary text-2xl">May 6th</span>!
+            <span className="text-secondary text-2xl">May 6th!</span>
             <br className="sm:hidden" />
             <span className="text-accent">
               {' '}

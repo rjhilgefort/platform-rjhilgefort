@@ -3,10 +3,9 @@ name: Ally Personal - Build and Deploy
 on:
   push:
     branches:
-      # - 'deploy/production'
-      - 'main'
-    # paths:
-    #   - 'apps/ally-personal/**'
+      - 'deploy/production'
+    paths:
+      - 'apps/ally-personal/**'
 
 jobs:
   build-and-deploy:
