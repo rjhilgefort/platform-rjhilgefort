@@ -38,7 +38,7 @@ jobs:
       - name: Build GitHub Action
         run: |
           npm install
-          npm run --workspace=@repo/portainer-stack-redeploy-action build
+          npm run build
 
       # https://github.com/wirgen/portainer-stack-redeploy-action/tree/v1.1
       # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.27.1#/stacks/StackUpdate
