@@ -80,7 +80,6 @@ export const portainerStackRedeploy = async (params: {
     Effect.flatMap(
       Array.findFirst(flow(Struct.get('Name'), equals(params.stackName))),
     ),
-    Effect.tap(Effect.log),
     Effect.runPromise,
   )
 
@@ -107,7 +106,7 @@ export const portainerStackRedeploy = async (params: {
       ),
     ),
     Effect.tap(Effect_logString('💾 Stack updated')),
-    Effect.tap(Effect_logString('🛑 Stopping Stack...')),
+    Effect.tap(Effect_logString('✋ Stopping Stack...')),
     Effect.flatMap(() =>
       Effect_fetchJson(
         `${host}/api/stacks/${stack.Id}/stop?endpointId=${stack.EndpointId}`,
@@ -117,7 +116,7 @@ export const portainerStackRedeploy = async (params: {
         },
       ),
     ),
-    Effect.tap(Effect_logString('🛑 Stack stopped')),
+    Effect.tap(Effect_logString('✋ Stack stopped')),
     Effect.tap(Effect_logString('🚀 Starting Stack...')),
     Effect.flatMap(() =>
       Effect_fetchJson(
