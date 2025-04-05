@@ -4,83 +4,118 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-base-200 text-base-content">
+    <footer className="bg-base-200 text-base-content py-6">
       <div className="container mx-auto px-4">
-        <div className="footer py-10">
-          <div>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
+          <div className="max-w-xs">
             <Link href="/" className="flex items-baseline">
-              <span className="text-2xl font-bold text-primary">Bright</span>
-              <span className="text-2xl text-secondary">Future</span>
+              <span className="text-xl font-bold text-primary">Bright</span>
+              <span className="text-xl text-secondary">Future</span>
             </Link>
-            <p className="max-w-xs mt-2">
-              Nurturing minds and hearts since 2010. Providing quality early
-              childhood education in a safe, loving environment.
+            <p className="mt-2 text-sm">
+              Nurturing minds and hearts since 2010.
             </p>
           </div>
 
-          <div>
-            <span className="footer-title">Programs</span>
-            <Link href="/programs/infants" className="link link-hover">
-              Infant Care
-            </Link>
-            <Link href="/programs/toddlers" className="link link-hover">
-              Toddler Program
-            </Link>
-            <Link href="/programs/preschool" className="link link-hover">
-              Preschool
-            </Link>
-          </div>
-
-          <div>
-            <span className="footer-title">About</span>
-            <Link href="/about" className="link link-hover">
-              Our Story
-            </Link>
-            <Link href="/about#our-team" className="link link-hover">
-              Our Team
-            </Link>
-            <Link href="/about#philosophy" className="link link-hover">
-              Philosophy
-            </Link>
-            <Link href="/faq" className="link link-hover">
-              FAQ
-            </Link>
-          </div>
-
-          <div>
-            <span className="footer-title">Contact</span>
-            <p>123 Learning Lane</p>
-            <p>Anytown, ST 12345</p>
-            <a href="tel:+15551234567" className="link link-hover">
-              (555) 123-4567
-            </a>
-            <a href="mailto:info@brightfuture.com" className="link link-hover">
-              info@brightfuture.com
-            </a>
+          <div className="flex flex-col md:items-end text-sm">
+            <div className="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <span>123 Learning Lane, Anytown, ST 12345</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3.5 5.5a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1h-16a1 1 0 01-1-1v-12z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3.5 8.5L12 15l8.5-6.5"
+                />
+              </svg>
+              <a
+                href="mailto:info@brightfuture.com"
+                className="link link-hover"
+              >
+                info@brightfuture.com
+              </a>
+            </div>
+            <div className="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 0v4m0-4h4m-4 0H8"
+                />
+              </svg>
+              <a href="tel:+15551234567" className="link link-hover">
+                (555) 123-4567
+              </a>
+            </div>
           </div>
         </div>
 
-        <div className="divider my-0"></div>
+        <div className="divider my-3"></div>
 
-        <div className="footer items-center py-6">
-          <div className="grid-flow-col items-center">
-            <p>
-              © {currentYear} Bright Future Early Learning Center. All rights
-              reserved.
-            </p>
-          </div>
-          <div className="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
+        <div className="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4">
+          <p className="text-xs text-center md:text-left opacity-75">
+            © {currentYear} Bright Future Early Learning Center. All rights
+            reserved.
+          </p>
+          <div className="flex justify-center md:justify-end gap-2">
             <a
               aria-label="Facebook"
               href="https://facebook.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-ghost btn-circle"
+              className="btn btn-xs btn-ghost btn-square"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 className="fill-current"
               >
@@ -92,12 +127,12 @@ const Footer = () => {
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-ghost btn-circle"
+              className="btn btn-xs btn-ghost btn-square"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 className="fill-current"
               >
@@ -109,12 +144,12 @@ const Footer = () => {
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-ghost btn-circle"
+              className="btn btn-xs btn-ghost btn-square"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 className="fill-current"
               >
