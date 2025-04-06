@@ -6,7 +6,6 @@ interface ProgramCardProps {
   ageRange: string
   description: string
   imageSrc: string
-  href: string
 }
 
 const ProgramCard = ({
@@ -14,11 +13,10 @@ const ProgramCard = ({
   ageRange,
   description,
   imageSrc,
-  href,
 }: ProgramCardProps) => {
   return (
     <div className="card lg:card-side bg-base-100 shadow-xl overflow-hidden">
-      <figure className="relative h-64 lg:h-auto lg:w-2/5">
+      <figure className="relative h-[20rem] lg:h-auto lg:w-2/5">
         <Image
           src={imageSrc}
           alt={`${title} program`}
@@ -26,15 +24,13 @@ const ProgramCard = ({
           className="object-cover"
         />
       </figure>
-      <div className="card-body lg:w-3/5">
-        <h3 className="card-title text-2xl font-bold text-primary">{title}</h3>
-        <div className="badge badge-secondary mb-2">{ageRange}</div>
-        <p>{description}</p>
-        <div className="card-actions justify-end mt-4">
-          <Link href={href} className="btn btn-primary">
-            Learn More
-          </Link>
-        </div>
+      <div className="card-body lg:w-3/5 py-10">
+        <h3 className="card-title text-2xl font-bold text-primary mb-4">
+          {title}
+        </h3>
+        <div className="badge badge-secondary mb-6">{ageRange}</div>
+        <p className="mb-8 text-lg">{description}</p>
+        <div className="h-6"></div> {/* Extra space at the bottom */}
       </div>
     </div>
   )
@@ -48,7 +44,6 @@ const Programs = () => {
       description:
         'Our infant program provides a nurturing environment where babies can develop at their own pace. We focus on language development, sensory experiences, and motor skills through one-on-one interaction.',
       imageSrc: '/kids-1.jpg',
-      href: '/programs/infants',
     },
     {
       title: 'Toddler Program',
@@ -56,7 +51,6 @@ const Programs = () => {
       description:
         'Toddlers are curious explorers. Our program encourages independence, social skills, and language development through play-based learning and structured activities.',
       imageSrc: '/kids-3.jpg',
-      href: '/programs/toddlers',
     },
     {
       title: 'Preschool',
@@ -64,7 +58,6 @@ const Programs = () => {
       description:
         'Our preschool curriculum prepares children for kindergarten with a focus on pre-reading, math concepts, science exploration, and social-emotional development through engaging activities.',
       imageSrc: '/kids-5.jpeg',
-      href: '/programs/preschool',
     },
   ]
 
@@ -87,7 +80,6 @@ const Programs = () => {
               ageRange={program.ageRange}
               description={program.description}
               imageSrc={program.imageSrc}
-              href={program.href}
             />
           ))}
         </div>

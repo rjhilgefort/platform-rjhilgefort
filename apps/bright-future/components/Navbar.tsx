@@ -1,8 +1,21 @@
+'use client'
+
 import Link from 'next/link'
 import { FaPhone } from 'react-icons/fa'
 import { phoneNumberLink, phoneNumberPretty } from '../utils/const'
 
 const Navbar = () => {
+  const scrollToPrograms = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const programsSection = document.getElementById('programs-section')
+    if (programsSection) {
+      programsSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
   return (
     <div className="navbar bg-base-100 shadow-md">
       <div className="navbar-start">
@@ -34,18 +47,9 @@ const Navbar = () => {
               <Link href="/about">About Us</Link>
             </li>
             <li>
-              <a>Programs</a>
-              <ul className="p-2">
-                <li>
-                  <Link href="/programs/infants">Infants</Link>
-                </li>
-                <li>
-                  <Link href="/programs/toddlers">Toddlers</Link>
-                </li>
-                <li>
-                  <Link href="/programs/preschool">Preschool</Link>
-                </li>
-              </ul>
+              <a href="#programs-section" onClick={scrollToPrograms}>
+                Programs
+              </a>
             </li>
           </ul>
         </div>
@@ -60,20 +64,9 @@ const Navbar = () => {
             <Link href="/">Home</Link>
           </li>
           <li>
-            <details>
-              <summary>Programs</summary>
-              <ul className="p-2 bg-base-100 z-10">
-                <li>
-                  <Link href="/programs/infants">Infants</Link>
-                </li>
-                <li>
-                  <Link href="/programs/toddlers">Toddlers</Link>
-                </li>
-                <li>
-                  <Link href="/programs/preschool">Preschool</Link>
-                </li>
-              </ul>
-            </details>
+            <a href="#programs-section" onClick={scrollToPrograms}>
+              Programs
+            </a>
           </li>
           <li>
             <Link href="/about">About Us</Link>
