@@ -15,12 +15,9 @@ export default function AboutPage() {
           <h1 className="text-4xl md:text-5xl font-bold">
             About Bright Future
           </h1>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-            Providing quality childcare and early education since 2010
-          </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12 items-center max-w-5xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-12 items-start max-w-5xl mx-auto">
           <div className="lg:w-1/2">
             <div className="relative aspect-square w-full max-w-md mx-auto rounded-lg overflow-hidden shadow-lg">
               <Image
@@ -37,7 +34,7 @@ export default function AboutPage() {
 
           <div className="lg:w-1/2 space-y-6">
             <h2 className="text-3xl font-semibold">Our Story</h2>
-            <p className="text-gray-700">
+            <p className="text-gray-700 leading-relaxed">
               Bright Future Preschool was founded with a simple mission: to
               provide children with a nurturing environment where they can
               learn, grow, and thrive. Located in Erlanger, Kentucky, we've been
@@ -45,26 +42,21 @@ export default function AboutPage() {
               programs since 2010.
             </p>
 
-            <h2 className="text-3xl font-semibold">Our Approach</h2>
-            <p className="text-gray-700">
+            <p className="text-gray-700 leading-relaxed">
               We believe that every child deserves a bright future. Our
               curriculum is designed to foster cognitive, social, emotional, and
               physical development through age-appropriate activities and
-              play-based learning.
-            </p>
-            <p className="text-gray-700">
-              Our dedicated staff members are passionate about early childhood
-              education and committed to providing a safe, loving, and
-              stimulating environment where children can explore, discover, and
-              build confidence.
+              play-based learning. Our dedicated staff members are passionate
+              about early childhood education and committed to providing a safe,
+              loving, and stimulating environment.
             </p>
 
-            <h2 className="text-3xl font-semibold">Our Facility</h2>
-            <p className="text-gray-700">
+            <p className="text-gray-700 leading-relaxed">
               Our spacious, modern facility features well-equipped classrooms, a
               secure outdoor playground, and separate areas for different age
               groups. We maintain small teacher-to-student ratios to ensure each
-              child receives the attention they need.
+              child receives the attention they need to explore, discover, and
+              build confidence.
             </p>
           </div>
         </div>
