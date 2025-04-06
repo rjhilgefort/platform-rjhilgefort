@@ -5,11 +5,11 @@ interface TestimonialProps {
   role: string
 }
 
-const Testimonial = ({ quote, author, rating, role }: TestimonialProps) => {
+const Testimonial = ({ quote, author, rating }: TestimonialProps) => {
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
-        <div className="text-4xl text-primary opacity-50 mb-4">"</div>
+        <div className="text-4xl text-primary opacity-50 mb-4">&quot;</div>
         <div className="flex mb-2">
           {[...Array(5)].map((_, i) => (
             <svg
@@ -32,7 +32,7 @@ const Testimonial = ({ quote, author, rating, role }: TestimonialProps) => {
           </div>
           <div className="ml-4">
             <h4 className="font-semibold">{author}</h4>
-            <p className="text-sm opacity-75">{role}</p>
+            <p className="text-sm opacity-75">Google Review</p>
           </div>
         </div>
       </div>
@@ -43,25 +43,25 @@ const Testimonial = ({ quote, author, rating, role }: TestimonialProps) => {
 const Testimonials = () => {
   const testimonials = [
     {
+      author: 'Emily Combs',
+      quote:
+        'My son is 5 years old and has been going to Bright Future since he was almost 2 years old. Bright future has always been the BEST which is why I haven’t taken him anywhere else. I feel safe dropping my child off here. My son has made great friendships and relationships with every teacher he has had here. I am so beyond thankful for every one of their staff, the directors and owner of Bright Future. Bright Future does all they can to be involved in my child’s every day care. I enjoy daily updates on how my son is in class and I love getting pictures on their app! I love this place! My son and I are excited for the upcoming dance class they will be having at their center in April!!!! I always recommend Bright Future to anyone in need of child care. THANK YOU FOR ALL YOU DO FOR MY CHILD BRIGHT FUTURE!!!☀️🙏',
+      rating: 5,
+      link: 'https://maps.app.goo.gl/pJZWVkRP7T3BMiYz7',
+    },
+    {
+      author: 'Emily Combs',
       quote:
         'My children have been going here for a year now and I am so happy with the facility, staff, director, and owners. They do an amazing job teaching my children, getting them ready for school, developing their social skills, and making it feel like a home away from home. I would not send my kids anywhere else.',
-      author: 'Ashley Valerius',
       rating: 5,
-      role: 'Parent of Lily, Age 4',
+      link: 'https://maps.app.goo.gl/pJZWVkRP7T3BMiYz7',
     },
     {
+      author: 'Emily Combs',
       quote:
-        "My son has attended since he was 6 weeks old and we couldn't be happier. The teachers and director go above and beyond to make Bright Future feel like a true extension of our family and keep us up to date on all of his progress and milestones. We love our BF family!",
-      author: 'Brianna Gastright',
+        'My children have been going here for a year now and I am so happy with the facility, staff, director, and owners. They do an amazing job teaching my children, getting them ready for school, developing their social skills, and making it feel like a home away from home. I would not send my kids anywhere else.',
       rating: 5,
-      role: 'Parent of Lily, Age 4',
-    },
-    {
-      quote:
-        'Bright Future has been a blessing to our family. Our daughter transitioned from another center during COVID and it has been the best decision. The staff is amazing, caring, and truly make the center feel like home. The facility is set up perfectly for our daughter to learn and grow. Highly recommend!',
-      author: 'Sarah Thompson',
-      rating: 5,
-      role: 'Parent of Lily, Age 4',
+      link: 'https://maps.app.goo.gl/pJZWVkRP7T3BMiYz7',
     },
   ]
 
