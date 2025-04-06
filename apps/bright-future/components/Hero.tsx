@@ -31,7 +31,7 @@ const Hero = () => {
         </div>
         <div className="max-w-md lg:mr-8">
           <h1 className="text-4xl md:text-5xl font-bold">
-            <span className="text-primary">Bright</span>
+            <span className="text-primary font-bold">Bright</span>
             <span className="text-secondary">Future</span>
             <span className="block text-3xl md:text-4xl mt-2">
               Child Enrichment
