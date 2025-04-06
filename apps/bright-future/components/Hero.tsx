@@ -37,9 +37,9 @@ const Hero = () => {
               Child Enrichment
             </span>
           </h1>
-          <div className="badge badge-primary mt-2">Florence, KY</div>
+          <div className="badge badge-primary mt-2">Erlanger, KY</div>
           <p className="py-6 text-lg">
-            Where every child's potential shines bright. Our nurturing
+            Where every child&apos;s potential shines bright. Our nurturing
             environment fosters growth, curiosity, and joy in learning.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">

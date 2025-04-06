@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { phoneNumberPretty } from '../utils/const'
+import { phoneNumberLink } from '../utils/const'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -12,10 +14,6 @@ const Footer = () => {
               <span className="text-xl font-bold text-primary">Bright</span>
               <span className="text-xl text-secondary">Future</span>
             </Link>
-            <p className="mt-2 text-sm">
-              Nurturing young minds since 2015. Providing quality early
-              childhood education and enrichment.
-            </p>
             <p className="text-xs mt-1 opacity-75">
               © {currentYear} Bright Future Child Enrichment
             </p>
@@ -111,8 +109,8 @@ const Footer = () => {
                   d="M12 8v4m0 0v4m0-4h4m-4 0H8"
                 />
               </svg>
-              <a href="tel:+15595811071" className="link link-hover">
-                (559) 581-1071
+              <a href={phoneNumberLink} className="link link-hover">
+                {phoneNumberPretty}
               </a>
             </div>
           </div>
