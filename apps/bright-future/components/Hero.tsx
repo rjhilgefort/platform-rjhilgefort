@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 
 const Hero = () => {
   const scrollToPrograms = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -19,17 +20,26 @@ const Hero = () => {
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:20px_20px]"></div>
       </div>
-      <div className="hero-content flex-col lg:flex-row-reverse z-10">
-        <div className="relative w-full max-w-lg h-80 sm:h-96 lg:h-[32rem] rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary/70 to-secondary/70 flex items-center justify-center">
-          <div className="text-center text-white p-8">
-            <h2 className="text-3xl font-bold mb-4">Learning Through Play</h2>
-            <p className="text-lg">
-              Our play-based curriculum encourages creativity, curiosity, and
-              confidence.
-            </p>
+      <div className="hero-content flex-col lg:flex-row-reverse z-10 gap-8">
+        <div className="relative w-full lg:w-1/2 h-80 sm:h-96 lg:h-[32rem] rounded-xl overflow-hidden shadow-2xl">
+          <Image
+            src="/bf-building.jpg"
+            alt="Bright Future Child Enrichment building"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 flex items-end justify-center">
+            <div className="text-center text-white p-8">
+              <h2 className="text-3xl font-bold mb-4">Learning Through Play</h2>
+              <p className="text-lg">
+                Our play-based curriculum encourages creativity, curiosity, and
+                confidence.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="max-w-md lg:mr-8">
+        <div className="lg:w-1/2 lg:pr-4">
           <h1 className="text-4xl md:text-5xl font-bold">
             <span className="text-primary font-bold">Bright</span>
             <span className="text-secondary">Future</span>
