@@ -41,8 +41,8 @@ const Hero = () => {
         </div>
         <div className="lg:w-1/2 lg:pr-4">
           <h1 className="text-4xl md:text-5xl font-bold">
-            <span className="text-primary font-bold">Bright</span>
-            <span className="text-secondary">Future</span>
+            <span className="text-[#2E86C1] font-bold">Bright</span>
+            <span className="text-[#D35400]">Future</span>
             <span className="block text-3xl md:text-4xl mt-2">
               Child Enrichment
             </span>

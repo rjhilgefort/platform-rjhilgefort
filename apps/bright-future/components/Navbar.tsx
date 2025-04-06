@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { FaPhone } from 'react-icons/fa'
 import { phoneNumberLink, phoneNumberPretty } from '../utils/const'
 
@@ -53,9 +54,19 @@ const Navbar = () => {
             </li>
           </ul>
         </div>
-        <Link href="/" className="btn btn-ghost text-xl">
-          <span className="text-primary font-bold">Bright</span>
-          <span className="text-secondary">Future</span>
+        <Link href="/" className="btn btn-ghost flex items-center gap-2">
+          <div className="relative h-8 w-8 overflow-hidden rounded-full">
+            <Image
+              src="/logo.jpeg"
+              alt="Bright Future Logo"
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="text-xl">
+            <span className="text-[#2E86C1] font-bold">Bright</span>
+            <span className="text-[#D35400]">Future</span>
+          </div>
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
