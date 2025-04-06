@@ -16,7 +16,8 @@ const Hero = () => {
   }
 
   return (
-    <div className="hero min-h-[80vh] relative bg-gradient-to-r from-blue-100 to-purple-100">
+    // <div className="hero min-h-[80vh] relative bg-radial from-primary/25 to-secondary/25">
+    <div className="hero min-h-[80vh] relative bg-radial from-yellow-300/30 from-0% via-yellow-400/30 via-80% to-orange-500/30 to-100%">
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:20px_20px]"></div>
       </div>
@@ -41,19 +42,18 @@ const Hero = () => {
         </div>
         <div className="lg:w-1/2 lg:pr-4">
           <h1 className="text-4xl md:text-5xl font-bold">
-            <span className="text-[#2E86C1] font-bold">Bright</span>
-            <span className="text-[#D35400]">Future</span>
+            <span className="text-accent font-bold">Bright Future</span>
             <span className="block text-3xl md:text-4xl mt-2">
               Child Enrichment
             </span>
           </h1>
-          <div className="badge badge-primary mt-2">Erlanger, KY</div>
+          <div className="badge badge-secondary mt-2">Erlanger, KY</div>
           <p className="py-6 text-lg">
             Where every child&apos;s potential shines bright. Our nurturing
             environment fosters growth, curiosity, and joy in learning.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/contact" className="btn btn-primary">
+            <Link href="/contact" className="btn btn-secondary">
               Schedule a Tour
             </Link>
             <a

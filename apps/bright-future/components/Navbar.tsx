@@ -64,8 +64,7 @@ const Navbar = () => {
             />
           </div>
           <div className="text-xl">
-            <span className="text-[#2E86C1] font-bold">Bright</span>
-            <span className="text-[#D35400]">Future</span>
+            <span className="text-accent font-bold">Bright Future</span>
           </div>
         </Link>
       </div>
