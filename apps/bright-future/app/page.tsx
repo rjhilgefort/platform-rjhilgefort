@@ -6,9 +6,9 @@ import Testimonials from '../components/Testimonials'
 import CTA from '../components/CTA'
 
 export const metadata: Metadata = {
-  title: 'Bright Future Early Learning Center',
+  title: 'Bright Future Child Enrichment | Florence, KY',
   description:
-    'Providing quality early childhood education in a safe, nurturing environment where every child can thrive.',
+    'Bright Future Child Enrichment in Florence, KY provides quality childcare and early childhood education in a loving environment. Open Mon-Fri 6:30 AM - 6:00 PM.',
 }
 
 export default function Home() {

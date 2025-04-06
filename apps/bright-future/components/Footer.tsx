@@ -13,10 +13,11 @@ const Footer = () => {
               <span className="text-xl text-secondary">Future</span>
             </Link>
             <p className="mt-2 text-sm">
-              Nurturing minds and hearts since 2010.
+              Nurturing young minds since 2015. Providing quality early
+              childhood education and enrichment.
             </p>
             <p className="text-xs mt-1 opacity-75">
-              © {currentYear} Bright Future Early Learning Center
+              © {currentYear} Bright Future Child Enrichment
             </p>
           </div>
 
@@ -42,7 +43,24 @@ const Footer = () => {
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span>123 Learning Lane, Anytown, ST 12345</span>
+              <span>240 Main St, Florence, KY 41042</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>Mon-Fri: 6:30 AM - 6:00 PM</span>
             </div>
             <div className="flex items-center gap-1">
               <svg
@@ -66,10 +84,10 @@ const Footer = () => {
                 />
               </svg>
               <a
-                href="mailto:info@brightfuture.com"
+                href="mailto:info@brightfuturekids.com"
                 className="link link-hover"
               >
-                info@brightfuture.com
+                info@brightfuturekids.com
               </a>
             </div>
             <div className="flex items-center gap-1">
@@ -93,8 +111,8 @@ const Footer = () => {
                   d="M12 8v4m0 0v4m0-4h4m-4 0H8"
                 />
               </svg>
-              <a href="tel:+15551234567" className="link link-hover">
-                (555) 123-4567
+              <a href="tel:+15595811071" className="link link-hover">
+                (559) 581-1071
               </a>
             </div>
           </div>

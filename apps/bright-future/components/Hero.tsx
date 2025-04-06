@@ -34,9 +34,10 @@ const Hero = () => {
             <span className="text-primary">Bright</span>
             <span className="text-secondary">Future</span>
             <span className="block text-3xl md:text-4xl mt-2">
-              Early Learning Center
+              Child Enrichment
             </span>
           </h1>
+          <div className="badge badge-primary mt-2">Florence, KY</div>
           <p className="py-6 text-lg">
             Where every child's potential shines bright. Our nurturing
             environment fosters growth, curiosity, and joy in learning.
