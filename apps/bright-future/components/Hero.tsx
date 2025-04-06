@@ -1,6 +1,19 @@
+'use client'
+
 import Link from 'next/link'
 
 const Hero = () => {
+  const scrollToPrograms = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const programsSection = document.getElementById('programs-section')
+    if (programsSection) {
+      programsSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
   return (
     <div className="hero min-h-[80vh] relative bg-gradient-to-r from-blue-100 to-purple-100">
       <div className="absolute inset-0 overflow-hidden z-0">
@@ -32,9 +45,13 @@ const Hero = () => {
             <Link href="/contact" className="btn btn-primary">
               Schedule a Tour
             </Link>
-            <Link href="/programs" className="btn btn-outline">
+            <a
+              href="#programs-section"
+              className="btn btn-outline"
+              onClick={scrollToPrograms}
+            >
               Explore Programs
-            </Link>
+            </a>
           </div>
         </div>
       </div>

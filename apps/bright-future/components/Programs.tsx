@@ -124,7 +124,7 @@ const Programs = () => {
   ]
 
   return (
-    <section className="py-16">
+    <section id="programs-section" className="py-16 scroll-mt-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">Our Programs</h2>
