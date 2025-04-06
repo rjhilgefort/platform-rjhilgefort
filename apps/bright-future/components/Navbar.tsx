@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { FaPhone } from 'react-icons/fa'
+import { phoneNumberLink, phoneNumberPretty } from '../utils/const'
 
 const Navbar = () => {
   return (
@@ -45,12 +47,6 @@ const Navbar = () => {
                 </li>
               </ul>
             </li>
-            <li>
-              <Link href="/gallery">Gallery</Link>
-            </li>
-            <li>
-              <Link href="/faq">FAQ</Link>
-            </li>
           </ul>
         </div>
         <Link href="/" className="btn btn-ghost text-xl">
@@ -62,9 +58,6 @@ const Navbar = () => {
         <ul className="menu menu-horizontal px-1">
           <li>
             <Link href="/">Home</Link>
-          </li>
-          <li>
-            <Link href="/about">About Us</Link>
           </li>
           <li>
             <details>
@@ -83,17 +76,18 @@ const Navbar = () => {
             </details>
           </li>
           <li>
-            <Link href="/gallery">Gallery</Link>
-          </li>
-          <li>
-            <Link href="/faq">FAQ</Link>
+            <Link href="/about">About Us</Link>
           </li>
         </ul>
       </div>
       <div className="navbar-end">
-        <Link href="/contact" className="btn btn-primary">
-          Enroll Now
-        </Link>
+        <a
+          href={phoneNumberLink}
+          className="btn btn-primary flex items-center gap-2"
+        >
+          <FaPhone className="h-4 w-4" />
+          {phoneNumberPretty}
+        </a>
       </div>
     </div>
   )
