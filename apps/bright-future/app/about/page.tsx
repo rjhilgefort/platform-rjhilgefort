@@ -24,14 +24,14 @@ export default function AboutPage() {
           <div className="lg:w-1/2">
             <div className="relative aspect-square w-full max-w-md mx-auto rounded-lg overflow-hidden shadow-lg">
               <Image
-                src="/images/about-placeholder.jpg"
-                alt="Bright Future Preschool classroom"
+                src="/bf-building-2.jpeg"
+                alt="Bright Future Preschool building"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />
-              <div className="absolute inset-0 bg-primary/10"></div>
+              <div className="absolute inset-0 bg-primary/5"></div>
             </div>
           </div>
 
