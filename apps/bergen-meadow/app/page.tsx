@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  const youtubeVideoId = 'YOUR_YOUTUBE_VIDEO_ID'
+  const youtubeVideoId = 'CuVthbu_ehI'
 
   return (
     <div className="bg-base-100">
@@ -98,23 +98,129 @@ export default function Home() {
 
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
-            <h2 className="card-title text-3xl">A Unique Opportunity</h2>
+            <h2 className="card-title text-3xl">Project Background & Status</h2>
             <div className="prose max-w-none">
               <p>
-                The closure of the Bergen Meadow Elementary School left a
-                significant plot of land idle. Our community group sees this as
-                a chance to create something truly special – a space that
-                reflects our mountain values, provides needed recreational
-                opportunities, and serves as a central gathering point. Imagine
-                walking trails, picnic areas, a community garden, and spaces for
-                outdoor events, all while preserving the natural character of
-                the meadow and respecting the surrounding environment, including
-                the local elk population.
+                I discovered from attending a board meeting of the Evergreen
+                Park and Recreation District that a group was meeting on the
+                disposition of Bergen Meadow Elementary School. Jenny Touhey and
+                I met personally with a representative of the group on 3/31/25,
+                and I invited her to speak to the The Trails HOA board.
               </p>
               <p>
-                Replace this with more detailed text about the project's vision
-                and background.
+                Here's a summary of what Coordinator Linda Kirkpatrick,
+                Executive Director of the Evergreen Legacy Fund, presented to
+                The Trails HOA board on 4/9/25:
               </p>
+              <ul>
+                <li>
+                  In April of 2024, the Board of Education announced Bergen
+                  Meadow was 1 of 19 properties to be disposed of. Their process
+                  stated offering to municipalities first, then to the general
+                  marketplace otherwise. Their plan to dispose of 4 properties
+                  at a time took longer than anticipated.
+                </li>
+                <li>
+                  Foothills Regional Housing (considered a special district with
+                  a 45-year presence in Evergreen) had been formulating plans to
+                  apply for acquisition of the 13 acres. EPRD pulled together
+                  other special districts (Evergreen Fire and Evergreen Metro),
+                  hoping to qualify as a quasi-municipality. The group invited
+                  Foothills Regional Housing to the table, building a cohesive
+                  approach rather than a competitive one, as no one group needed
+                  13 acres. Initially, the process did not allow for
+                  sub-dividing.
+                </li>
+                <li>
+                  The group of 4 special districts, 6 nonprofit entities, and 1
+                  architectural firm learned the existing building would likely
+                  need to be razed due to environmental concerns.
+                </li>
+                <li>
+                  Members of the group lobbied independently:
+                  <ul>
+                    <li>
+                      to urge the BOE to move Bergen Meadow up on the list. and
+                      to allow for Foothills Regional Housing and EPRD to
+                      co-present, each bidding for a portion of the land
+                    </li>
+                    <li>
+                      to familiarize Jeffco Commissioners of Evergreen's desire
+                      to have this for community use
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  On March 13, 2025, the BOE announced
+                  <ul>
+                    <li>
+                      Bergen Meadow would be on the second set of 4 properties
+                      to be sold as "surplus"
+                    </li>
+                    <li>
+                      they would recognize Jefferson County as the municipal
+                      entity with first right of refusal
+                    </li>
+                    <li>they would allow the land to be subdivided</li>
+                  </ul>
+                </li>
+                <li>
+                  On March 31, 2025, the Deputy County Manager asked to sit in
+                  on the meeting of the Evergreen group to gather information on
+                  how the community would use the 13 acres vs. how the county
+                  might use it. The Evergreen group put together a case for
+                  community use as follows:
+                  <ul>
+                    <li>
+                      Senior Housing / Athletic Fields / Senior Services
+                      <ul>
+                        <li>
+                          Foothills Regional Housing would acquire a portion of
+                          the property on which to construct two 3-story
+                          buildings, roughly on the same footprint as the
+                          school. These buildings would be for senior housing
+                          (rentals) to help fill a deficit of housing for the
+                          senior population.
+                        </li>
+                        <li>
+                          EPRD would acquire the rest of the property to include
+                          the athletic fields, playground equipment, and
+                          additional open space sufficient to construct a
+                          community center or senior center in the future (the
+                          building not necessarily owned and operated by EPRD).
+                          This would include access roads and parking for
+                          fields.
+                        </li>
+                        <li>
+                          A place for senior services to help fill the
+                          tremendous void created by the pullout of the Seniors
+                          Resource Center in 2019.
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  On April 14, 2025, the County Manager and representatives of
+                  the BOE were to meet to discuss options. The Evergreen group
+                  is optimistic that the county would suggest a way to broker
+                  this on their behalf.
+                </li>
+                <li>
+                  Everything depends on price tags that BOE puts on the
+                  property....
+                  <ul>
+                    <li>
+                      Foothills Regional Housing would need to acquire financing
+                    </li>
+                    <li>
+                      EPRD board would need to approve the expenditure in the
+                      midst of the expansion of Buchanan Park facilities
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+              <p>The BOD of The Trails seemed very receptive.</p>
             </div>
           </div>
         </div>
@@ -135,7 +241,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mb-12">
+        {/* <div className="mb-12">
           <h2 className="text-3xl font-bold mb-6 text-center">Concept Ideas</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <img
@@ -149,7 +255,7 @@ export default function Home() {
               className="rounded-box shadow-md w-full h-auto"
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
