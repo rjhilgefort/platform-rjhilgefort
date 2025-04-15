@@ -10,14 +10,7 @@ export default function Home() {
 
   return (
     <div className="bg-base-100">
-      <div
-        className="hero min-h-[50vh]"
-        style={{
-          backgroundImage:
-            'url(https://via.placeholder.com/1500x500.png?text=Mountain+Meadow+View)',
-        }}
-      >
-        <div className="hero-overlay bg-black bg-opacity-50"></div>
+      <div className="hero min-h-[50vh] bg-[url('/google-maps.jpeg')] bg-cover bg-center">
         <div className="hero-content text-center text-neutral-content">
           <div className="max-w-lg">
             <h1 className="mb-5 text-6xl font-bold">
