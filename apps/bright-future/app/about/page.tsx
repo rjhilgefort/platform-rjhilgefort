@@ -18,14 +18,13 @@ export default function AboutPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 items-start max-w-5xl mx-auto">
-          <div className="lg:w-1/2">
-            <div className="relative aspect-square w-full max-w-md mx-auto rounded-lg overflow-hidden shadow-lg">
+          <div className="w-full lg:w-1/2">
+            <div className="relative w-full rounded-lg overflow-hidden shadow-lg aspect-[4/3] lg:aspect-square">
               <Image
                 src="/bf-building-2.jpeg"
                 alt="Bright Future Preschool building"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />
               <div className="absolute inset-0 bg-primary/5"></div>
