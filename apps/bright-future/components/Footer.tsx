@@ -9,8 +9,8 @@ const Footer = () => {
   return (
     <footer className="bg-base-200 text-base-content py-6">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
-          <div className="flex flex-col">
+        <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center gap-6">
+          <div className="flex flex-col items-center">
             <Link href="/" className="flex items-center gap-2">
               <div className="relative h-8 w-8 overflow-hidden rounded-full">
                 <Image
@@ -29,7 +29,7 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="flex flex-col md:items-end text-sm">
+          <div className="flex flex-col items-center md:items-end text-sm">
             <div className="flex items-center gap-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
