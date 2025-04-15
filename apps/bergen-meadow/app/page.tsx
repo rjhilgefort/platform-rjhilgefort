@@ -235,7 +235,8 @@ export default function Home() {
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="w-full h-150"
+              className="w-full block"
+              style={{ aspectRatio: '16 / 9' }}
             ></iframe>
           </div>
         </div>
