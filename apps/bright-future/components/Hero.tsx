@@ -17,7 +17,7 @@ const Hero = () => {
 
   return (
     // <div className="hero min-h-[80vh] relative bg-radial from-primary/25 to-secondary/25">
-    <div className="hero min-h-[80vh] relative bg-radial from-yellow-300/30 from-0% via-yellow-400/30 via-80% to-orange-500/30 to-100%">
+    <div className="hero min-h-[80vh] relative bg-radial from-yellow-300/30 from-0% via-yellow-400/30 via-60% to-orange-500/30 to-100%">
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:20px_20px]"></div>
       </div>
