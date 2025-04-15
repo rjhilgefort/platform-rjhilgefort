@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { FaMapPin, FaMountain, FaRegClock } from 'react-icons/fa'
 
 export const metadata: Metadata = {
   title: 'Bergen Meadow: A Community Vision',
@@ -13,12 +14,9 @@ export default function Home() {
       <div className="hero min-h-[50vh] bg-[url('/google-maps.jpeg')] bg-cover bg-center">
         <div className="hero-content text-center text-neutral-content">
           <div className="max-w-lg">
-            <h1 className="mb-5 text-6xl font-bold">
+            <h1 className="mb-5 text-6xl font-bold [text-shadow:-3px_-3px_0_#000,3px_-3px_0_#000,-3px_3px_0_#000,3px_3px_0_#000,0px_-3px_0_#000,0px_3px_0_#000,-3px_0px_0_#000,3px_0px_0_#000]">
               The Future of Bergen Meadow
             </h1>
-            <p className="mb-5 text-xl">
-              Envisioning a vibrant community space in harmony with nature.
-            </p>
           </div>
         </div>
       </div>
@@ -27,65 +25,29 @@ export default function Home() {
         <div className="stats shadow stats-vertical lg:stats-horizontal w-full mb-12">
           <div className="stat">
             <div className="stat-figure text-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="inline-block w-8 h-8 stroke-current"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                ></path>
-              </svg>
+              <FaMapPin className="text-3xl" />
             </div>
             <div className="stat-title">The Land</div>
-            <div className="stat-value">XX Acres</div>
+            <div className="stat-value">13 Acres</div>
             <div className="stat-desc">Former elementary school site</div>
           </div>
 
           <div className="stat">
             <div className="stat-figure text-secondary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="inline-block w-8 h-8 stroke-current"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                ></path>
-              </svg>
+              <FaMountain className="text-3xl" />
             </div>
             <div className="stat-title">Our Goal</div>
-            <div className="stat-value">Community Hub</div>
+            <div className="stat-value">Keep It Community</div>
             <div className="stat-desc">Recreation, nature, gathering</div>
           </div>
 
           <div className="stat">
             <div className="stat-figure text-accent">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="inline-block w-8 h-8 stroke-current"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
+              <FaRegClock className="text-3xl" />
             </div>
             <div className="stat-title">Current Phase</div>
             <div className="stat-value">Planning</div>
-            <div className="stat-desc">Gathering community input</div>
+            <div className="stat-desc">Awaiting Municipal Decision</div>
           </div>
         </div>
 
@@ -250,7 +212,7 @@ export default function Home() {
           </div>
         </div> */}
 
-        <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
+        {/* <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
             <h2 className="card-title text-3xl">How You Can Help</h2>
             <div className="prose max-w-none">
@@ -279,14 +241,14 @@ export default function Home() {
               <button className="btn btn-ghost">Learn More</button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <footer className="footer footer-center p-6 bg-base-300 text-base-content">
         <aside>
           <p>
-            Copyright © {new Date().getFullYear()} - Bergen Meadow Community
-            Group - Preserving our space, together.
+            Copyright © {new Date().getFullYear()} - The Trails Collective -
+            Friends & Neighbors in Support of Bergen Meadow’s Best Plan.
           </p>
         </aside>
       </footer>
