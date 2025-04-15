@@ -231,7 +231,7 @@ export default function Home() {
           </h2>
           <div className="rounded-box overflow-hidden shadow-lg bg-black">
             <iframe
-              src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+              src={`https://www.youtube.com/embed/${youtubeVideoId}?rel=0`}
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
