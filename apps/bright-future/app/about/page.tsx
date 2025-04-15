@@ -36,9 +36,9 @@ export default function AboutPage() {
             <p className="text-gray-700 leading-relaxed">
               Bright Future Preschool was founded with a simple mission: to
               provide children with a nurturing environment where they can
-              learn, grow, and thrive. Located in Erlanger, Kentucky, we've been
-              serving local families with quality childcare and early education
-              programs since 2010.
+              learn, grow, and thrive. Located in Erlanger, Kentucky, we&apos;ve
+              been serving local families with quality childcare and early
+              education programs since 2010.
             </p>
 
             <p className="text-gray-700 leading-relaxed">
