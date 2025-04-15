@@ -4,16 +4,25 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FaPhone } from 'react-icons/fa'
 import { phoneNumberLink, phoneNumberPretty } from '../utils/const'
+import { usePathname, useRouter } from 'next/navigation'
 
 const Navbar = () => {
+  const pathname = usePathname()
+  const router = useRouter()
+
   const scrollToPrograms = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
-    const programsSection = document.getElementById('programs-section')
-    if (programsSection) {
-      programsSection.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
+
+    if (pathname === '/') {
+      const programsSection = document.getElementById('programs-section')
+      if (programsSection) {
+        programsSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }
+    } else {
+      router.push('/#programs-section')
     }
   }
 
