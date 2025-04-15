@@ -229,14 +229,13 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-6 text-center">
             See the Vision
           </h2>
-          <div className="aspect-w-16 aspect-h-9 rounded-box overflow-hidden shadow-lg bg-black">
+          <div className="rounded-box overflow-hidden shadow-lg bg-black">
             <iframe
               src={`https://www.youtube.com/embed/${youtubeVideoId}`}
               title="YouTube video player"
-              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="w-full h-full"
+              className="w-full h-150"
             ></iframe>
           </div>
         </div>
