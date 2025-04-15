@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { phoneNumberPretty } from '../utils/const'
 import { phoneNumberLink } from '../utils/const'
 
@@ -9,10 +10,19 @@ const Footer = () => {
     <footer className="bg-base-200 text-base-content py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
-          <div className="max-w-xs">
-            <Link href="/" className="flex items-baseline">
-              <span className="text-xl font-bold text-primary">Bright</span>
-              <span className="text-xl text-secondary">Future</span>
+          <div className="flex flex-col">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                <Image
+                  src="/logo.jpeg"
+                  alt="Bright Future Logo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="text-xl">
+                <span className="text-accent font-bold">Bright Future</span>
+              </div>
             </Link>
             <p className="text-xs mt-1 opacity-75">
               © {currentYear} Bright Future Child Enrichment
