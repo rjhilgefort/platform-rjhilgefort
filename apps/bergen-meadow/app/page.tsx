@@ -126,9 +126,9 @@ export default function Home() {
           <Image
             src="/people-1.jpg"
             alt="Community members discussing plans"
-            className="rounded-box shadow-lg w-full h-auto object-cover max-h-[60vh]"
-            width={1000}
-            height={1000}
+            className="rounded-box shadow-lg w-full h-auto object-contain max-w-3xl mx-auto"
+            width={4032}
+            height={3024}
           />
         </div>
 
