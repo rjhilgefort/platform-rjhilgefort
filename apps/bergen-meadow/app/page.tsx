@@ -89,33 +89,18 @@ export default function Home() {
               </p>
               <p>
                 From attending a board meeting of the Evergreen Park and
-                Recreation District (EPRD),{' '}
-                <a
-                  href="https://eprdally.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Ally
-                </a>{' '}
-                discovered that a group was meeting on the disposition of the
-                Bergen Meadow Elementary School. This coalition of Evergreen
-                groups sounded promising and uplifting, that so many entrenched
-                residents of our community had already been working toward a
-                common goal.
+                Recreation District (EPRD), Ally discovered that a group was
+                meeting on the disposition of the Bergen Meadow Elementary
+                School. This coalition of Evergreen groups sounded promising and
+                uplifting, that so many entrenched residents of our community
+                had already been working toward a common goal.
               </p>
               <p>
-                Jenny and{' '}
-                <a
-                  href="https://eprdally.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Ally
-                </a>{' '}
-                met personally with a representative of the group on 3/31/25,
-                and subsequently invited her to speak to the The Trails HOA
-                board. The following outlines that conversation and what The
-                Trails Collective believes to be Bergen Meadow's Best Plan.
+                Jenny and Ally met personally with a representative of the group
+                on 3/31/25, and subsequently invited her to speak to the The
+                Trails HOA board. The following outlines that conversation and
+                what The Trails Collective believes to be Bergen Meadow's Best
+                Plan.
               </p>
             </div>
           </div>
@@ -289,8 +274,6 @@ export default function Home() {
                   Ally Hilgefort
                 </a>{' '}
                 & Jenny Touhey
-                <br />
-                (Special thanks to Rob Hilgefort for site implementation!)
               </p>
             </div>
           </div>
