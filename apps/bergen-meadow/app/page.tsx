@@ -121,18 +121,21 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Insert image here */}
-        <div className="mb-12">
+        <div
+          className="mb-12 tooltip tooltip-bottom flex justify-center"
+          data-tip={
+            "📸 Jenny, Linda, and Ally chat from Jenny's backyard about the Bergen Meadow property, shown immediately behind them."
+          }
+        >
           <Image
             src="/people-1.jpg"
             alt="Community members discussing plans"
-            className="rounded-box shadow-lg w-full h-auto object-contain max-w-3xl mx-auto"
+            className="rounded-box shadow-lg w-full h-auto object-contain max-w-3xl"
             width={4032}
             height={3024}
           />
         </div>
 
-        {/* Start new card for Project Background & Thoughts */}
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
             <div className="prose max-w-none">
