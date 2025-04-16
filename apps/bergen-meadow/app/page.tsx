@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import Image from 'next/image'
 import { FaMapPin, FaMountain, FaRegClock } from 'react-icons/fa'
 
 export const metadata: Metadata = {
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  const youtubeVideoId = 'CuVthbu_ehI'
+  // const youtubeVideoId = 'CuVthbu_ehI'
 
   return (
     <div className="bg-base-100">
@@ -74,27 +75,68 @@ export default function Home() {
                 had.
               </p>
               <p>
-                Trails neighbors Ally Hilgefort and Jenny Touhey recently heard
-                an exciting potential plan for the Bergen Meadow Property, and
-                they're eager to spread the word.
+                Trails neighbors{' '}
+                <a
+                  href="https://eprdally.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ally Hilgefort
+                </a>{' '}
+                and Jenny Touhey recently heard an exciting potential plan for
+                the Bergen Meadow Property, and they're eager to spread the
+                word.
               </p>
               <p>
                 From attending a board meeting of the Evergreen Park and
-                Recreation District (EPRD), Ally discovered that a group was
-                meeting on the disposition of the Bergen Meadow Elementary
-                School. This coalition of Evergreen groups sounded promising and
-                uplifting, that so many entrenched residents of our community
-                had already been working toward a common goal.
+                Recreation District (EPRD),{' '}
+                <a
+                  href="https://eprdally.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ally
+                </a>{' '}
+                discovered that a group was meeting on the disposition of the
+                Bergen Meadow Elementary School. This coalition of Evergreen
+                groups sounded promising and uplifting, that so many entrenched
+                residents of our community had already been working toward a
+                common goal.
               </p>
               <p>
-                Jenny and Ally met personally with a representative of the group
-                on 3/31/25, and subsequently invited her to speak to the The
-                Trails HOA board. The following outlines that conversation and
-                what The Trails Collective believes to be Bergen Meadow's Best
-                Plan.
+                Jenny and{' '}
+                <a
+                  href="https://eprdally.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ally
+                </a>{' '}
+                met personally with a representative of the group on 3/31/25,
+                and subsequently invited her to speak to the The Trails HOA
+                board. The following outlines that conversation and what The
+                Trails Collective believes to be Bergen Meadow's Best Plan.
               </p>
+            </div>
+          </div>
+        </div>
 
-              <h2 className="card-title text-3xl mt-6">
+        {/* Insert image here */}
+        <div className="mb-12">
+          <Image
+            src="/people-1.jpg"
+            alt="Community members discussing plans"
+            className="rounded-box shadow-lg w-full h-auto object-cover max-h-[60vh]"
+            width={1000}
+            height={1000}
+          />
+        </div>
+
+        {/* Start new card for Project Background & Thoughts */}
+        <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
+          <div className="card-body">
+            <div className="prose max-w-none">
+              <h2 className="card-title text-3xl">
                 Project Background & Status
               </h2>
               <p>
@@ -235,7 +277,15 @@ export default function Home() {
               <p>We hope this potential plan excites you, too!</p>
               <p>Thanks,</p>
               <p>
-                Trails Collective Founders, Ally Hilgefort & Jenny Touhey
+                Trails Collective Founders,{' '}
+                <a
+                  href="https://eprdally.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ally Hilgefort
+                </a>{' '}
+                & Jenny Touhey
                 <br />
                 (Special thanks to Rob Hilgefort for site implementation!)
               </p>
