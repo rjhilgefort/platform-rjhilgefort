@@ -265,15 +265,14 @@ export default function Home() {
               <p>We hope this potential plan excites you, too!</p>
               <p>Thanks,</p>
               <p>
-                Trails Collective Founders,{' '}
+                Trails Collective Founders, Jenny Touhey &{' '}
                 <a
                   href="https://eprdally.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Ally Hilgefort
-                </a>{' '}
-                & Jenny Touhey
+                </a>
               </p>
             </div>
           </div>
