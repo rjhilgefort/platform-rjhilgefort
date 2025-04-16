@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { FaMapPin, FaMountain, FaRegClock } from 'react-icons/fa'
 
 export const metadata: Metadata = {
-  title: 'Bergen Meadow: A Community Vision',
+  title: "Bergen Meadow's Best Plan",
   description: 'Help shape the future of the Bergen Meadow site.',
 }
 
