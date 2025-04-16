@@ -53,15 +53,50 @@ export default function Home() {
 
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
-            <h2 className="card-title text-3xl">Project Background & Status</h2>
+            <h2 className="card-title text-3xl">
+              What's Happening with Bergen Meadow?
+            </h2>
             <div className="prose max-w-none">
               <p>
-                I discovered from attending a board meeting of the Evergreen
-                Park and Recreation District that a group was meeting on the
-                disposition of Bergen Meadow Elementary School. Jenny Touhey and
-                I met personally with a representative of the group on 3/31/25,
-                and I invited her to speak to the The Trails HOA board.
+                As homeowners in the Trails at Hiwan neighborhood, this is a
+                question we have wondered and worried about for a couple of
+                years now. Many of us have backyards that flow into the Bergen
+                Meadow property, and many of us look over to that area from
+                various windows or spots of our yards. More importantly, many
+                love the open space and community use provided by the fields and
+                playground at Bergen Meadow.
               </p>
+              <p>
+                This spot is also so incredibly centrally located- convenient to
+                the fire department, middle school, restaurants, grocery and
+                recreational activities- that we hope its future use serves as
+                an asset to our community, as the elementary school previously
+                had.
+              </p>
+              <p>
+                Trails neighbors Ally Hilgefort and Jenny Touhey recently heard
+                an exciting potential plan for the Bergen Meadow Property, and
+                they're eager to spread the word.
+              </p>
+              <p>
+                From attending a board meeting of the Evergreen Park and
+                Recreation District (EPRD), Ally discovered that a group was
+                meeting on the disposition of the Bergen Meadow Elementary
+                School. This coalition of Evergreen groups sounded promising and
+                uplifting, that so many entrenched residents of our community
+                had already been working toward a common goal.
+              </p>
+              <p>
+                Jenny and Ally met personally with a representative of the group
+                on 3/31/25, and subsequently invited her to speak to the The
+                Trails HOA board. The following outlines that conversation and
+                what The Trails Collective believes to be Bergen Meadow's Best
+                Plan.
+              </p>
+
+              <h2 className="card-title text-3xl mt-6">
+                Project Background & Status
+              </h2>
               <p>
                 Here's a summary of what Coordinator Linda Kirkpatrick,
                 Executive Director of the Evergreen Legacy Fund, presented to
@@ -69,22 +104,22 @@ export default function Home() {
               </p>
               <ul>
                 <li>
-                  In April of 2024, the Board of Education announced Bergen
-                  Meadow was 1 of 19 properties to be disposed of. Their process
-                  stated offering to municipalities first, then to the general
-                  marketplace otherwise. Their plan to dispose of 4 properties
-                  at a time took longer than anticipated.
+                  In April of 2024, the Board of Education (BOE) announced
+                  Bergen Meadow was 1 of 19 properties to be disposed of. Their
+                  process started offering to municipalities first, then to the
+                  general marketplace otherwise. Their plan to dispose of 4
+                  properties at a time took longer than anticipated.
                 </li>
                 <li>
                   Foothills Regional Housing (considered a special district with
                   a 45-year presence in Evergreen) had been formulating plans to
-                  apply for acquisition of the 13 acres. EPRD pulled together
-                  other special districts (Evergreen Fire and Evergreen Metro),
-                  hoping to qualify as a quasi-municipality. The group invited
-                  Foothills Regional Housing to the table, building a cohesive
-                  approach rather than a competitive one, as no one group needed
-                  13 acres. Initially, the process did not allow for
-                  sub-dividing.
+                  apply for acquisition of Bergen Meadow's 13 acres. EPRD pulled
+                  together other special districts (Evergreen Fire and Evergreen
+                  Metro), hoping to qualify as a quasi-municipality. The group
+                  invited Foothills Regional Housing to the table, building a
+                  cohesive approach rather than a competitive one, as no one
+                  group needed 13 acres. Initially, the process did not allow
+                  for sub-dividing.
                 </li>
                 <li>
                   The group of 4 special districts, 6 nonprofit entities, and 1
@@ -92,31 +127,24 @@ export default function Home() {
                   need to be razed due to environmental concerns.
                 </li>
                 <li>
-                  Members of the group lobbied independently:
-                  <ul>
-                    <li>
-                      to urge the BOE to move Bergen Meadow up on the list. and
-                      to allow for Foothills Regional Housing and EPRD to
-                      co-present, each bidding for a portion of the land
-                    </li>
-                    <li>
-                      to familiarize Jeffco Commissioners of Evergreen's desire
-                      to have this for community use
-                    </li>
-                  </ul>
+                  Members of the group lobbied independently: to urge the BOE to
+                  move Bergen Meadow up on the list and to allow for Foothills
+                  Regional Housing and EPRD to co-present, each bidding for a
+                  portion of the land to familiarize Jeffco Commissioners of
+                  Evergreen's desire to have this for community use
                 </li>
                 <li>
-                  On March 13, 2025, the BOE announced
+                  On March 13, 2025, the BOE announced:
                   <ul>
                     <li>
                       Bergen Meadow would be on the second set of 4 properties
                       to be sold as "surplus"
                     </li>
                     <li>
-                      they would recognize Jefferson County as the municipal
+                      They would recognize Jefferson County as the municipal
                       entity with first right of refusal
                     </li>
-                    <li>they would allow the land to be subdivided</li>
+                    <li>They would allow the land to be subdivided</li>
                   </ul>
                 </li>
                 <li>
@@ -174,8 +202,43 @@ export default function Home() {
                     </li>
                   </ul>
                 </li>
+                <li>The Trails HOA Board seemed very receptive.</li>
               </ul>
-              <p>The BOD of The Trails seemed very receptive.</p>
+
+              <h2 className="card-title text-3xl mt-6">
+                Thoughts from The Trails Collective
+              </h2>
+              <p>
+                We Trails neighbors love this notion- A generational community
+                space, where seniors have access to trails nearby and
+                entertainment in the form of kids' sports happening on the
+                fields. Where middle schoolers and neighbors could volunteer to
+                help seniors with their gardens, or even just spend time
+                socializing. Where children can still play, and where neighbors
+                can still look out onto the fields.
+              </p>
+              <p>
+                We love that the community would not lose the fields and open
+                space, and that the new structure(s) would aim to remain on the
+                current building's footprint, and just about one level higher
+                than the old school. We love that the new structure would offer
+                a more feasible living option for more senior residents of
+                Evergreen, to keep those valuable members of our community right
+                here at home.
+              </p>
+              <p>
+                The Trails Collective - friends and neighbors in support of
+                Bergen Meadow's best plan - hopes this vision comes to life, as
+                this collaboration would keep the property community, generally,
+                and also create a wonderful new senior community for Evergreen.
+              </p>
+              <p>We hope this potential plan excites you, too!</p>
+              <p>Thanks,</p>
+              <p>
+                Trails Collective Founders, Ally Hilgefort & Jenny Touhey
+                <br />
+                (Special thanks to Rob Hilgefort for site implementation!)
+              </p>
             </div>
           </div>
         </div>
@@ -248,7 +311,7 @@ export default function Home() {
         <aside>
           <p>
             Copyright © {new Date().getFullYear()} - The Trails Collective -
-            Friends & Neighbors in Support of Bergen Meadow’s Best Plan.
+            Friends & Neighbors in Support of Bergen Meadow's Best Plan.
           </p>
         </aside>
       </footer>
