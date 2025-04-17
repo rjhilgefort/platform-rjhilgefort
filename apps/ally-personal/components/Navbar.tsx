@@ -14,9 +14,10 @@ type NavigationItem = {
 
 const Navbar = () => {
   const navigation: Array<NavigationItem> = [
-    // { name: 'Home', href: '/' },
+    { name: 'Home', href: '/' },
     // { name: 'Articles', href: '/articles' },
     // { name: 'About', href: '/about' },
+    { name: 'Q&A', href: '/qa' },
   ]
 
   const pathname = usePathname()
