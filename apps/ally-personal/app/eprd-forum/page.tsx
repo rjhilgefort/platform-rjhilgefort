@@ -84,7 +84,9 @@ const Qa = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Q&A</h1>
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
+        EPRD Forum
+      </h1>
       <div className="space-y-3 max-w-4xl mx-auto">
         {processedQnaData.map((item) => (
           <div

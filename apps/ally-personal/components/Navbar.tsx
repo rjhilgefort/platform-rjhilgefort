@@ -17,7 +17,7 @@ const Navbar = () => {
     { name: 'Home', href: '/' },
     // { name: 'Articles', href: '/articles' },
     // { name: 'About', href: '/about' },
-    { name: 'Q&A', href: '/qa' },
+    { name: 'EPRD Forum', href: '/eprd-forum' },
   ]
 
   const pathname = usePathname()
