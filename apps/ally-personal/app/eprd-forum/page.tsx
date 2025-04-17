@@ -83,7 +83,7 @@ const Qa = () => {
   }))
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 min-h-[70vh]">
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
         EPRD Forum
       </h1>
