@@ -81,9 +81,8 @@ const Qa = () => {
             className="collapse collapse-arrow bg-base-200 rounded-lg shadow"
           >
             {' '}
-            {/* Adjusted rounding/shadow */}
             <input
-              type="checkbox"
+              type="radio"
               name="qa-accordion"
               id={item.id}
               className="peer"
