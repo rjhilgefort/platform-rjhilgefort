@@ -1,12 +1,7 @@
-import { Metadata } from 'next'
-import React from 'react'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Q&A',
-  description: 'Questions and Answers from Ally Hilgefort',
-}
+import React, { useState, useEffect } from 'react'
 
-// Raw Q&A data
 const qnaDataRaw = [
   {
     question:
@@ -46,9 +41,7 @@ const qnaDataRaw = [
   },
 ]
 
-// Helper function to format answer text into HTML paragraphs
 const formatAnswerToHtml = (answerText: string): string => {
-  // Replace literal \n with actual newlines before splitting
   const textWithNewlines = answerText.replace(/\n/g, '\n')
   return textWithNewlines
     .trim()
@@ -58,6 +51,31 @@ const formatAnswerToHtml = (answerText: string): string => {
 }
 
 const Qa = () => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  const toggleVisibility = () => {
+    if (window.scrollY > 300) {
+      setIsVisible(true)
+    } else {
+      setIsVisible(false)
+    }
+  }
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', toggleVisibility)
+
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility)
+    }
+  }, [])
+
   const processedQnaData = qnaDataRaw.map((item, index) => ({
     id: `qa-${index}`,
     question: item.question,
@@ -67,22 +85,19 @@ const Qa = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       {' '}
-      {/* Added more padding */}
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
         Q&A
       </h1>{' '}
-      {/* Responsive title size, more margin */}
       <div className="space-y-3 max-w-4xl mx-auto">
         {' '}
-        {/* Increased max-width, adjusted spacing */}
-        {processedQnaData.map((item, index) => (
+        {processedQnaData.map((item) => (
           <div
             key={item.id}
             className="collapse collapse-arrow bg-base-200 rounded-lg shadow"
           >
             {' '}
             <input
-              type="radio"
+              type="checkbox"
               name="qa-accordion"
               id={item.id}
               className="peer"
@@ -93,19 +108,38 @@ const Qa = () => {
             >
               {item.question}
             </label>
-            {/* Apply transition to content visibility/height if possible with Tailwind/DaisyUI, otherwise use basic classes */}
             <div className="collapse-content bg-base-100 text-base-content peer-checked:border peer-checked:border-t-0 peer-checked:border-base-300">
               {' '}
-              {/* Removed top border when open */}
               <div
                 className="pt-4 pb-2 px-2 md:px-4"
                 dangerouslySetInnerHTML={{ __html: item.answerHtml }}
               />{' '}
-              {/* Added padding to content */}
             </div>
           </div>
         ))}
       </div>
+      {isVisible && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-5 right-5 p-3 bg-primary text-primary-content rounded-full shadow-lg hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-opacity duration-300 ease-in-out z-50" // Added z-index
+          aria-label="Scroll to top"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   )
 }
