@@ -84,18 +84,13 @@ const Qa = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {' '}
-      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
-        Q&A
-      </h1>{' '}
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Q&A</h1>
       <div className="space-y-3 max-w-4xl mx-auto">
-        {' '}
         {processedQnaData.map((item) => (
           <div
             key={item.id}
             className="collapse collapse-arrow bg-base-200 rounded-lg shadow"
           >
-            {' '}
             <input
               type="checkbox"
               name="qa-accordion"
@@ -109,11 +104,10 @@ const Qa = () => {
               {item.question}
             </label>
             <div className="collapse-content bg-base-100 text-base-content peer-checked:border peer-checked:border-t-0 peer-checked:border-base-300">
-              {' '}
               <div
                 className="pt-4 pb-2 px-2 md:px-4"
                 dangerouslySetInnerHTML={{ __html: item.answerHtml }}
-              />{' '}
+              />
             </div>
           </div>
         ))}
