@@ -83,11 +83,10 @@ const Qa = () => {
             {' '}
             {/* Adjusted rounding/shadow */}
             <input
-              type="radio"
+              type="checkbox"
               name="qa-accordion"
               id={item.id}
               className="peer"
-              defaultChecked={index === 0}
             />
             <label
               htmlFor={item.id}
