@@ -232,15 +232,15 @@ export default function Home() {
                     </li>
                   </ul>
                 </li>
-                <li>The Trails HOA Board seemed very receptive.</li>
               </ul>
+              <p>The Trails HOA Board seemed very receptive.</p>
 
               <h2 className="card-title text-3xl mt-6">
                 Thoughts from The Trails Collective
               </h2>
               <p>
-                We Trails neighbors love this notion- A generational community
-                space, where seniors have access to trails nearby and
+                We Trails neighbors love this notion- A multi-generational
+                community space, where seniors have access to trails nearby and
                 entertainment in the form of kids' sports happening on the
                 fields. Where middle schoolers and neighbors could volunteer to
                 help seniors with their gardens, or even just spend time
