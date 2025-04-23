@@ -80,8 +80,10 @@ export default function Home() {
 
           {/* Output Section */}
           <div className="flex flex-col items-center text-center flex-1">
-            {/* Display calculated PDGA rating */}
-            <div className="text-4xl font-bold mb-2">{pdgaRating}</div>
+            {/* Display calculated PDGA rating, using non-breaking space as placeholder */}
+            <div className="text-4xl font-bold mb-2">
+              {pdgaRating || '\u00A0'}
+            </div>
             {/* Changed button to div for label */}
             <div className="text-sm text-gray-400 mt-1">{outputLabel}</div>
           </div>
