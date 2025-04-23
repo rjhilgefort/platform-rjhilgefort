@@ -114,7 +114,12 @@ export default function Home() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+      {/* Page Title */}
+      <h1 className="text-3xl font-bold text-gray-200 mb-8">
+        uDisc to PDGA Rating Converter
+      </h1>
+      {/* Converter Card */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex items-center justify-between space-x-6">
           {/* Input Section */}
@@ -124,10 +129,10 @@ export default function Home() {
               type="number"
               value={displayUDisc} // Bind to display state
               onChange={handleUDiscInputChange} // Use debounced handler
-              className="text-4xl font-bold mb-2 bg-transparent border-none text-white text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-4xl font-bold mb-2 bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="---" // Add placeholder for empty state
             />
-            <div className="text-sm text-gray-400 mt-1">{inputLabel}</div>
+            <div className="text-sm text-orange-500 mt-1">{inputLabel}</div>
           </div>
 
           {/* Arrow */}
@@ -141,10 +146,10 @@ export default function Home() {
               type="number"
               value={displayPdga} // Bind to display state
               onChange={handlePdgaInputChange} // Use debounced handler
-              className="text-4xl font-bold mb-2 bg-transparent border-none text-white text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-4xl font-bold mb-2 bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="---" // Add placeholder for empty state
             />
-            <div className="text-sm text-gray-400 mt-1">{outputLabel}</div>
+            <div className="text-sm text-blue-400 mt-1">{outputLabel}</div>
           </div>
         </div>
         {/* Warning Message Area */}
