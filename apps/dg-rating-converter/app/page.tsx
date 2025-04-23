@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 
 export default function Home() {
   // Placeholder state - update with actual conversion logic
-  const [uDiscRating, setUDiscRating] = useState('950') // Example uDisc Rating
+  const [uDiscRating, setUDiscRating] = useState('175') // Example uDisc Rating
   const [pdgaRating, setPdgaRating] = useState('') // Initialize as empty or calculation placeholder
   const inputLabel = 'uDisc Rating'
   const outputLabel = 'PDGA Rating'
