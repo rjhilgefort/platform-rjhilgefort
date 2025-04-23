@@ -2,6 +2,7 @@
 
 import { Metadata } from 'next'
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image' // Import Image component
 // Assuming Card is not needed anymore based on the new design
 // import { Card } from '@repo/ui/card'
 
@@ -26,10 +27,6 @@ export default function Home() {
   const [displayUDisc, setDisplayUDisc] = useState(initialUDisc)
   const [displayPdga, setDisplayPdga] = useState(initialPdga)
   const [warningMessage, setWarningMessage] = useState('') // State for warning message
-
-  const inputLabel = 'uDisc Rating'
-  const outputLabel = 'PDGA Rating'
-  // const [lastUpdated, setLastUpdated] = useState('Updated 38 minutes ago') // Removed state
 
   // Refs for debounce timers
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -116,9 +113,22 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
       {/* Page Title */}
-      <h1 className="text-3xl font-bold text-gray-200 mb-8">
-        <span className="text-orange-500">uDisc</span> to{' '}
-        <span className="text-blue-400">PDGA</span> Rating Converter
+      <h1 className="text-3xl font-bold text-gray-200 mb-8 inline-flex items-center gap-3">
+        <span className="inline-flex items-center gap-2">
+          <Image
+            src="/udisc-logo.webp"
+            alt="uDisc Logo"
+            width={28}
+            height={28}
+          />
+          <span className="text-orange-500">uDisc</span>
+        </span>
+        to
+        <span className="inline-flex items-center gap-2">
+          <Image src="/pdga-logo.svg" alt="PDGA Logo" width={28} height={28} />
+          <span className="text-blue-400">PDGA</span>
+        </span>
+        Rating Converter
       </h1>
       {/* Converter Card */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl">
@@ -133,7 +143,11 @@ export default function Home() {
               className="text-4xl font-bold mb-2 bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="---" // Add placeholder for empty state
             />
-            <div className="text-sm text-orange-500 mt-1">{inputLabel}</div>
+            {/* uDisc Label with Logo */}
+            <div className="text-sm text-orange-500 mt-1 flex items-center justify-center gap-1.5">
+              <Image src="/udisc-logo.webp" alt="" width={16} height={16} />
+              uDisc Rating
+            </div>
           </div>
 
           {/* Arrow */}
@@ -150,7 +164,11 @@ export default function Home() {
               className="text-4xl font-bold mb-2 bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="---" // Add placeholder for empty state
             />
-            <div className="text-sm text-blue-400 mt-1">{outputLabel}</div>
+            {/* PDGA Label with Logo */}
+            <div className="text-sm text-blue-400 mt-1 flex items-center justify-center gap-1.5">
+              <Image src="/pdga-logo.svg" alt="" width={16} height={16} />
+              PDGA Rating
+            </div>
           </div>
         </div>
         {/* Warning Message Area */}
