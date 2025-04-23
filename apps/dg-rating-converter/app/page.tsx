@@ -37,7 +37,16 @@ export default function Home() {
             <input
               type="number" // Changed type to number
               value={uDiscRating}
-              onChange={(e) => setUDiscRating(e.target.value)} // Update state
+              onChange={(e) => {
+                const value = e.target.value
+                const numValue = parseFloat(value)
+                // Check if the number exceeds the max value
+                if (!isNaN(numValue) && numValue > 300) {
+                  setUDiscRating('300') // Set to max value
+                } else {
+                  setUDiscRating(value) // Otherwise, update normally
+                }
+              }} // Update state with max value check
               className="text-4xl font-bold mb-2 bg-transparent border-none text-white text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               // Consider adding inputmode="numeric" pattern="[0-9]*" for mobile
             />
