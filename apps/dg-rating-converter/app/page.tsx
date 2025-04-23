@@ -34,14 +34,20 @@ export default function Home() {
   // Refs for debounce timers
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  // Ref for autofocus
+  const uDiscInputRef = useRef<HTMLInputElement | null>(null)
 
   // Cleanup timeouts on unmount
   useEffect(() => {
+    // Autofocus the uDisc input on initial mount
+    uDiscInputRef.current?.focus()
+
+    // Cleanup function for timeouts
     return () => {
       if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
       if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
     }
-  }, [])
+  }, []) // Empty dependency array ensures this runs only once on mount
 
   // Handler for uDisc input changes with debounce
   const handleUDiscInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +120,7 @@ export default function Home() {
           {/* Input Section */}
           <div className="flex flex-col items-center text-center flex-1">
             <input
+              ref={uDiscInputRef} // Attach ref for autofocus
               type="number"
               value={displayUDisc} // Bind to display state
               onChange={handleUDiscInputChange} // Use debounced handler
