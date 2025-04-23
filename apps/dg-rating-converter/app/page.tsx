@@ -1,24 +1,32 @@
 'use client'
 
 import { Metadata } from 'next'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // Assuming Card is not needed anymore based on the new design
 // import { Card } from '@repo/ui/card'
 
 export default function Home() {
   // Placeholder state - update with actual conversion logic
   const [uDiscRating, setUDiscRating] = useState('950') // Example uDisc Rating
-  const [pdgaRating, setPdgaRating] = useState('1000') // Example PDGA Rating (result)
+  const [pdgaRating, setPdgaRating] = useState('') // Initialize as empty or calculation placeholder
   const inputLabel = 'uDisc Rating'
   const outputLabel = 'PDGA Rating'
-  const [lastUpdated, setLastUpdated] = useState('Updated 38 minutes ago') // Keep or remove as needed
+  // const [lastUpdated, setLastUpdated] = useState('Updated 38 minutes ago') // Removed state
 
-  // TODO: Add conversion logic here
-  // Example: Update pdgaRating when uDiscRating changes
-  // useEffect(() => {
-  //   const convertedRating = convertUDiscToPdga(Number(uDiscRating));
-  //   setPdgaRating(String(convertedRating));
-  // }, [uDiscRating]);
+  // Conversion logic effect
+  useEffect(() => {
+    const ratingNum = parseFloat(uDiscRating) // Parse input to float
+
+    if (!isNaN(ratingNum)) {
+      // Check if parsing was successful
+      const calculatedPdgaRating = ratingNum * 2 + 500
+      // Optional: round the result if needed
+      // setPdgaRating(String(Math.round(calculatedPdgaRating)));
+      setPdgaRating(String(calculatedPdgaRating))
+    } else {
+      setPdgaRating('') // Set to empty string or '--' if input is invalid
+    }
+  }, [uDiscRating]) // Re-run effect when uDiscRating changes
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
