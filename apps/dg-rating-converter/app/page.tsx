@@ -117,7 +117,8 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
       {/* Page Title */}
       <h1 className="text-3xl font-bold text-gray-200 mb-8">
-        uDisc to PDGA Rating Converter
+        <span className="text-orange-500">uDisc</span> to{' '}
+        <span className="text-blue-400">PDGA</span> Rating Converter
       </h1>
       {/* Converter Card */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl">
