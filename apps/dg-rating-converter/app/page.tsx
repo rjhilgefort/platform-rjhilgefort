@@ -6,12 +6,19 @@ import { useState } from 'react'
 // import { Card } from '@repo/ui/card'
 
 export default function Home() {
-  // Placeholder state - you'll replace this with actual logic later
-  const [inputValue, setInputValue] = useState('5 btc')
-  const [outputValue, setOutputValue] = useState('$465,504.64')
-  const [inputUnit, setInputUnit] = useState('Bitcoins')
-  const [outputUnit, setOutputUnit] = useState('American Dollars')
-  const [lastUpdated, setLastUpdated] = useState('Updated 38 minutes ago')
+  // Placeholder state - update with actual conversion logic
+  const [uDiscRating, setUDiscRating] = useState('950') // Example uDisc Rating
+  const [pdgaRating, setPdgaRating] = useState('1000') // Example PDGA Rating (result)
+  const inputLabel = 'uDisc Rating'
+  const outputLabel = 'PDGA Rating'
+  const [lastUpdated, setLastUpdated] = useState('Updated 38 minutes ago') // Keep or remove as needed
+
+  // TODO: Add conversion logic here
+  // Example: Update pdgaRating when uDiscRating changes
+  // useEffect(() => {
+  //   const convertedRating = convertUDiscToPdga(Number(uDiscRating));
+  //   setPdgaRating(String(convertedRating));
+  // }, [uDiscRating]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
@@ -19,10 +26,15 @@ export default function Home() {
         <div className="flex items-center justify-between space-x-6">
           {/* Input Section */}
           <div className="flex flex-col items-center text-center flex-1">
-            <div className="text-4xl font-bold mb-2">{inputValue}</div>
-            <button className="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm py-1 px-4 rounded">
-              {inputUnit}
-            </button>
+            <input
+              type="number" // Changed type to number
+              value={uDiscRating}
+              onChange={(e) => setUDiscRating(e.target.value)} // Update state
+              className="text-4xl font-bold mb-2 bg-transparent border-none text-white text-center focus:outline-none w-full"
+              // Consider adding inputmode="numeric" pattern="[0-9]*" for mobile
+            />
+            {/* Changed button to div for label */}
+            <div className="text-sm text-gray-400 mt-1">{inputLabel}</div>
           </div>
 
           {/* Arrow and Update Info */}
@@ -35,10 +47,10 @@ export default function Home() {
 
           {/* Output Section */}
           <div className="flex flex-col items-center text-center flex-1">
-            <div className="text-4xl font-bold mb-2">{outputValue}</div>
-            <button className="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm py-1 px-4 rounded">
-              {outputUnit}
-            </button>
+            {/* Display calculated PDGA rating */}
+            <div className="text-4xl font-bold mb-2">{pdgaRating}</div>
+            {/* Changed button to div for label */}
+            <div className="text-sm text-gray-400 mt-1">{outputLabel}</div>
           </div>
         </div>
       </div>
