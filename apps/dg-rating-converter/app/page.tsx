@@ -30,7 +30,7 @@ export default function Home() {
               type="number" // Changed type to number
               value={uDiscRating}
               onChange={(e) => setUDiscRating(e.target.value)} // Update state
-              className="text-4xl font-bold mb-2 bg-transparent border-none text-white text-center focus:outline-none w-full"
+              className="text-4xl font-bold mb-2 bg-transparent border-none text-white text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               // Consider adding inputmode="numeric" pattern="[0-9]*" for mobile
             />
             {/* Changed button to div for label */}
@@ -40,9 +40,6 @@ export default function Home() {
           {/* Arrow and Update Info */}
           <div className="flex flex-col items-center">
             <div className="text-4xl text-gray-500 mb-1">→</div>
-            <div className="text-xs text-gray-500 whitespace-nowrap">
-              {lastUpdated}
-            </div>
           </div>
 
           {/* Output Section */}
