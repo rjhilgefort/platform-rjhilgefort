@@ -25,6 +25,7 @@ export default function Home() {
   // State for the displayed values in inputs
   const [displayUDisc, setDisplayUDisc] = useState(initialUDisc)
   const [displayPdga, setDisplayPdga] = useState(initialPdga)
+  const [warningMessage, setWarningMessage] = useState('') // State for warning message
 
   const inputLabel = 'uDisc Rating'
   const outputLabel = 'PDGA Rating'
@@ -52,21 +53,25 @@ export default function Home() {
     if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
 
     uDiscTimeoutRef.current = setTimeout(() => {
+      let currentWarning = '' // Warning for this update
       if (valueStr === '') {
         setDisplayPdga('')
-        return
+      } else {
+        const numValue = parseFloat(valueStr)
+        if (!isNaN(numValue)) {
+          if (numValue < MIN_UDISC || numValue > MAX_UDISC) {
+            currentWarning =
+              'uDisc Rating outside 0-300 range. Calculation uses nearest limit.'
+          }
+          const clampedUDisc = clamp(numValue, MIN_UDISC, MAX_UDISC)
+          const calculatedPdga = clampedUDisc * 2 + 500
+          setDisplayPdga(String(calculatedPdga))
+        } else {
+          // Handle invalid number input (e.g., '-', '1.2.3')
+          setDisplayPdga('')
+        }
       }
-
-      const numValue = parseFloat(valueStr)
-      if (!isNaN(numValue)) {
-        const clampedUDisc = clamp(numValue, MIN_UDISC, MAX_UDISC)
-        const calculatedPdga = clampedUDisc * 2 + 500
-        setDisplayPdga(String(calculatedPdga))
-      }
-      // If input is invalid (e.g., just "-"), clear the other field
-      else {
-        setDisplayPdga('')
-      }
+      setWarningMessage(currentWarning) // Update the warning state
     }, DEBOUNCE_DELAY)
   }
 
@@ -80,21 +85,25 @@ export default function Home() {
     if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
 
     pdgaTimeoutRef.current = setTimeout(() => {
+      let currentWarning = '' // Warning for this update
       if (valueStr === '') {
         setDisplayUDisc('')
-        return
+      } else {
+        const numValue = parseFloat(valueStr)
+        if (!isNaN(numValue)) {
+          if (numValue < MIN_PDGA || numValue > MAX_PDGA) {
+            currentWarning =
+              'PDGA Rating outside 500-1100 range. Calculation uses nearest limit.'
+          }
+          const clampedPdga = clamp(numValue, MIN_PDGA, MAX_PDGA)
+          const calculatedUDisc = (clampedPdga - 500) / 2
+          setDisplayUDisc(String(calculatedUDisc))
+        } else {
+          // Handle invalid number input
+          setDisplayUDisc('')
+        }
       }
-
-      const numValue = parseFloat(valueStr)
-      if (!isNaN(numValue)) {
-        const clampedPdga = clamp(numValue, MIN_PDGA, MAX_PDGA)
-        const calculatedUDisc = (clampedPdga - 500) / 2
-        setDisplayUDisc(String(calculatedUDisc))
-      }
-      // If input is invalid, clear the other field
-      else {
-        setDisplayUDisc('')
-      }
+      setWarningMessage(currentWarning) // Update the warning state
     }, DEBOUNCE_DELAY)
   }
 
@@ -130,6 +139,10 @@ export default function Home() {
             />
             <div className="text-sm text-gray-400 mt-1">{outputLabel}</div>
           </div>
+        </div>
+        {/* Warning Message Area */}
+        <div className="mt-4 text-center text-yellow-500 text-xs h-4">
+          {warningMessage}
         </div>
       </div>
     </div>
