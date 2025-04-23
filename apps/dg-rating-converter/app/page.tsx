@@ -125,7 +125,7 @@ export default function Home() {
 
           {/* Arrow */}
           <div className="flex flex-col items-center">
-            <div className="text-4xl text-gray-500 mb-1">→</div>
+            <div className="text-4xl text-gray-500 mb-1">↔</div>
           </div>
 
           {/* Output Section - Now an Input */}
