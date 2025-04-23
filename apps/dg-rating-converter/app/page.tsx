@@ -62,13 +62,11 @@ export default function Home() {
         const clampedUDisc = clamp(numValue, MIN_UDISC, MAX_UDISC)
         const calculatedPdga = clampedUDisc * 2 + 500
         setDisplayPdga(String(calculatedPdga))
-
-        // Update the input visually if clamping occurred
-        if (String(clampedUDisc) !== valueStr) {
-          setDisplayUDisc(String(clampedUDisc))
-        }
       }
-      // If input is invalid (e.g., just "-"), do nothing further in debounce
+      // If input is invalid (e.g., just "-"), clear the other field
+      else {
+        setDisplayPdga('')
+      }
     }, DEBOUNCE_DELAY)
   }
 
@@ -92,13 +90,11 @@ export default function Home() {
         const clampedPdga = clamp(numValue, MIN_PDGA, MAX_PDGA)
         const calculatedUDisc = (clampedPdga - 500) / 2
         setDisplayUDisc(String(calculatedUDisc))
-
-        // Update the input visually if clamping occurred
-        if (String(clampedPdga) !== valueStr) {
-          setDisplayPdga(String(clampedPdga))
-        }
       }
-      // If input is invalid, do nothing further
+      // If input is invalid, clear the other field
+      else {
+        setDisplayUDisc('')
+      }
     }, DEBOUNCE_DELAY)
   }
 
