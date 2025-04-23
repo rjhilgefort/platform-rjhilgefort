@@ -112,62 +112,67 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      {/* Page Title */}
-      <h1 className="text-3xl font-bold text-gray-200 mb-8 inline-flex items-center gap-3">
-        <span className="inline-flex items-center gap-2">
-          <Image
-            src="/udisc-logo.webp"
-            alt="uDisc Logo"
-            width={28}
-            height={28}
-          />
-          <span className="text-orange-500">uDisc</span>
-        </span>
-        to
-        <span className="inline-flex items-center gap-2">
-          <Image src="/pdga-logo.svg" alt="PDGA Logo" width={28} height={28} />
-          <span className="text-blue-400">PDGA</span>
-        </span>
-        Rating Converter
+      {/* Page Title - Logos removed */}
+      <h1 className="text-3xl font-bold text-gray-200 mb-8">
+        <span className="text-orange-500">uDisc</span> to{' '}
+        <span className="text-blue-400">PDGA</span> Rating Converter
       </h1>
       {/* Converter Card */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl">
-        <div className="flex items-center justify-between space-x-6">
-          {/* Input Section */}
-          <div className="flex flex-col items-center text-center flex-1">
-            <input
-              ref={uDiscInputRef} // Attach ref for autofocus
-              type="number"
-              value={displayUDisc} // Bind to display state
-              onChange={handleUDiscInputChange} // Use debounced handler
-              className="text-4xl font-bold mb-2 bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              placeholder="---" // Add placeholder for empty state
-            />
-            {/* uDisc Label with Logo */}
-            <div className="text-sm text-orange-500 mt-1 flex items-center justify-center gap-1.5">
-              <Image src="/udisc-logo.webp" alt="" width={16} height={16} />
-              uDisc Rating
+        <div className="flex items-stretch justify-between space-x-6">
+          {/* Centering Wrapper for uDisc Section */}
+          <div className="flex-1 flex justify-center items-center">
+            {/* uDisc Section Group - changed to vertical layout */}
+            <div className="flex flex-col items-center gap-2">
+              {' '}
+              {/* Changed to flex-col */}
+              <Image
+                src="/udisc-logo.webp"
+                alt="uDisc Logo"
+                width={48}
+                height={48}
+              />
+              <div className="flex flex-col items-center">
+                <input
+                  ref={uDiscInputRef}
+                  type="number"
+                  value={displayUDisc}
+                  onChange={handleUDiscInputChange}
+                  className="text-4xl font-bold mb-1 bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder="---"
+                />
+                <div className="text-sm text-orange-500">uDisc Rating</div>
+              </div>
             </div>
           </div>
 
           {/* Arrow */}
-          <div className="flex flex-col items-center">
-            <div className="text-4xl text-gray-500 mb-1">↔</div>
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-4xl text-gray-500">↔</div>
           </div>
 
-          {/* Output Section - Now an Input */}
-          <div className="flex flex-col items-center text-center flex-1">
-            <input
-              type="number"
-              value={displayPdga} // Bind to display state
-              onChange={handlePdgaInputChange} // Use debounced handler
-              className="text-4xl font-bold mb-2 bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              placeholder="---" // Add placeholder for empty state
-            />
-            {/* PDGA Label with Logo */}
-            <div className="text-sm text-blue-400 mt-1 flex items-center justify-center gap-1.5">
-              <Image src="/pdga-logo.svg" alt="" width={16} height={16} />
-              PDGA Rating
+          {/* Centering Wrapper for PDGA Section */}
+          <div className="flex-1 flex justify-center items-center">
+            {/* PDGA Section Group - changed to vertical layout */}
+            <div className="flex flex-col items-center gap-2">
+              {' '}
+              {/* Changed to flex-col */}
+              <Image
+                src="/pdga-logo.svg"
+                alt="PDGA Logo"
+                width={48}
+                height={48}
+              />
+              <div className="flex flex-col items-center">
+                <input
+                  type="number"
+                  value={displayPdga}
+                  onChange={handlePdgaInputChange}
+                  className="text-4xl font-bold mb-1 bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder="---"
+                />
+                <div className="text-sm text-blue-400">PDGA Rating</div>
+              </div>
             </div>
           </div>
         </div>
