@@ -216,22 +216,12 @@ export default function Home() {
               <ul className="list-disc pl-5 space-y-1">
                 <li>
                   <a
-                    href="https://www.reddit.com/r/discgolf/comments/s4q8kf/udisc_rating_v_pdga_rating/"
+                    href="https://www.reddit.com/r/discgolf/comments/1acvna4/comment/kjyqmh0/"
                     className="text-blue-400 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Reddit Discussion
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.dgcoursereview.com/forums/showthread.php?t=134867"
-                    className="text-blue-400 hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    DG Course Review Forums
+                    Manually converted distribution
                   </a>
                 </li>
               </ul>
