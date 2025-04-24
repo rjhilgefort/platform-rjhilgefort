@@ -203,7 +203,7 @@ export default function Home() {
       </div>
 
       {/* Learn More Section - moved below banner */}
-      <div className="w-full max-w-2xl mb-8">
+      <div className="w-full max-w-2xl mb-8 relative">
         <button
           onClick={() => setShowReferences(!showReferences)}
           className="text-sm text-gray-400 hover:text-gray-300 flex items-center mx-auto mb-2 focus:outline-none"
@@ -229,7 +229,7 @@ export default function Home() {
         </button>
 
         {showReferences && (
-          <div className="bg-gray-800 p-4 rounded-lg text-sm animate-fadeIn">
+          <div className="bg-gray-800 p-4 rounded-lg text-sm absolute top-10 left-0 right-0 z-10 shadow-lg border border-gray-700">
             <p className="mb-2 text-gray-300">
               This calculation uses a simple formula: (uDisc Rating × 2) + 500 =
               PDGA Rating
