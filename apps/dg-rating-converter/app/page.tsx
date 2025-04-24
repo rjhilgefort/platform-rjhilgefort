@@ -122,23 +122,26 @@ export default function Home() {
         <div className="flex items-stretch justify-between space-x-6">
           {/* Centering Wrapper for uDisc Section */}
           <div className="flex-1 flex justify-center items-center">
-            {/* uDisc Section Group - changed to vertical layout */}
-            <div className="flex flex-col items-center gap-2">
-              {' '}
-              {/* Changed to flex-col */}
-              <Image
-                src="/udisc-logo.webp"
-                alt="uDisc Logo"
-                width={48}
-                height={48}
-              />
-              <div className="flex flex-col items-center">
+            {/* uDisc Section Group with tighter spacing */}
+            <div className="flex items-center justify-center w-full gap-0">
+              {/* Logo container - more compact */}
+              <div className="flex items-center justify-center w-16">
+                <Image
+                  src="/udisc-logo.webp"
+                  alt="uDisc Logo"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
+              </div>
+              {/* Input and label container with increased negative margin */}
+              <div className="flex flex-col items-center w-36 -ml-4">
                 <input
                   ref={uDiscInputRef}
                   type="number"
                   value={displayUDisc}
                   onChange={handleUDiscInputChange}
-                  className="text-4xl font-bold mb-1 bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="text-4xl font-bold bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="---"
                 />
                 <div className="text-sm text-orange-500">uDisc Rating</div>
@@ -153,22 +156,25 @@ export default function Home() {
 
           {/* Centering Wrapper for PDGA Section */}
           <div className="flex-1 flex justify-center items-center">
-            {/* PDGA Section Group - changed to vertical layout */}
-            <div className="flex flex-col items-center gap-2">
-              {' '}
-              {/* Changed to flex-col */}
-              <Image
-                src="/pdga-logo.svg"
-                alt="PDGA Logo"
-                width={48}
-                height={48}
-              />
-              <div className="flex flex-col items-center">
+            {/* PDGA Section Group with tighter spacing */}
+            <div className="flex items-center justify-center w-full gap-0">
+              {/* Logo container - more compact */}
+              <div className="flex items-center justify-center w-16">
+                <Image
+                  src="/pdga-logo.svg"
+                  alt="PDGA Logo"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
+              </div>
+              {/* Input and label container with increased negative margin */}
+              <div className="flex flex-col items-center w-36 -ml-4">
                 <input
                   type="number"
                   value={displayPdga}
                   onChange={handlePdgaInputChange}
-                  className="text-4xl font-bold mb-1 bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="text-4xl font-bold bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="---"
                 />
                 <div className="text-sm text-blue-400">PDGA Rating</div>
