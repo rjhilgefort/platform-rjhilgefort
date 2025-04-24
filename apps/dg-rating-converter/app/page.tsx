@@ -1,18 +1,14 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image' // Import Image component
-// Assuming Card is not needed anymore based on the new design
-// import { Card } from '@repo/ui/card'
+import Image from 'next/image'
 
-// Constants for limits
 const MIN_UDISC = 0
 const MAX_UDISC = 300
-const MIN_PDGA = MIN_UDISC * 2 + 500 // 500
-const MAX_PDGA = MAX_UDISC * 2 + 500 // 1100
+const MIN_PDGA = 500
+const MAX_PDGA = 1100
 const DEBOUNCE_DELAY = 300 // ms
 
-// Helper to clamp numbers
 const clamp = (num: number, min: number, max: number): number =>
   Math.max(min, Math.min(max, num))
 
@@ -20,43 +16,35 @@ export default function Home() {
   const initialUDisc = '175'
   const initialPdga = String(
     clamp(parseFloat(initialUDisc), MIN_UDISC, MAX_UDISC) * 2 + 500,
-  ) // Calculate initial PDGA
+  )
 
-  // State for the displayed values in inputs
   const [displayUDisc, setDisplayUDisc] = useState(initialUDisc)
   const [displayPdga, setDisplayPdga] = useState(initialPdga)
-  const [warningMessage, setWarningMessage] = useState('') // State for warning message
-  const [showReferences, setShowReferences] = useState(false) // State to toggle reference visibility
+  const [warningMessage, setWarningMessage] = useState('')
+  const [showReferences, setShowReferences] = useState(false)
 
-  // Refs for debounce timers
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  // Ref for autofocus
   const uDiscInputRef = useRef<HTMLInputElement | null>(null)
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
-    // Autofocus the uDisc input on initial mount
     uDiscInputRef.current?.focus()
 
-    // Cleanup function for timeouts
     return () => {
       if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
       if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
     }
-  }, []) // Empty dependency array ensures this runs only once on mount
+  }, [])
 
-  // Handler for uDisc input changes with debounce
   const handleUDiscInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valueStr = e.target.value
-    setDisplayUDisc(valueStr) // Update display immediately
+    setDisplayUDisc(valueStr)
 
-    // Clear existing timers
     if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
     if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
 
     uDiscTimeoutRef.current = setTimeout(() => {
-      let currentWarning = '' // Warning for this update
+      let currentWarning = ''
       if (valueStr === '') {
         setDisplayPdga('')
       } else {
@@ -83,7 +71,6 @@ export default function Home() {
     const valueStr = e.target.value
     setDisplayPdga(valueStr) // Update display immediately
 
-    // Clear existing timers
     if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
     if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
 
@@ -102,30 +89,24 @@ export default function Home() {
           const calculatedUDisc = (clampedPdga - 500) / 2
           setDisplayUDisc(String(calculatedUDisc))
         } else {
-          // Handle invalid number input
           setDisplayUDisc('')
         }
       }
-      setWarningMessage(currentWarning) // Update the warning state
+      setWarningMessage(currentWarning)
     }, DEBOUNCE_DELAY)
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      {/* Page Title */}
       <h1 className="text-[2.5rem] font-bold mb-8 max-w-2xl text-center leading-tight">
         <span className="text-orange-500">uDisc</span> to{' '}
         <span className="text-blue-400">PDGA</span> Rating Converter
       </h1>
 
-      {/* Converter Card */}
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl mb-8">
         <div className="flex items-stretch justify-between space-x-6">
-          {/* Centering Wrapper for uDisc Section */}
           <div className="flex-1 flex justify-center items-center">
-            {/* uDisc Section Group with tighter spacing */}
             <div className="flex items-center justify-center w-full gap-0">
-              {/* Logo container - more compact */}
               <div className="flex items-center justify-center w-16">
                 <Image
                   src="/udisc-logo.webp"
@@ -135,7 +116,6 @@ export default function Home() {
                   className="object-contain"
                 />
               </div>
-              {/* Input and label container with increased negative margin */}
               <div className="flex flex-col items-center w-36 -ml-4">
                 <input
                   ref={uDiscInputRef}
@@ -150,16 +130,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Arrow */}
           <div className="flex flex-col items-center justify-center">
             <div className="text-4xl text-gray-500">↔</div>
           </div>
 
-          {/* Centering Wrapper for PDGA Section */}
           <div className="flex-1 flex justify-center items-center">
-            {/* PDGA Section Group with tighter spacing */}
             <div className="flex items-center justify-center w-full gap-0">
-              {/* Logo container - more compact */}
               <div className="flex items-center justify-center w-16">
                 <Image
                   src="/pdga-logo.svg"
@@ -169,7 +145,6 @@ export default function Home() {
                   className="object-contain"
                 />
               </div>
-              {/* Input and label container with increased negative margin */}
               <div className="flex flex-col items-center w-36 -ml-4">
                 <input
                   type="number"
@@ -183,7 +158,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {/* Warning Message Area */}
         <div className="mt-4 text-center text-warning text-xs h-4">
           {warningMessage}
         </div>
@@ -260,7 +234,6 @@ export default function Home() {
                     DG Course Review Forums
                   </a>
                 </li>
-                {/* Add more reference links as needed */}
               </ul>
             </div>
           </div>
