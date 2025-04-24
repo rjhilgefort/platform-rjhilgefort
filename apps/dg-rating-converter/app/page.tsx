@@ -211,19 +211,51 @@ export default function Home() {
               This is an approximation based on community observations. Results
               may vary.
             </p>
+
+            {/* Notes Section - moved above reference links */}
+            <div className="mb-4 text-xs text-gray-400">
+              <p className="mb-1">Notes:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>
+                  Conversion is approximate and may vary based on course
+                  difficulty
+                </li>
+                <li>
+                  PDGA ratings take into account more statistical factors than
+                  just raw scores
+                </li>
+                <li>
+                  Different course layouts may produce different conversion
+                  factors
+                </li>
+              </ul>
+            </div>
+
+            {/* Reference Links Section */}
             <div className="text-xs text-gray-400">
               <p className="mb-1">Reference Links:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>
                   <a
-                    href="https://www.reddit.com/r/discgolf/comments/1acvna4/comment/kjyqmh0/"
+                    href="https://www.reddit.com/r/discgolf/comments/s4q8kf/udisc_rating_v_pdga_rating/"
                     className="text-blue-400 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Manually converted distribution
+                    Reddit Discussion
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="https://www.dgcoursereview.com/forums/showthread.php?t=134867"
+                    className="text-blue-400 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    DG Course Review Forums
+                  </a>
+                </li>
+                {/* Add more reference links as needed */}
               </ul>
             </div>
           </div>
