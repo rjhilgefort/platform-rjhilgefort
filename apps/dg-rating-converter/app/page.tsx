@@ -112,13 +112,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      {/* Page Title - Logos removed */}
-      <h1 className="text-3xl font-bold text-gray-200 mb-8">
+      {/* Page Title */}
+      <h1 className="text-[2.5rem] font-bold mb-8 max-w-2xl text-center leading-tight">
         <span className="text-orange-500">uDisc</span> to{' '}
         <span className="text-blue-400">PDGA</span> Rating Converter
       </h1>
+
       {/* Converter Card */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl mb-8">
         <div className="flex items-stretch justify-between space-x-6">
           {/* Centering Wrapper for uDisc Section */}
           <div className="flex-1 flex justify-center items-center">
@@ -183,9 +184,21 @@ export default function Home() {
           </div>
         </div>
         {/* Warning Message Area */}
-        <div className="mt-4 text-center text-yellow-500 text-xs h-4">
+        <div className="mt-4 text-center text-warning text-xs h-4">
           {warningMessage}
         </div>
+      </div>
+
+      {/* Banner image - moved below calculator */}
+      <div className="w-full max-w-2xl mb-8 overflow-hidden rounded-lg shadow-md">
+        <Image
+          src="/dg-putting-banner.webp"
+          alt="Disc Golf Putting Banner"
+          width={1200}
+          height={300}
+          className="w-full object-cover"
+          priority
+        />
       </div>
     </div>
   )
