@@ -1,6 +1,5 @@
 'use client'
 
-import { Metadata } from 'next'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image' // Import Image component
 // Assuming Card is not needed anymore based on the new design
