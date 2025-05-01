@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  // const youtubeVideoId = 'CuVthbu_ehI'
+  const youtubeVideoId = 'cyybOFx4lkY'
 
   return (
     <div className="bg-base-100">
@@ -278,7 +278,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* <div className="mb-12">
+        <div className="mb-12">
           <h2 className="text-3xl font-bold mb-6 text-center">
             See the Vision
           </h2>
@@ -292,7 +292,7 @@ export default function Home() {
               style={{ aspectRatio: '16 / 9' }}
             ></iframe>
           </div>
-        </div> */}
+        </div>
 
         {/* <div className="mb-12">
           <h2 className="text-3xl font-bold mb-6 text-center">Concept Ideas</h2>
