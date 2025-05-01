@@ -163,7 +163,13 @@ Evergreen, for everyone.`,
             04/26/2025 Forum
           </h1>
           <p className="text-center text-gray-600">
-            Important community information and updates
+            Unfortunately when the Mountain Area Democrats organization
+            announced this nonpartisan forum to the candidates in March, I had
+            already committed to a big Mother-Daughter trip to Disney World over
+            this same weekend. Luckily Jess Hastings acted as an amazing
+            stand-in, reading an introduction and closing for me, and even
+            applying some other forum answers and notes from me, to answer live
+            questions. THANK YOU JESS!
           </p>
         </header>
 
