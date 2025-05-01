@@ -162,15 +162,19 @@ Evergreen, for everyone.`,
           <h1 className="text-3xl font-bold text-center mb-2">
             04/26/2025 Forum
           </h1>
-          <p className="text-center text-gray-600">
-            Unfortunately when the Mountain Area Democrats organization
-            announced this nonpartisan forum to the candidates in March, I had
-            already committed to a big Mother-Daughter trip to Disney World over
-            this same weekend. Luckily Jess Hastings acted as an amazing
-            stand-in, reading an introduction and closing for me, and even
-            applying some other forum answers and notes from me, to answer live
-            questions. THANK YOU JESS!
-          </p>
+          <div className="max-w-3xl mx-auto">
+            <p className="text-center text-gray-600">
+              Unfortunately when the Mountain Area Democrats organization
+              announced this nonpartisan forum to the candidates in March, I had
+              already committed to a big Mother-Daughter trip to Disney World
+              over this same weekend. Luckily Jess Hastings acted as an amazing
+              stand-in, reading an introduction and closing for me, and even
+              applying some other forum answers and notes from me, to answer
+              live questions.
+              <br />
+              <span className="font-bold">THANK YOU JESS!</span>
+            </p>
+          </div>
         </header>
 
         <div className="mb-6">
