@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Footer from '../../components/Footer'
 
 interface Section {
   title: string
@@ -104,7 +105,7 @@ so that we can shape an even better Evergreen, for everyone.`,
     },
     {
       title: 'Closing Statement',
-      content: `Ally Hilgefort is invested in EPRD, whether or not she’s on the board. She
+      content: `Ally Hilgefort is invested in EPRD, whether or not she's on the board. She
 feels someone with her dedicated involvement can best serve the
 community from the board itself, though. She wants to see Evergreen
 continue to thrive, and EPRD can help achieve that goal.
@@ -112,12 +113,12 @@ The more EPRD can do for our community, to enhance our community, the
 better it is for evergreen as a whole. The more people are out together, the
 more likely they are to go visit our local businesses and be involved in other
 ways, making Evergreen an even more likely place for families to grow, and
-for their kids to want to do the same, when they’re grown.
+for their kids to want to do the same, when they're grown.
 Ally is so appreciative of those who have worked for decades to shape the
 Evergreen we have today. She has loved talking with who she feels are
 some superheros of Evergreen- Commited community members who, over
 the years, saved Noble Meadow, built us our Lake House, developed
-Buchanan Rec Center, and contributed in countless ways we’re all so
+Buchanan Rec Center, and contributed in countless ways we're all so
 grateful for.
 Ally aspires to continue those efforts and is already collaborating with some
 of those town heroes. She would love the opportunity to work from the
@@ -155,43 +156,41 @@ Evergreen, for everyone.`,
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Forum Updates</h1>
-        <p className="text-center text-gray-600">
-          Important community information and updates
-        </p>
-      </header>
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-grow max-w-4xl mx-auto px-4 py-8 w-full">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-center mb-2">Forum Updates</h1>
+          <p className="text-center text-gray-600">
+            Important community information and updates
+          </p>
+        </header>
 
-      <div className="mb-6">
-        <div className="flex border-b">
-          {sections.map((section, index) => (
-            <button
-              key={index}
-              className={`px-4 py-2 font-medium ${
-                activeTab === index
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-              onClick={() => setActiveTab(index)}
-            >
-              {section.title}
-            </button>
-          ))}
+        <div className="mb-6">
+          <div className="flex border-b">
+            {sections.map((section, index) => (
+              <button
+                key={index}
+                className={`px-4 py-2 font-medium ${
+                  activeTab === index
+                    ? 'border-b-2 border-blue-500 text-blue-600'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                onClick={() => setActiveTab(index)}
+              >
+                {section.title}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">
-          {sections[activeTab]?.title}
-        </h2>
-        <div className="prose max-w-none">
-          {formatContent(sections[activeTab]?.content || '')}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-2xl font-bold mb-4">
+            {sections[activeTab]?.title}
+          </h2>
+          <div className="prose max-w-none">
+            {formatContent(sections[activeTab]?.content || '')}
+          </div>
         </div>
-      </div>
-
-      <div className="mt-8 text-center">
-        <p className="text-sm text-gray-500">Last updated: April 26, 2023</p>
       </div>
     </div>
   )
