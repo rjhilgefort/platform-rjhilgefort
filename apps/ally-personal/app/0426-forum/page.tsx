@@ -159,7 +159,9 @@ Evergreen, for everyone.`,
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow max-w-4xl mx-auto px-4 py-8 w-full">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-center mb-2">Forum Updates</h1>
+          <h1 className="text-3xl font-bold text-center mb-2">
+            04/26/2025 Forum
+          </h1>
           <p className="text-center text-gray-600">
             Important community information and updates
           </p>
