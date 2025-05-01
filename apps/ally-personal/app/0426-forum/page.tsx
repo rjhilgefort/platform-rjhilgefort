@@ -12,7 +12,7 @@ const ForumPage = () => {
 
   const sections: Section[] = [
     {
-      title: 'EPRD Board Candidacy Statement',
+      title: 'Introductory Statement',
       content: `As a committed member of our community, and as someone eager to share
 her passion for EPRD, and explain why she believes she can better provide
 perspective to the Board, Ally Hilgefort is so sorry she cannot be here with
@@ -103,32 +103,26 @@ the board in all of the decision making that they have in the years ahead,
 so that we can shape an even better Evergreen, for everyone.`,
     },
     {
-      title: 'Additional Information',
-      content: `As a committed member of our community, and as someone eager to share
-her passion for EPRD, and explain why she believes she can better provide
-perspective to the Board, Ally Hilgefort is so sorry she cannot be here with
-you all this morning.
-As a mom of a preschooler and second-grader, she unfortunately could not
-cancel a long-awaited Mother-Daughter trip with her seven-year-old to the
-'most magical place on Earth' - Although, to be honest, she would actually
-argue that the most magical place is here in Evergreen.
-While originally from the Cincinnati area, Ally and her husband always
-dreamed of planting their own roots somewhere they could raise kids with
-tons of outdoor natural activities, but with enough community to feel that
-sense of belonging and contribution.
-They moved into their home here four years ago, but Ally began dialing
-herself in with EPRD nearly two years prior- that's how important
-community-building groups are to her. She has long emailed feedback on
-events and classes, taken their surveys, and generally rooted for their
-success. Because their successes translate to our collective community's
-benefit.
-While the rec centers and spaces for activity and growth in a variety of
-areas are incredibly valuable to have accessible here- the most important
-thing EPRD does, is actually helping to build our community itself- bringing
-people together for campouts on the fields, giving kids an after-school play
-space together... Offering us communal environments to be together, here,
-within our beautiful natural environment- letting us interact and grow
-friendships, and partnerships.`,
+      title: 'Closing Statement',
+      content: `Ally Hilgefort is invested in EPRD, whether or not she’s on the board. She
+feels someone with her dedicated involvement can best serve the
+community from the board itself, though. She wants to see Evergreen
+continue to thrive, and EPRD can help achieve that goal.
+The more EPRD can do for our community, to enhance our community, the
+better it is for evergreen as a whole. The more people are out together, the
+more likely they are to go visit our local businesses and be involved in other
+ways, making Evergreen an even more likely place for families to grow, and
+for their kids to want to do the same, when they’re grown.
+Ally is so appreciative of those who have worked for decades to shape the
+Evergreen we have today. She has loved talking with who she feels are
+some superheros of Evergreen- Commited community members who, over
+the years, saved Noble Meadow, built us our Lake House, developed
+Buchanan Rec Center, and contributed in countless ways we’re all so
+grateful for.
+Ally aspires to continue those efforts and is already collaborating with some
+of those town heroes. She would love the opportunity to work from the
+Board of EPRD, learning even more and helping to shape an even better
+Evergreen, for everyone.`,
     },
   ]
 
