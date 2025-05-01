@@ -1,5 +1,11 @@
 # @repo/ally-personal
 
+## 1.2.6
+
+### Patch Changes
+
+- 570843e: Added new forum page, added latest change to footer
+
 ## 1.2.5
 
 ### Patch Changes
