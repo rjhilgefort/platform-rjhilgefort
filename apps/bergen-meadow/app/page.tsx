@@ -8,7 +8,8 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  const youtubeVideoId = 'cyybOFx4lkY'
+  // const youtubeVideoId = 'cyybOFx4lkY' // first, rough video
+  const youtubeVideoId = '5TqQko71DF0' // second, more polished
 
   return (
     <div className="bg-base-100">
