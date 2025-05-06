@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import Footer from '../../components/Footer'
 
 interface Section {
   title: string
