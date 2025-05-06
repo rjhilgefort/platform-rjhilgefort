@@ -52,8 +52,8 @@ const BergenMeadowUpdatePage = () => {
           <Image
             src="/images/ELF_Newsletter_1.png"
             alt="Evergreen Legacy Foundation Newsletter"
-            width={1200}
-            height={800}
+            width={649}
+            height={602}
             className="w-full object-contain"
           />
         </div>
@@ -61,10 +61,10 @@ const BergenMeadowUpdatePage = () => {
         {/* Second image */}
         <div className="w-full rounded-lg overflow-hidden shadow-lg">
           <Image
-            src="/images/ELF_Newsletter_2.png"
+            src="/images/Elf_Newsletter_2.png"
             alt="Ally Hilgefort"
-            width={1200}
-            height={800}
+            width={598}
+            height={872}
             className="w-full object-contain"
           />
         </div>
