@@ -48,20 +48,36 @@ const BergenMeadowUpdatePage = () => {
       {/* Full width images */}
       <div className="space-y-8 mb-12">
         {/* First image */}
-        <div className="w-full bg-gray-200 h-[400px] rounded-lg flex items-center justify-center">
-          <p className="text-gray-500">[Your Full Width Image 1]</p>
+        <div className="w-full rounded-lg overflow-hidden shadow-lg">
+          <Image
+            src="/images/ELF_Newsletter_1.png"
+            alt="Evergreen Legacy Foundation Newsletter"
+            width={1200}
+            height={800}
+            className="w-full object-contain"
+          />
         </div>
 
         {/* Second image */}
-        <div className="w-full bg-gray-200 h-[400px] rounded-lg flex items-center justify-center">
-          <p className="text-gray-500">[Your Full Width Image 2]</p>
+        <div className="w-full rounded-lg overflow-hidden shadow-lg">
+          <Image
+            src="/images/ELF_Newsletter_2.png"
+            alt="Ally Hilgefort"
+            width={1200}
+            height={800}
+            className="w-full object-contain"
+          />
         </div>
       </div>
 
       {/* Full width text line */}
       <div className="text-center mb-8">
         <p className="text-lg">
-          This is a small line of text that spans the full width of the page.
+          To find out more about ELF and to subscribe to their newsletter, visit
+          their website:{' '}
+          <a href="https://www.evergreenlegacyfund.org">
+            https://www.evergreenlegacyfund.org
+          </a>
         </p>
       </div>
     </div>
