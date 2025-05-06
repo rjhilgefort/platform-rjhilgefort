@@ -1,5 +1,13 @@
 # @repo/ally-personal
 
+## 1.2.7
+
+### Patch Changes
+
+- 1d2fdb1: ally personal bergen meadow update tab
+- 951a3df: fix ally bm image sizes and name
+- db436dd: Added bergen meadow update tab
+
 ## 1.2.6
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@repo/ally-personal",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3002 --turbopack",
