@@ -11,10 +11,9 @@ export default function Home() {
   // const youtubeVideoId = 'cyybOFx4lkY' // first, rough video
   const youtubeVideoId = '5TqQko71DF0' // second, more polished
 
-  // TODO: Credit Travis Hawkes Hatch as photographer of hero image
   return (
     <div className="bg-base-100">
-      <div className="hero min-h-[50vh] bg-[url('/BergenElementaryCampus.jpg')] bg-cover bg-center">
+      <div className="hero relative min-h-[50vh] bg-[url('/BergenElementaryCampus.jpg')] bg-cover bg-center">
         <div className="hero-content text-center text-neutral-content">
           <div className="max-w-lg">
             <h1 className="mb-5 text-6xl font-bold [text-shadow:-3px_-3px_0_#000,3px_-3px_0_#000,-3px_3px_0_#000,3px_3px_0_#000,0px_-3px_0_#000,0px_3px_0_#000,-3px_0px_0_#000,3px_0px_0_#000]">
@@ -22,6 +21,9 @@ export default function Home() {
             </h1>
           </div>
         </div>
+        <p className="absolute bottom-2 right-2 rounded bg-black/50 p-1 text-xs text-white/75">
+          Photo by Travis Hawkes Hatch
+        </p>
       </div>
 
       <div className="container mx-auto px-4 py-12">
