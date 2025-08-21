@@ -56,6 +56,22 @@ export default function Home() {
           </div>
         </div>
 
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6 text-center">
+            See the Vision
+          </h2>
+          <div className="rounded-box overflow-hidden shadow-lg bg-black">
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeVideoId}?rel=0`}
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full block"
+              style={{ aspectRatio: '16 / 9' }}
+            ></iframe>
+          </div>
+        </div>
+
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
             <h2 className="card-title text-3xl">
@@ -279,22 +295,6 @@ export default function Home() {
                 </a>
               </p>
             </div>
-          </div>
-        </div>
-
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">
-            See the Vision
-          </h2>
-          <div className="rounded-box overflow-hidden shadow-lg bg-black">
-            <iframe
-              src={`https://www.youtube.com/embed/${youtubeVideoId}?rel=0`}
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full block"
-              style={{ aspectRatio: '16 / 9' }}
-            ></iframe>
           </div>
         </div>
 

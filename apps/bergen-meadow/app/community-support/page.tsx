@@ -1,10 +1,14 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import { FaRegFilePdf, FaExternalLinkAlt, FaDownload } from 'react-icons/fa'
 
 const CommunitySupportPage = () => {
+  const [selected, setSelected] = useState<{
+    name: string
+    pdfSrc: string
+  } | null>(null)
   const letters = [
     {
       name: 'Evergreen Legacy Foundation',
@@ -50,38 +54,79 @@ const CommunitySupportPage = () => {
                 {org.name}
               </h2>
 
-              <div className="card-actions justify-center mt-2 gap-2">
+              <div className="card-actions mt-2 flex flex-col gap-2">
                 <a
                   href={org.pdfSrc}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-primary btn-sm btn-block"
                 >
                   <FaRegFilePdf className="mr-2" /> View letter{' '}
                   <FaExternalLinkAlt className="ml-2 opacity-80" />
                 </a>
-                <a href={org.pdfSrc} download className="btn btn-ghost btn-sm">
+                <a
+                  href={org.pdfSrc}
+                  download
+                  className="btn btn-secondary btn-sm btn-block"
+                >
                   <FaDownload className="mr-2" /> Download PDF
                 </a>
+                <button
+                  className="btn btn-accent btn-sm btn-block"
+                  onClick={() =>
+                    setSelected({ name: org.name, pdfSrc: org.pdfSrc })
+                  }
+                >
+                  Preview
+                </button>
               </div>
-
-              <details className="mt-4">
-                <summary className="cursor-pointer text-sm text-base-content/70">
-                  Quick preview
-                </summary>
-                <div className="mt-3 rounded-box overflow-hidden bg-base-300">
-                  <iframe
-                    src={`${org.pdfSrc}#toolbar=0&view=FitH`}
-                    title={`${org.name} letter preview`}
-                    className="w-full block"
-                    style={{ height: 420 }}
-                  />
-                </div>
-              </details>
             </div>
           </div>
         ))}
       </div>
+
+      {selected && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-5xl w-11/12">
+            <h3 className="font-bold text-lg">{selected.name} — Preview</h3>
+            <div className="mt-4 rounded-box overflow-hidden bg-base-300">
+              <iframe
+                src={`${selected.pdfSrc}#toolbar=0&view=FitH`}
+                title={`${selected.name} letter preview`}
+                className="w-full block"
+                style={{ height: '70vh' }}
+              />
+            </div>
+            <div className="modal-action w-full">
+              <div className="flex flex-col gap-2 w-full">
+                <a
+                  href={selected.pdfSrc}
+                  download
+                  className="btn btn-ghost btn-sm btn-block"
+                >
+                  <FaDownload className="mr-2" /> Download
+                </a>
+                <a
+                  href={selected.pdfSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary btn-sm btn-block"
+                >
+                  <FaRegFilePdf className="mr-2" /> Open in new tab{' '}
+                  <FaExternalLinkAlt className="ml-2 opacity-80" />
+                </a>
+                <button
+                  className="btn btn-sm btn-block"
+                  onClick={() => setSelected(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => setSelected(null)} />
+        </div>
+      )}
     </div>
   )
 }
