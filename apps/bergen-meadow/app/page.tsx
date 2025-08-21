@@ -345,15 +345,6 @@ export default function Home() {
           </div>
         </div> */}
       </div>
-
-      <footer className="footer footer-center p-6 bg-base-300 text-base-content">
-        <aside>
-          <p>
-            Copyright © {new Date().getFullYear()} - The Trails Collective -
-            Friends & Neighbors in Support of Bergen Meadow's Best Plan.
-          </p>
-        </aside>
-      </footer>
     </div>
   )
 }
