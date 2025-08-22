@@ -75,7 +75,7 @@ export default function Home() {
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
             <h2 className="card-title text-3xl">
-              What's Happening with Bergen Meadow?
+              What&apos;s Happening with Bergen Meadow?
             </h2>
             <div className="prose max-w-none">
               <p>
