@@ -4,7 +4,7 @@ import React from 'react'
 const Bio = () => {
   return (
     <section className="container mx-auto px-4 py-12 max-w-4xl">
-      <h2 className="text-3xl font-bold mb-8 text-center">About Ally</h2>
+      {/* <h2 className="text-3xl font-bold mb-8 text-center">About Ally</h2> */}
 
       <div
         className="w-2/5 float-left mr-6 mb-6 max-sm:w-1/2 tooltip tooltip-bottom"

@@ -21,14 +21,13 @@ const BergenMeadowUpdatePage = () => {
           </div>
         </div>
 
-        {/* Right column - Text */}
         <div className="md:w-1/2">
-          <h1 className="text-3xl font-bold mb-4">Bergen Meadow Update</h1>
+          <h1 className="text-3xl font-bold mb-4">Trails Collective</h1>
           <p className="mb-4">
-            Ally and fellow neighbors are excited about this potential plan that
-            the Evergreen Legacy Foundation (ELF) and several other
-            organizations have collaborated on. Below you can see the update
-            from ELF in their most recent newsletter.
+            05/03/2025: Ally and fellow neighbors are excited about this
+            potential plan that the Evergreen Legacy Foundation (ELF) and
+            several other organizations have collaborated on. Below you can see
+            the update from ELF in their most recent newsletter.
           </p>
           <p className="mb-4">
             Ally and her husband put together this website to keep the community
