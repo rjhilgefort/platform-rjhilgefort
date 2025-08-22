@@ -1,5 +1,11 @@
 # @repo/bergen-meadow
 
+## 0.1.1
+
+### Patch Changes
+
+- 7a4fc16: ally personal tweaks post board member
+
 ## 0.1.0
 
 ### Minor Changes
