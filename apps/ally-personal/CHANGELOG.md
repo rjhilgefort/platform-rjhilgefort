@@ -1,5 +1,11 @@
 # @repo/ally-personal
 
+## 1.2.8
+
+### Patch Changes
+
+- 7a4fc16: ally personal tweaks post board member
+
 ## 1.2.7
 
 ### Patch Changes
