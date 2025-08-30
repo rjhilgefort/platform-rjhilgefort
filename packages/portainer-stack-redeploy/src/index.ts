@@ -14,6 +14,7 @@ import { Effect_logString } from './Effect_logString'
 import { String_UrlHost } from './String_UrlHost'
 import { Stacks } from './Stack'
 import { StackFileResponse } from './StackFileResponse'
+import { test } from './test'
 
 /**
  * @url https://github.com/wirgen/portainer-stack-redeploy-action/tree/v1.1
@@ -40,6 +41,7 @@ export const portainerStackRedeploy = async (params: {
   })
 
   console.log('🔄 Getting Stack...')
+  test()
   const stack = await pipe(
     apiClient.get('stacks'),
     Effect.mapError(Effect.logError),
