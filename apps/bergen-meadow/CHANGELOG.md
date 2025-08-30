@@ -1,5 +1,11 @@
 # @repo/bergen-meadow
 
+## 0.1.2
+
+### Patch Changes
+
+- b5227d1: tweak bm email button in mobile
+
 ## 0.1.1
 
 ### Patch Changes
