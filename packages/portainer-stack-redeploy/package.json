@@ -1,7 +1,7 @@
 {
   "name": "@repo/portainer-stack-redeploy",
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.1.0",
+  "type": "commonjs",
   "files": [
     "dist"
   ],
