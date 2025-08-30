@@ -4,7 +4,6 @@ import React from 'react'
 import { Array } from 'effect'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { FaBars, FaEnvelope } from 'react-icons/fa6'
 
 type NavigationItem = {
@@ -60,8 +59,13 @@ const Header = () => {
           ))}
         </div>
         <div className="navbar-end">
-          <a href="mailto:ally.hilgefort@gmail.com" className="btn btn-primary">
-            <FaEnvelope /> Reach Out!
+          <a
+            href="mailto:ally.hilgefort@gmail.com"
+            className="btn btn-primary gap-2"
+            aria-label="Reach out via email"
+          >
+            <FaEnvelope />
+            <span className="hidden md:inline">Reach Out!</span>
           </a>
         </div>
       </nav>
