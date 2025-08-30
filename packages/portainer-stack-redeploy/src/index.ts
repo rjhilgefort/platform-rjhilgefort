@@ -41,12 +41,16 @@ export const portainerStackRedeploy = async (params: {
 
   const stack = await pipe(
     apiClient.get('stacks'),
+    Effect.mapError(Effect.logError),
     Effect.flatMap(Schema.decodeUnknown(Stacks)),
     Effect.flatMap(
       Array.findFirst(flow(Struct.get('Name'), equals(params.stackName))),
     ),
     Effect.runPromise,
-  )
+  ).catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
 
   console.log('🔄 Deploying Stack...')
 
