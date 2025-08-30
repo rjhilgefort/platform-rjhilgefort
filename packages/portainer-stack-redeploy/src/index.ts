@@ -39,6 +39,7 @@ export const portainerStackRedeploy = async (params: {
     accessToken: params.accessToken,
   })
 
+  console.log('🔄 Getting Stack...')
   const stack = await pipe(
     apiClient.get('stacks'),
     Effect.mapError(Effect.logError),
