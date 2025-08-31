@@ -36,14 +36,14 @@ export const portainerStackRedeploy = async (params: {
   )
 
   const apiClient = makeApiClient({
-    host: `${host}/api/`,
+    host: `${host}/api`,
     accessToken: params.accessToken,
   })
 
   console.log('🔄 Getting Stack...')
   test()
   const stack = await pipe(
-    apiClient.get('stacks'),
+    apiClient.get('/stacks'),
     Effect.mapError(Effect.logError),
     Effect.flatMap(Schema.decodeUnknown(Stacks)),
     Effect.flatMap(
@@ -58,12 +58,12 @@ export const portainerStackRedeploy = async (params: {
   console.log('🔄 Deploying Stack...')
 
   await pipe(
-    apiClient.get(`stacks/${stack.Id}/file`),
+    apiClient.get(`/stacks/${stack.Id}/file`),
     Effect.flatMap(Schema.decodeUnknown(StackFileResponse)),
     Effect.map(Struct.get('StackFileContent')),
     Effect.tap(Effect_logString('💾 Updating Stack...')),
     Effect.flatMap((stackFile) =>
-      apiClient.put(`stacks/${stack.Id}?endpointId=${stack.EndpointId}`, {
+      apiClient.put(`/stacks/${stack.Id}?endpointId=${stack.EndpointId}`, {
         stackFileContent: stackFile,
         pullImage: true,
       }),
@@ -71,12 +71,14 @@ export const portainerStackRedeploy = async (params: {
     Effect.tap(Effect_logString('💾 Stack updated')),
     Effect.tap(Effect_logString('✋ Stopping Stack...')),
     Effect.flatMap(() =>
-      apiClient.post(`stacks/${stack.Id}/stop?endpointId=${stack.EndpointId}`),
+      apiClient.post(`/stacks/${stack.Id}/stop?endpointId=${stack.EndpointId}`),
     ),
     Effect.tap(Effect_logString('✋ Stack stopped')),
     Effect.tap(Effect_logString('🚀 Starting Stack...')),
     Effect.flatMap(() =>
-      apiClient.post(`stacks/${stack.Id}/start?endpointId=${stack.EndpointId}`),
+      apiClient.post(
+        `/stacks/${stack.Id}/start?endpointId=${stack.EndpointId}`,
+      ),
     ),
     Effect.tap(Effect_logString('🚀 Stack deployed')),
     Effect.runPromise,
