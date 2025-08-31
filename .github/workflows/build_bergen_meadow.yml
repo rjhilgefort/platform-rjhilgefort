@@ -2,9 +2,8 @@ name: Bergen Meadow - Build and Deploy
 
 env:
   APP_NAME: bergen-meadow
-  APP_NAME_PRETTY: Bergen Meadow
   STACK_NAME: bergen-meadow-site
-  SITE_URL: https://bergenmeadow.hilgefort.com
+  NOTIFICATION_PREFIX: '${{ github.repository }} [deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for [Bergen Meadow Update](https://bergenmeadowupdate.com/)'
 
 on:
   push:
@@ -21,10 +20,9 @@ jobs:
         with:
           MATTERMOST_WEBHOOK_URL: ${{ vars.MATTERMOST_WEBHOOK_URL }}
           MATTERMOST_CHANNEL: ${{ vars.MATTERMOST_CHANNEL }}
-          TEXT: |
-            🔄 ${{ github.repository }} [${{ env.APP_NAME_PRETTY }}](${{ env.SITE_URL }}) [deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) was started...
-          MATTERMOST_USERNAME: ${{ github.triggering_actor }}
-          MATTERMOST_ICON_URL: ${{ vars.MATTERMOST_ICON_URL }}
+          # MATTERMOST_USERNAME: ${{ github.triggering_actor }}
+          # MATTERMOST_ICON_URL: ${{ vars.MATTERMOST_ICON_URL }}
+          TEXT: '🔄 ${{ env.NOTIFICATION_PREFIX }} was started...'
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,7 +63,6 @@ jobs:
         with:
           MATTERMOST_WEBHOOK_URL: ${{ vars.MATTERMOST_WEBHOOK_URL }}
           MATTERMOST_CHANNEL: ${{ vars.MATTERMOST_CHANNEL }}
-          TEXT: |
-            ✅ ${{ github.repository }} [${{ env.APP_NAME_PRETTY }}](${{ env.SITE_URL }}) [deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) was completed!
-          MATTERMOST_USERNAME: ${{ github.triggering_actor }}
-          MATTERMOST_ICON_URL: ${{ vars.MATTERMOST_ICON_URL }}
+          # MATTERMOST_USERNAME: ${{ github.triggering_actor }}
+          # MATTERMOST_ICON_URL: ${{ vars.MATTERMOST_ICON_URL }}
+          TEXT: '✅ ${{ env.NOTIFICATION_PREFIX }} was completed!'
