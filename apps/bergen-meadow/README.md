@@ -21,7 +21,7 @@ npm run build
 npm run start
 ```
 
-3. Docker
+3. Docker Build
 
 ```
 docker build -t rjhilgefort/bergen-meadow:latest .
