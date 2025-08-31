@@ -8,11 +8,19 @@ export const makeApiClient = ({
   host: string
   accessToken: string
 }) => ({
-  get: (uri: string) =>
-    EffectFetch.fetchJson(`${host}/api/${uri}`, {
+  get: (uri: string) => {
+    console.log(`${host}/api/${uri}`)
+    console.log({
       method: 'GET',
       headers: { 'X-API-Key': accessToken },
-    }),
+    })
+
+    return EffectFetch.fetchJson(`${host}/api/${uri}`, {
+      method: 'GET',
+      headers: { 'X-API-Key': accessToken },
+    })
+  },
+
   post: <T>(uri: string, body?: T) =>
     EffectFetch.fetchJson(`${host}/api/${uri}`, {
       method: 'POST',
