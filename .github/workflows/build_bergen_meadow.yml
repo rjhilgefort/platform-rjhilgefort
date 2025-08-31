@@ -11,16 +11,15 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/mattermost/action-mattermost-notify
-      # - uses: mattermost/action-mattermost-notify@master
-      #   with:
-      #     MATTERMOST_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
-      #     MATTERMOST_CHANNEL: the-best-channel
-      #     TEXT: |
-      #       This is a message from ${{ github.repository }}.
-      #       [Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) was completed :white_check_mark:
-      #     MATTERMOST_USERNAME: ${{ github.triggering_actor }}
-      #     MATTERMOST_ICON_URL: https://cdn3.iconfinder.com/data/icons/system-basic-vol-4-1/20/icon-note-attention-alt3-512.png
+      - uses: mattermost/action-mattermost-notify@master
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ vars.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_CHANNEL: ${{ vars.MATTERMOST_CHANNEL }}
+          TEXT: |
+            This is a message from ${{ github.repository }}.
+            [Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) was started :up_arrow:
+          MATTERMOST_USERNAME: ${{ github.triggering_actor }}
+          MATTERMOST_ICON_URL: ${{ vars.MATTERMOST_ICON_URL }}
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,3 +55,13 @@ jobs:
           host: '${{ secrets.PORTAINER_URL }}'
           accessToken: '${{ secrets.PORTAINER_ACCESS_TOKEN }}'
           stackName: 'bergen-meadow-site'
+
+      - uses: mattermost/action-mattermost-notify@master
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ vars.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_CHANNEL: ${{ vars.MATTERMOST_CHANNEL }}
+          TEXT: |
+            This is a message from ${{ github.repository }}.
+            [Pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) was completed :white_check_mark:
+          MATTERMOST_USERNAME: ${{ github.triggering_actor }}
+          MATTERMOST_ICON_URL: ${{ vars.MATTERMOST_ICON_URL }}
