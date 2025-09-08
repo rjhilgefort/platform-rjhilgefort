@@ -135,6 +135,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center w-36 ml-0 sm:-ml-4">
                 <input
+                  autoFocus
                   ref={uDiscInputRef}
                   type="number"
                   value={displayUDisc}
