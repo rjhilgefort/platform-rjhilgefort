@@ -1,5 +1,12 @@
 # @repo/dg-rating-converter
 
+## 1.0.2
+
+### Patch Changes
+
+- a4bb0f9: blank default inputs
+- fadcb20: autofocus input
+
 ## 1.0.1
 
 ### Patch Changes
