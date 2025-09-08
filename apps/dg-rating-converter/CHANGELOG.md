@@ -1,0 +1,11 @@
+# @repo/dg-rating-converter
+
+## 1.0.0
+
+### Major Changes
+
+- 1873739: First version of dg-rating-converter
+
+### Patch Changes
+
+- a92c083: scaffold dg-rating-converter project

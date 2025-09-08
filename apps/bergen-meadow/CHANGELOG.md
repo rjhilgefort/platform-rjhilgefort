@@ -1,5 +1,11 @@
 # @repo/bergen-meadow
 
+## 0.1.3
+
+### Patch Changes
+
+- db0b317: testing deploy notifications
+
 ## 0.1.2
 
 ### Patch Changes
