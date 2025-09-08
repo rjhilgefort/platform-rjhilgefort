@@ -14,13 +14,13 @@ const clamp = (num: number, min: number, max: number): number =>
   Math.max(min, Math.min(max, num))
 
 export default function Home() {
-  const initialUDisc = '175'
-  const initialPdga = String(
-    clamp(parseFloat(initialUDisc), MIN_UDISC, MAX_UDISC) * 2 + 500,
-  )
+  // const initialUDisc = '175'
+  // const initialPdga = String(
+  //   clamp(parseFloat(initialUDisc), MIN_UDISC, MAX_UDISC) * 2 + 500,
+  // )
 
-  const [displayUDisc, setDisplayUDisc] = useState(initialUDisc)
-  const [displayPdga, setDisplayPdga] = useState(initialPdga)
+  const [displayUDisc, setDisplayUDisc] = useState('')
+  const [displayPdga, setDisplayPdga] = useState('')
   const [warningMessage, setWarningMessage] = useState('')
   const [showReferences, setShowReferences] = useState(false)
 
