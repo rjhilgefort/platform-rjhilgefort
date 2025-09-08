@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.0.1
+
+### Patch Changes
+
+- 581a925: update favicon
+
 ## 1.0.0
 
 ### Major Changes
