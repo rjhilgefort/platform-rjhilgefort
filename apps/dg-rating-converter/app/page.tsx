@@ -111,7 +111,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+    <div className="flex flex-col items-center justify-start md:justify-center min-h-screen bg-gray-900 text-white p-4">
       <h1 className="text-3xl sm:text-[2.5rem] font-bold mb-8 max-w-2xl text-center leading-tight">
         <span className="text-orange-500">uDisc</span> to{' '}
         <span className="text-blue-400">PDGA</span> Rating Converter
