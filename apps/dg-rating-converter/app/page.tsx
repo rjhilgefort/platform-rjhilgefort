@@ -166,7 +166,8 @@ export default function Home() {
       {/* Banner image */}
       <div className="w-full max-w-2xl mb-8 overflow-hidden rounded-lg shadow-md">
         <Image
-          src="/dg-putting-banner.webp"
+          // src="/dg-putting-banner.webp"
+          src="/dg-putting-sunset-banner.jpg"
           alt="Disc Golf Putting Banner"
           width={1200}
           height={300}
