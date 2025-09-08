@@ -37,6 +37,19 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!showReferences) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowReferences(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showReferences])
+
   const handleUDiscInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valueStr = e.target.value
     setDisplayUDisc(valueStr)
@@ -185,19 +198,6 @@ export default function Home() {
         >
           <AiOutlineInfoCircle size={16} className="mr-1" aria-hidden="true" />
           <span>Learn More About This Calculator</span>
-          <svg
-            className={`ml-1 w-4 h-4 transition-transform ${showReferences ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
         </button>
 
         {showReferences && (
