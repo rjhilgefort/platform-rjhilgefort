@@ -9,7 +9,7 @@ export const makeApiClient = ({
   accessToken: string
 }) => ({
   get: (uri: string) => {
-    console.log(`${host}/${uri}`)
+    console.log(`${host}${uri}`)
     console.log({
       method: 'GET',
       headers: { 'X-API-Key': accessToken },
