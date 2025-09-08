@@ -11,7 +11,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={`${inter.className} bg-gray-900 text-white min-h-screen overflow-x-hidden`}
+      >
+        {children}
+      </body>
       <GoogleAnalytics gaId="TODO" />
     </html>
   )
