@@ -64,7 +64,7 @@ const LearnMoreContent = ({
       aria-modal="true"
     >
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative bg-gray-900 w-full max-w-lg rounded-lg shadow-xl border border-gray-700 p-6">
+      <div className="relative bg-gray-900 w-full max-w-lg md:max-w-xl max-h-[85vh] overflow-y-auto rounded-lg shadow-xl border border-gray-700 p-6">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-white focus:outline-none"
@@ -129,7 +129,7 @@ const LearnMoreContent = ({
             alt="ratings-plot"
             width={1170}
             height={791}
-            className="rounded-lg shadow-xl"
+            className="rounded-lg shadow-xl max-w-full h-auto max-h-[40vh] object-contain"
           />
         </SectionBody>
 
