@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.0.4
+
+### Patch Changes
+
+- 6e0f844: Accurate rating calculator info in modal, functionality tweaks
+
 ## 1.0.3
 
 ### Patch Changes
