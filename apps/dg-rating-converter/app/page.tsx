@@ -28,6 +28,19 @@ export default function Home() {
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const uDiscInputRef = useRef<HTMLInputElement | null>(null)
 
+  const blockInvalidCharKeys = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+      e.preventDefault()
+    }
+  }
+
+  const handlePasteSanitize = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text')
+    if (!/^\d*\.?\d*$/.test(text)) {
+      e.preventDefault()
+    }
+  }
+
   useEffect(() => {
     uDiscInputRef.current?.focus()
 
@@ -125,8 +138,11 @@ export default function Home() {
                   autoFocus
                   ref={uDiscInputRef}
                   type="number"
+                  inputMode="decimal"
                   value={displayUDisc}
                   onChange={handleUDiscInputChange}
+                  onKeyDown={blockInvalidCharKeys}
+                  onPaste={handlePasteSanitize}
                   className="text-4xl font-bold bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="---"
                 />
@@ -153,8 +169,11 @@ export default function Home() {
               <div className="flex flex-col items-center w-36 ml-0 sm:-ml-4">
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={displayPdga}
                   onChange={handlePdgaInputChange}
+                  onKeyDown={blockInvalidCharKeys}
+                  onPaste={handlePasteSanitize}
                   className="text-4xl font-bold bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="---"
                 />
