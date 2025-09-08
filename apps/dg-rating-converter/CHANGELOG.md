@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.0.3
+
+### Patch Changes
+
+- 45e98aa: add google analytics
+
 ## 1.0.2
 
 ### Patch Changes
