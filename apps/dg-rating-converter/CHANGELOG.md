@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.0.5
+
+### Patch Changes
+
+- 3257ff9: modal sizig tweaks
+
 ## 1.0.4
 
 ### Patch Changes

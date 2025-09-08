@@ -1,6 +1,6 @@
 {
   "name": "@repo/dg-rating-converter",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3004 --turbopack",
