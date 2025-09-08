@@ -4,6 +4,9 @@
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "emitDeclarationOnly": false
   }
 }

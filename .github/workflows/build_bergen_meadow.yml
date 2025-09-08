@@ -1,5 +1,10 @@
 name: Bergen Meadow - Build and Deploy
 
+env:
+  APP_NAME: bergen-meadow
+  STACK_NAME: bergen-meadow-site
+  NOTIFICATION_PREFIX: '[deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for [Bergen Meadow Update](https://bergenmeadowupdate.com/)'
+
 on:
   push:
     branches:
@@ -11,6 +16,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: mattermost/action-mattermost-notify@master
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ vars.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_CHANNEL: ${{ vars.MATTERMOST_CHANNEL }}
+          TEXT: '🔄 ${{ env.NOTIFICATION_PREFIX }} was started...'
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -31,8 +42,8 @@ jobs:
         with:
           context: .
           push: true
-          file: ./apps/bergen-meadow/Dockerfile
-          tags: rjhilgefort/bergen-meadow:latest
+          file: ./apps/${{ env.APP_NAME }}/Dockerfile
+          tags: rjhilgefort/${{ env.APP_NAME }}:latest
 
       - name: Build Monorepo Packages
         run: |
@@ -44,4 +55,10 @@ jobs:
         with:
           host: '${{ secrets.PORTAINER_URL }}'
           accessToken: '${{ secrets.PORTAINER_ACCESS_TOKEN }}'
-          stackName: 'bergen-meadow-site'
+          stackName: '${{ env.STACK_NAME }}'
+
+      - uses: mattermost/action-mattermost-notify@master
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ vars.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_CHANNEL: ${{ vars.MATTERMOST_CHANNEL }}
+          TEXT: '✅ ${{ env.NOTIFICATION_PREFIX }} was completed!'

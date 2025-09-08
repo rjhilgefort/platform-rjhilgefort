@@ -8,11 +8,12 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  // const youtubeVideoId = 'CuVthbu_ehI'
+  // const youtubeVideoId = 'cyybOFx4lkY' // first, rough video
+  const youtubeVideoId = '5TqQko71DF0' // second, more polished
 
   return (
     <div className="bg-base-100">
-      <div className="hero min-h-[50vh] bg-[url('/google-maps.jpeg')] bg-cover bg-center">
+      <div className="hero relative min-h-[50vh] bg-[url('/BergenElementaryCampus.jpg')] bg-cover bg-center">
         <div className="hero-content text-center text-neutral-content">
           <div className="max-w-lg">
             <h1 className="mb-5 text-6xl font-bold [text-shadow:-3px_-3px_0_#000,3px_-3px_0_#000,-3px_3px_0_#000,3px_3px_0_#000,0px_-3px_0_#000,0px_3px_0_#000,-3px_0px_0_#000,3px_0px_0_#000]">
@@ -20,6 +21,9 @@ export default function Home() {
             </h1>
           </div>
         </div>
+        <p className="absolute bottom-2 right-2 rounded bg-black/50 p-1 text-xs text-white/75">
+          Photo by Travis Hawkes Hatch
+        </p>
       </div>
 
       <div className="container mx-auto px-4 py-12">
@@ -52,10 +56,26 @@ export default function Home() {
           </div>
         </div>
 
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6 text-center">
+            See the Vision
+          </h2>
+          <div className="rounded-box overflow-hidden shadow-lg bg-black">
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeVideoId}?rel=0`}
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full block"
+              style={{ aspectRatio: '16 / 9' }}
+            ></iframe>
+          </div>
+        </div>
+
         <div className="card lg:card-side bg-base-200 shadow-xl mb-12">
           <div className="card-body">
             <h2 className="card-title text-3xl">
-              What's Happening with Bergen Meadow?
+              What&apos;s Happening with Bergen Meadow?
             </h2>
             <div className="prose max-w-none">
               <p>
@@ -279,22 +299,6 @@ export default function Home() {
         </div>
 
         {/* <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">
-            See the Vision
-          </h2>
-          <div className="rounded-box overflow-hidden shadow-lg bg-black">
-            <iframe
-              src={`https://www.youtube.com/embed/${youtubeVideoId}?rel=0`}
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full block"
-              style={{ aspectRatio: '16 / 9' }}
-            ></iframe>
-          </div>
-        </div> */}
-
-        {/* <div className="mb-12">
           <h2 className="text-3xl font-bold mb-6 text-center">Concept Ideas</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <img
@@ -341,15 +345,6 @@ export default function Home() {
           </div>
         </div> */}
       </div>
-
-      <footer className="footer footer-center p-6 bg-base-300 text-base-content">
-        <aside>
-          <p>
-            Copyright © {new Date().getFullYear()} - The Trails Collective -
-            Friends & Neighbors in Support of Bergen Meadow's Best Plan.
-          </p>
-        </aside>
-      </footer>
     </div>
   )
 }

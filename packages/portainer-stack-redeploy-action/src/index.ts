@@ -1,10 +1,14 @@
 import actionsCore from '@actions/core'
 import { portainerStackRedeploy } from '@repo/portainer-stack-redeploy'
 
+const host = actionsCore.getInput('host')
+const accessToken = actionsCore.getInput('accessToken')
+const stackName = actionsCore.getInput('stackName')
+
 portainerStackRedeploy({
-  host: actionsCore.getInput('host'),
-  accessToken: actionsCore.getInput('accessToken'),
-  stackName: actionsCore.getInput('stackName'),
+  host,
+  accessToken,
+  stackName,
 })
   .then(() => {
     actionsCore.setOutput('success', true)

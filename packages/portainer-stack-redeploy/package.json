@@ -1,7 +1,7 @@
 {
   "name": "@repo/portainer-stack-redeploy",
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.1.0",
+  "type": "commonjs",
   "files": [
     "dist"
   ],
@@ -12,7 +12,8 @@
     "build": "tsc",
     "check-types": "tsc --noEmit",
     "dev": "tsc --watch",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "dependencies": {
     "effect": "^3.13.9"

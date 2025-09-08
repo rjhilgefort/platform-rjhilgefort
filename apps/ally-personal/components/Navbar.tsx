@@ -18,6 +18,8 @@ const Navbar = () => {
     // { name: 'Articles', href: '/articles' },
     // { name: 'About', href: '/about' },
     { name: 'EPRD Forum', href: '/eprd-forum' },
+    { name: '04/26 Forum', href: '/0426-forum' },
+    { name: 'Trails Collective', href: '/trails-collective' },
   ]
 
   const pathname = usePathname()

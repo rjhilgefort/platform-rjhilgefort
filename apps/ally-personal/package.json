@@ -1,12 +1,13 @@
 {
   "name": "@repo/ally-personal",
-  "version": "1.2.5",
+  "version": "1.2.8",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3002 --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings 0",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {

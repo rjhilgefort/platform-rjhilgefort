@@ -21,7 +21,7 @@ const galleryImages = [
   '/gallery/hike-ally-jesselin-rob-raelin.png',
   '/gallery/hike-dedisse-ally-raelin.png',
   '/gallery/hike-naylorlake-ally-jesselin-raelin.png',
-  '/gallery/holidaywalk-evergreen-all-jesselin-raelin-auntaimee.png',
+  '/gallery/holidaywalk-evergreen-ally-jesselin-raelin-auntaimee.png',
   '/gallery/hopsdrops-ally-jesselin.png',
   '/gallery/iceskate-evergreenlake-ally-jesselin-rob-raelin-grandmacarolynjump.png',
   '/gallery/kayak-ally-jesselin-raelin.png',
