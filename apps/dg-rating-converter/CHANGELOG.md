@@ -28,7 +28,7 @@
 
 ### Patch Changes
 
-- 3257ff9: modal sizig tweaks
+- 3257ff9: modal sizing tweaks
 
 ## 1.0.4
 
