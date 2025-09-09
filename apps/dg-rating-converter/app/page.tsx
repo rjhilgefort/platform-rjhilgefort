@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { GiDiscGolfBasket } from 'react-icons/gi'
-import { MdRocketLaunch } from 'react-icons/md'
+import { MdRocketLaunch, MdArrowBack, MdArrowForward } from 'react-icons/md'
 import { pipe } from 'effect'
 import { LearnMore } from '../components/LearnMore'
 import {
@@ -15,6 +15,8 @@ import {
 } from '../utils/const'
 import { pdgaFromUdiscSimple } from '../utils/pdgaFromUdiscSimple'
 import { udiscFromPdgaSimple } from '../utils/udiscFromPdgaSimple'
+import { pdgaFromUdiscPolynomial } from '../utils/pdgaFromUdiscPolynomial'
+import { udiscFromPdgaPolynomial } from '../utils/udiscFromPdgaPolynomial'
 
 export default function Home() {
   // const initialUDisc = '175'
@@ -26,11 +28,34 @@ export default function Home() {
   const [displayPdga, setDisplayPdga] = useState('')
   const [warningMessage, setWarningMessage] = useState('')
   const [showReferences, setShowReferences] = useState(false)
+  const [formula, setFormula] = useState<'linear' | 'poly'>('poly')
+  const [lastEdited, setLastEdited] = useState<null | 'udisc' | 'pdga'>(null)
 
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const uDiscInputRef = useRef<HTMLInputElement | null>(null)
   const pdgaInputRef = useRef<HTMLInputElement | null>(null)
+
+  // Effect: initialize formula from URL or localStorage
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const q = params.get('formula')
+      const fromQuery = q === 'linear' || q === 'poly' ? q : null
+      const fromStorage =
+        (localStorage.getItem('formula') as 'linear' | 'poly' | null) || null
+      const initial = fromQuery ?? fromStorage ?? 'poly'
+      if (initial !== formula) setFormula(initial)
+      if (!fromQuery) {
+        params.set('formula', initial)
+        const newUrl = `${window.location.pathname}?${params.toString()}`
+        window.history.replaceState({}, '', newUrl)
+      }
+    } catch {
+      // ignore: URL/localStorage may be unavailable
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const blockInvalidCharKeys = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (['e', 'E', '+', '-', '.'].includes(e.key)) {
@@ -69,6 +94,7 @@ export default function Home() {
   const handleUDiscInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valueStr = e.target.value
     setDisplayUDisc(valueStr)
+    setLastEdited('udisc')
 
     if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
     if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
@@ -84,7 +110,9 @@ export default function Home() {
             currentWarning =
               'uDisc Rating outside 0-300 range. Calculation uses nearest limit.'
           }
-          pipe(numValue, pdgaFromUdiscSimple, (x) => String(x), setDisplayPdga)
+          const converter =
+            formula === 'poly' ? pdgaFromUdiscPolynomial : pdgaFromUdiscSimple
+          pipe(numValue, converter, (x) => String(x), setDisplayPdga)
         } else {
           // Handle invalid number input (e.g., '-', '1.2.3')
           setDisplayPdga('')
@@ -98,6 +126,7 @@ export default function Home() {
   const handlePdgaInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valueStr = e.target.value
     setDisplayPdga(valueStr) // Update display immediately
+    setLastEdited('pdga')
 
     if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
     if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
@@ -113,13 +142,46 @@ export default function Home() {
             currentWarning =
               'PDGA Rating outside 500-1100 range. Calculation uses nearest limit.'
           }
-          pipe(numValue, udiscFromPdgaSimple, (x) => String(x), setDisplayUDisc)
+          const converter =
+            formula === 'poly' ? udiscFromPdgaPolynomial : udiscFromPdgaSimple
+          pipe(numValue, converter, (x) => String(x), setDisplayUDisc)
         } else {
           setDisplayUDisc('')
         }
       }
       setWarningMessage(currentWarning)
     }, DEBOUNCE_DELAY)
+  }
+
+  const handleFormulaChange = (next: 'linear' | 'poly') => {
+    if (next === formula) return
+    setFormula(next)
+    try {
+      localStorage.setItem('formula', next)
+      const params = new URLSearchParams(window.location.search)
+      params.set('formula', next)
+      const newUrl = `${window.location.pathname}?${params.toString()}`
+      window.history.replaceState({}, '', newUrl)
+    } catch {
+      // ignore: URL/localStorage may be unavailable
+    }
+
+    // Recalculate immediately from last edited side
+    if (lastEdited === 'udisc') {
+      if (displayUDisc !== '' && !isNaN(parseFloat(displayUDisc))) {
+        const n = parseFloat(displayUDisc)
+        const converter =
+          next === 'poly' ? pdgaFromUdiscPolynomial : pdgaFromUdiscSimple
+        setDisplayPdga(String(converter(n)))
+      }
+    } else if (lastEdited === 'pdga') {
+      if (displayPdga !== '' && !isNaN(parseFloat(displayPdga))) {
+        const n = parseFloat(displayPdga)
+        const converter =
+          next === 'poly' ? udiscFromPdgaPolynomial : udiscFromPdgaSimple
+        setDisplayUDisc(String(converter(n)))
+      }
+    }
   }
 
   return (
@@ -132,7 +194,6 @@ export default function Home() {
       </h1>
 
       <div className="bg-gray-800 p-4 rounded-lg shadow-xl w-full max-w-2xl mb-6">
-        <div className="h-4" aria-hidden="true" />
         <div className="flex flex-col md:flex-row items-stretch justify-between md:space-x-6 space-y-3 md:space-y-0">
           <div className="flex-1 flex justify-center items-center">
             <div className="flex items-center justify-center w-full gap-0">
@@ -164,7 +225,30 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <div className="text-4xl text-gray-500">↔</div>
+            <div className="flex items-center justify-center">
+              <MdArrowBack
+                className="text-gray-400 text-2xl sm:text-3xl"
+                aria-hidden="true"
+              />
+              <label id="formula-label" className="sr-only">
+                Formula
+              </label>
+              <select
+                aria-labelledby="formula-label"
+                value={formula}
+                onChange={(e) =>
+                  handleFormulaChange(e.target.value as 'linear' | 'poly')
+                }
+                className="px-3 py-1 text-sm rounded-md bg-gray-800 text-gray-200 border border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <option value="linear">Linear</option>
+                <option value="poly">Polynomial</option>
+              </select>
+              <MdArrowForward
+                className="text-gray-400 text-2xl sm:text-3xl"
+                aria-hidden="true"
+              />
+            </div>
           </div>
 
           <div className="flex-1 flex justify-center items-center">
