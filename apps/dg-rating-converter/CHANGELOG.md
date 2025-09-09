@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.1.1
+
+### Patch Changes
+
+- 1199ccc: add some top padding
+
 ## 1.1.0
 
 ### Minor Changes
