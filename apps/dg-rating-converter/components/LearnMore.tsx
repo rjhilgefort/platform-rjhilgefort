@@ -73,19 +73,7 @@ const LearnMoreContent = ({
           <MdClose size={16} />
         </button>
 
-        <SectionHeader>The Calculation</SectionHeader>
-        <SectionBody>
-          <p className="mb-1">
-            This calculation uses a simple formula:
-            <br />
-            (uDisc Rating × 2) + 500 = PDGA Rating
-          </p>
-          <p className="text-gray-400 text-xs">
-            This is an approximation based on community observations.
-          </p>
-        </SectionBody>
-
-        <SectionHeader>Notes</SectionHeader>
+        <SectionHeader>uDisc Rating Notes</SectionHeader>
         <SectionBody>
           <ul className="list-disc pl-5 space-y-1">
             <li>
@@ -96,17 +84,22 @@ const LearnMoreContent = ({
               course could have played much harder (high wind).
             </li>
             <li>
-              uDisc ratings &lt;= 150 are less accurate with this formula (see
-              below).
-            </li>
-            <li>
               PDGA ratings take into account more statistical factors than just
               raw scores.
             </li>
           </ul>
         </SectionBody>
 
-        <SectionHeader>Deeper Dive</SectionHeader>
+        <SectionHeader>Linear Formula</SectionHeader>
+        <SectionBody>
+          <p className="mb-1">
+            <code>(uDisc × 2) + 500 = PDGA Rating</code>
+          </p>
+          <p className="text-gray-400 text-xs">
+            This is an approximation based on community observations.
+          </p>
+        </SectionBody>
+
         <SectionBody>
           <p className="mb-2">
             A Reddit user{' '}
@@ -123,16 +116,64 @@ const LearnMoreContent = ({
             </Link>{' '}
             and found a more accurate logarithmic relationship, but concluded
             that the simpler formula above was nearly just as accurate.
+            Although, uDisc ratings &lt;= 150 are less accurate with this
+            formula.
           </p>
           <Image
-            src="/ratings-plot.jpg"
-            alt="ratings-plot"
+            src="/linear-plot.jpg"
+            alt="linear-plot"
             width={1170}
             height={791}
             className="rounded-lg shadow-xl max-w-full h-auto max-h-[40vh] object-contain"
           />
         </SectionBody>
 
+        <SectionHeader>Polynomial Formula</SectionHeader>
+        <SectionBody>
+          <p className="mb-1">
+            <p className="mb-1">
+              <code>
+                (-3.010639379e-7 × uDisc^4) + (2.25588648e-4 × uDisc^3) -
+                (0.06630698227 × uDisc^2) + (11.08668699 × uDisc) + 36.01871726
+                = PDGA Rating
+              </code>
+            </p>
+            <p className="text-gray-400 text-xs">
+              <code>R^2 ~ 0.97</code>.
+            </p>
+          </p>
+        </SectionBody>
+
+        <SectionBody>
+          <p className="mb-2">
+            You can compute PDGA rating from a UDisc rating with a 4th‑order
+            polynomial with the above coefficients,{' '}
+            <Link href="https://www.reddit.com/r/discgolf/comments/1nc7fun/comment/nd8szwl/">
+              fit by Reddit user 1000RatedSass
+            </Link>
+            . This was fit to 107 data points ranging from PDGA ratings in the
+            700s into the 1000s.
+          </p>
+          <p className="mb-3">
+            This site evaluates the polynomial using{' '}
+            <Link href="https://en.wikipedia.org/wiki/Horner%27s_method">
+              Horner's method
+            </Link>{' '}
+            for numerical stability and speed. Additionally, the reverse
+            calculation (PDGA to UDisc) follows a similar approach, but with
+            <Link href="https://www.reddit.com/r/discgolf/comments/1nc7fun/comment/nd9lz0o/">
+              coefficients from the reverse polynomial
+            </Link>
+            .
+          </p>
+          <Image
+            src="/polynomial-plot.webp"
+            alt="polynomial-plot"
+            width={1170}
+            height={791}
+            className="rounded-lg shadow-xl max-w-full h-auto max-h-[40vh] object-contain"
+          />
+        </SectionBody>
         <SectionHeader>Reference Links</SectionHeader>
         <SectionBody className="text-xs">
           <ul className="list-disc pl-5 space-y-1">
@@ -144,6 +185,11 @@ const LearnMoreContent = ({
             <li>
               <Link href="https://www.reddit.com/r/discgolf/comments/17uhf28/my_udisc_to_pdga_chart/">
                 Reddit Post: 71 ratings plotted on a graph
+              </Link>
+            </li>
+            <li>
+              <Link href="https://www.reddit.com/r/discgolf/comments/1nc7fun/comment/nd8szwl/">
+                Reddit Comment: 4th Order Polynomial coefficients
               </Link>
             </li>
           </ul>
