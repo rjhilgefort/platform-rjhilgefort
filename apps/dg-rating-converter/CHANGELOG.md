@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.0.7
+
+### Patch Changes
+
+- fcf18d5: add link to my pdga page
+
 ## 1.0.6
 
 ### Patch Changes
