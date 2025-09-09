@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import { GiDiscGolfBasket } from 'react-icons/gi'
+import { MdRocketLaunch } from 'react-icons/md'
 import { LearnMore } from '../components/LearnMore'
 
 const MIN_UDISC = 0
@@ -201,7 +203,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="w-full max-w-2xl mb-8 overflow-hidden rounded-lg shadow-md">
+      <div className="w-full max-w-2xl mb-5 overflow-hidden rounded-lg shadow-md">
         <Image
           src="/dg-putting-sunset-banner.jpg"
           alt="Disc Golf Putting Banner"
@@ -213,11 +215,27 @@ export default function Home() {
       </div>
 
       <div className="w-full max-w-2xl mb-8 relative">
-        <LearnMore
-          isOpen={showReferences}
-          onOpen={() => setShowReferences(true)}
-          onClose={() => setShowReferences(false)}
-        />
+        <div className="flex items-center justify-between w-full">
+          <LearnMore
+            isOpen={showReferences}
+            onOpen={() => setShowReferences(true)}
+            onClose={() => setShowReferences(false)}
+            className="ml-0"
+          />
+          <GiDiscGolfBasket className="mr-1" />
+          <div className="flex items-center gap-1 text-sm text-gray-400">
+            <MdRocketLaunch className="mr-1" />
+            Built By
+            <a
+              href="https://www.pdga.com/player/306677"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-300"
+            >
+              Rob Hilgefort #306677
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )

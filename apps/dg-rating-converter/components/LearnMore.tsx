@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect } from 'react'
-import { AiOutlineClose, AiOutlineInfoCircle } from 'react-icons/ai'
+import { MdClose, MdInfo } from 'react-icons/md'
 
 const Link = ({
   href,
@@ -70,7 +70,7 @@ const LearnMoreContent = ({
           className="absolute top-3 right-3 text-gray-400 hover:text-white focus:outline-none"
           aria-label="Close"
         >
-          <AiOutlineClose size={16} />
+          <MdClose size={16} />
         </button>
 
         <SectionHeader>The Calculation</SectionHeader>
@@ -111,16 +111,16 @@ const LearnMoreContent = ({
           <p className="mb-2">
             A Reddit user{' '}
             <Link href="https://www.reddit.com/r/discgolf/comments/1b7s0ad/udisc_round_ratings_to_pdga_round_ratings/">
-              compared lots of rounds side by side (uDisc vs PDGA){' '}
-            </Link>
+              compared lots of rounds side by side (uDisc vs PDGA)
+            </Link>{' '}
             and found that uDisc ratings are approximately based on 200 being
             900 rated, 250 being 1,000 rated, and 300 being 1,100 rated.
           </p>
           <p className="mb-3">
             Another user responded to the side-by-side comparison and{' '}
             <Link href="https://www.reddit.com/r/discgolf/comments/17uhf28/my_udisc_to_pdga_chart/">
-              plotted 71 ratings on a graph{' '}
-            </Link>
+              plotted 71 ratings on a graph
+            </Link>{' '}
             and found a more accurate logarithmic relationship, but concluded
             that the simpler formula above was nearly just as accurate.
           </p>
@@ -157,18 +157,22 @@ export const LearnMore = ({
   isOpen,
   onOpen,
   onClose,
+  className,
 }: {
   isOpen: boolean
   onOpen: () => void
   onClose: () => void
+  className?: string
 }) => {
   return (
     <>
       <button
         onClick={onOpen}
-        className="text-sm text-gray-400 hover:text-gray-300 flex items-center mx-auto mb-2 focus:outline-none"
+        className={`text-sm text-gray-400 hover:text-gray-300 flex items-center mb-2 focus:outline-none ${
+          className ?? 'mx-auto'
+        }`}
       >
-        <AiOutlineInfoCircle size={16} className="mr-1" aria-hidden="true" />
+        <MdInfo size={16} className="mr-1" aria-hidden="true" />
         <span>Learn More About This Calculator</span>
       </button>
       <LearnMoreContent isOpen={isOpen} onClose={onClose} />
