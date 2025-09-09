@@ -3,7 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { GiDiscGolfBasket } from 'react-icons/gi'
-import { MdRocketLaunch, MdArrowBack, MdArrowForward } from 'react-icons/md'
+import {
+  MdRocketLaunch,
+  MdArrowBack,
+  MdArrowForward,
+  MdArrowDropDown,
+} from 'react-icons/md'
 import { pipe } from 'effect'
 import { LearnMore } from '../components/LearnMore'
 import {
@@ -229,14 +234,18 @@ export default function Home() {
                 className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -mr-1.5"
                 aria-hidden="true"
               />
-              <div className="dropdown dropdown-center w-[9ch]">
+              <div className="dropdown dropdown-center w-[11ch]">
                 <div
                   tabIndex={0}
                   role="button"
                   ref={dropdownTriggerRef}
-                  className="btn btn-sm md:btn-md w-full rounded-md bg-gray-400 border border-gray-400 text-gray-800 hover:bg-white hover:border-white shadow-none min-h-0 h-auto px-3 py-1"
+                  className="btn btn-sm md:btn-md w-full rounded-md bg-gray-400 border border-gray-400 text-gray-800 hover:bg-white hover:border-white shadow-none min-h-0 h-auto px-3 py-1 relative"
                 >
-                  {formula === 'poly' ? 'Polynomial' : 'Linear'}
+                  <span>{formula === 'poly' ? 'Polynomial' : 'Linear'}</span>
+                  <MdArrowDropDown
+                    className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-gray-700 text-base md:text-lg"
+                    aria-hidden="true"
+                  />
                 </div>
                 <ul
                   tabIndex={0}

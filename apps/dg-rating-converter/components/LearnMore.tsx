@@ -157,7 +157,7 @@ const LearnMoreContent = ({
           <p className="mb-3">
             This site evaluates the polynomial using{' '}
             <Link href="https://en.wikipedia.org/wiki/Horner%27s_method">
-              Horner's method
+              Horner&apos;s method
             </Link>{' '}
             for numerical stability and speed. Additionally, the reverse
             calculation (PDGA to UDisc) follows a similar approach, but with
