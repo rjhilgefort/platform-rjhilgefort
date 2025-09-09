@@ -30,11 +30,13 @@ export default function Home() {
   const [showReferences, setShowReferences] = useState(false)
   const [formula, setFormula] = useState<'linear' | 'poly'>('poly')
   const [lastEdited, setLastEdited] = useState<null | 'udisc' | 'pdga'>(null)
+  const [isFormulaOpen, setIsFormulaOpen] = useState(false)
 
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const uDiscInputRef = useRef<HTMLInputElement | null>(null)
   const pdgaInputRef = useRef<HTMLInputElement | null>(null)
+  const formulaRef = useRef<HTMLDivElement | null>(null)
 
   // Effect: initialize formula from URL or localStorage
   useEffect(() => {
@@ -88,6 +90,21 @@ export default function Home() {
     return () => {
       if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
       if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
+    }
+  }, [])
+
+  // Close custom dropdown on outside click/tap
+  useEffect(() => {
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      if (!formulaRef.current) return
+      const target = e.target as Node
+      if (!formulaRef.current.contains(target)) setIsFormulaOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('touchstart', onDown)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('touchstart', onDown)
     }
   }, [])
 
@@ -225,27 +242,70 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center gap-2">
               <MdArrowBack
-                className="text-gray-400 text-2xl sm:text-3xl"
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl"
                 aria-hidden="true"
               />
-              <label id="formula-label" className="sr-only">
-                Formula
-              </label>
-              <select
-                aria-labelledby="formula-label"
-                value={formula}
-                onChange={(e) =>
-                  handleFormulaChange(e.target.value as 'linear' | 'poly')
-                }
-                className="px-3 py-1 text-sm rounded-md bg-gray-800 text-gray-200 border border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              <div
+                ref={formulaRef}
+                className="relative inline-block min-w-[9rem]"
               >
-                <option value="linear">Linear</option>
-                <option value="poly">Polynomial</option>
-              </select>
+                <label id="formula-label" className="sr-only">
+                  Formula
+                </label>
+                <button
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={isFormulaOpen}
+                  aria-labelledby="formula-label"
+                  onClick={() => setIsFormulaOpen((x) => !x)}
+                  className="w-full px-3 py-1 text-sm rounded-md bg-gray-800 text-gray-200 border border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex items-center justify-between"
+                >
+                  <span>{formula === 'poly' ? 'Polynomial' : 'Linear'}</span>
+                  <span className="ml-2 text-xs">▾</span>
+                </button>
+                {isFormulaOpen && (
+                  <div
+                    role="listbox"
+                    aria-labelledby="formula-label"
+                    className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-xl z-20 overflow-hidden"
+                  >
+                    <button
+                      role="option"
+                      aria-selected={formula === 'linear'}
+                      onClick={() => {
+                        handleFormulaChange('linear')
+                        setIsFormulaOpen(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm ${
+                        formula === 'linear'
+                          ? 'bg-blue-600 text-white'
+                          : 'hover:bg-gray-700'
+                      }`}
+                    >
+                      Linear
+                    </button>
+                    <button
+                      role="option"
+                      aria-selected={formula === 'poly'}
+                      onClick={() => {
+                        handleFormulaChange('poly')
+                        setIsFormulaOpen(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm ${
+                        formula === 'poly'
+                          ? 'bg-blue-600 text-white'
+                          : 'hover:bg-gray-700'
+                      }`}
+                    >
+                      Polynomial
+                    </button>
+                  </div>
+                )}
+              </div>
               <MdArrowForward
-                className="text-gray-400 text-2xl sm:text-3xl"
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl"
                 aria-hidden="true"
               />
             </div>
