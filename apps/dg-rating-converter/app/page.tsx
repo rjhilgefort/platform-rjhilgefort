@@ -27,6 +27,7 @@ export default function Home() {
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const uDiscInputRef = useRef<HTMLInputElement | null>(null)
+  const pdgaInputRef = useRef<HTMLInputElement | null>(null)
 
   const blockInvalidCharKeys = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (['e', 'E', '+', '-', '.'].includes(e.key)) {
@@ -39,6 +40,18 @@ export default function Home() {
     if (!/^\d*\.?\d*$/.test(text)) {
       e.preventDefault()
     }
+  }
+
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    otherRef: React.RefObject<HTMLInputElement | null>,
+  ) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      otherRef.current?.focus()
+      return
+    }
+    blockInvalidCharKeys(e)
   }
 
   useEffect(() => {
@@ -141,7 +154,7 @@ export default function Home() {
                   inputMode="decimal"
                   value={displayUDisc}
                   onChange={handleUDiscInputChange}
-                  onKeyDown={blockInvalidCharKeys}
+                  onKeyDown={(e) => handleInputKeyDown(e, pdgaInputRef)}
                   onPaste={handlePasteSanitize}
                   className="text-4xl font-bold bg-transparent border-none text-orange-500 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="---"
@@ -168,11 +181,12 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center w-36 ml-0 sm:-ml-4">
                 <input
+                  ref={pdgaInputRef}
                   type="number"
                   inputMode="decimal"
                   value={displayPdga}
                   onChange={handlePdgaInputChange}
-                  onKeyDown={blockInvalidCharKeys}
+                  onKeyDown={(e) => handleInputKeyDown(e, uDiscInputRef)}
                   onPaste={handlePasteSanitize}
                   className="text-4xl font-bold bg-transparent border-none text-blue-400 text-center focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="---"
@@ -187,10 +201,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Banner image */}
       <div className="w-full max-w-2xl mb-8 overflow-hidden rounded-lg shadow-md">
         <Image
-          // src="/dg-putting-banner.webp"
           src="/dg-putting-sunset-banner.jpg"
           alt="Disc Golf Putting Banner"
           width={1200}
