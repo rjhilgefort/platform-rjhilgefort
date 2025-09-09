@@ -8,6 +8,8 @@ import {
   MdArrowBack,
   MdArrowForward,
   MdArrowDropDown,
+  MdArrowDownward,
+  MdArrowUpward,
 } from 'react-icons/md'
 import { pipe } from 'effect'
 import { LearnMore } from '../components/LearnMore'
@@ -230,8 +232,12 @@ export default function Home() {
 
           <div className="flex flex-col items-center justify-center my-2 md:my-0">
             <div className="flex items-center justify-center gap-0 mb-2 md:mb-0">
+              <MdArrowDownward
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl sm:hidden"
+                aria-hidden="true"
+              />
               <MdArrowBack
-                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -mr-1.5"
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -mr-1.5 hidden sm:inline"
                 aria-hidden="true"
               />
               <div className="dropdown dropdown-center w-[10ch] sm:w-[11ch]">
@@ -296,8 +302,12 @@ export default function Home() {
                   </li>
                 </ul>
               </div>
+              <MdArrowUpward
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl sm:hidden"
+                aria-hidden="true"
+              />
               <MdArrowForward
-                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -ml-2"
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl hidden sm:inline -ml-1.5"
                 aria-hidden="true"
               />
             </div>
