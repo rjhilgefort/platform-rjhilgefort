@@ -348,14 +348,17 @@ export default function Home() {
       </div>
 
       <div className="w-full max-w-2xl mb-8 relative">
-        <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-between w-full gap-2">
           <LearnMore
             isOpen={showReferences}
             onOpen={() => setShowReferences(true)}
             onClose={() => setShowReferences(false)}
-            className="ml-0"
+            className="mx-auto sm:mx-0"
           />
-          <GiDiscGolfBasket className="mr-1" />
+          <GiDiscGolfBasket
+            className="mr-1 hidden sm:inline"
+            aria-hidden="true"
+          />
           <div className="flex items-center gap-1 text-sm text-gray-400">
             <MdRocketLaunch className="mr-1" />
             Built By
@@ -363,7 +366,7 @@ export default function Home() {
               href="https://www.pdga.com/player/306677"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-gray-300"
+              className="hover:text-gray-300 hover:cursor-pointer underline underline-offset-2 hover:underline"
             >
               Rob Hilgefort #306677
             </a>

@@ -131,16 +131,14 @@ const LearnMoreContent = ({
         <SectionHeader>Polynomial Formula</SectionHeader>
         <SectionBody>
           <p className="mb-1">
-            <p className="mb-1">
-              <code>
-                (-3.010639379e-7 × uDisc^4) + (2.25588648e-4 × uDisc^3) -
-                (0.06630698227 × uDisc^2) + (11.08668699 × uDisc) + 36.01871726
-                = PDGA Rating
-              </code>
-            </p>
-            <p className="text-gray-400 text-xs">
-              <code>R^2 ~ 0.97</code>.
-            </p>
+            <code>
+              (-3.010639379e-7 × uDisc^4) + (2.25588648e-4 × uDisc^3) -
+              (0.06630698227 × uDisc^2) + (11.08668699 × uDisc) + 36.01871726 =
+              PDGA Rating
+            </code>
+          </p>
+          <p className="text-gray-400 text-xs">
+            <code>R^2 ~ 0.97</code>.
           </p>
         </SectionBody>
 
@@ -160,7 +158,7 @@ const LearnMoreContent = ({
               Horner&apos;s method
             </Link>{' '}
             for numerical stability and speed. Additionally, the reverse
-            calculation (PDGA to UDisc) follows a similar approach, but with
+            calculation (PDGA to UDisc) follows a similar approach, but with{' '}
             <Link href="https://www.reddit.com/r/discgolf/comments/1nc7fun/comment/nd9lz0o/">
               coefficients from the reverse polynomial
             </Link>
@@ -214,12 +212,14 @@ export const LearnMore = ({
     <>
       <button
         onClick={onOpen}
-        className={`text-sm text-gray-400 hover:text-gray-300 flex items-center mb-2 focus:outline-none ${
+        className={`hover:cursor-pointer text-sm text-gray-400 hover:text-gray-300 flex items-center mb-2 focus:outline-none ${
           className ?? 'mx-auto'
         }`}
       >
         <MdInfo size={16} className="mr-1" aria-hidden="true" />
-        <span>Learn More About This Calculator</span>
+        <span className="underline underline-offset-2">
+          Learn More About This Calculator
+        </span>
       </button>
       <LearnMoreContent isOpen={isOpen} onClose={onClose} />
     </>
