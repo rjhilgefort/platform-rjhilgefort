@@ -108,8 +108,7 @@ export default function Home() {
         const numValue = parseFloat(valueStr)
         if (!isNaN(numValue)) {
           if (numValue < UDISC_MIN || numValue > UDISC_MAX) {
-            currentWarning =
-              'uDisc Rating outside 0-300 range. Calculation uses nearest limit.'
+            currentWarning = `uDisc Rating outside ${UDISC_MIN}-${UDISC_MAX} range. Calculation uses nearest limit.`
           }
           const converter =
             formula === 'poly' ? pdgaFromUdiscPolynomial : pdgaFromUdiscSimple
@@ -140,8 +139,7 @@ export default function Home() {
         const numValue = parseFloat(valueStr)
         if (!isNaN(numValue)) {
           if (numValue < PDGA_MIN || numValue > PDGA_MAX) {
-            currentWarning =
-              'PDGA Rating outside 500-1100 range. Calculation uses nearest limit.'
+            currentWarning = `PDGA Rating outside ${PDGA_MIN}-${PDGA_MAX} range. Calculation uses nearest limit.`
           }
           const converter =
             formula === 'poly' ? udiscFromPdgaPolynomial : udiscFromPdgaSimple
