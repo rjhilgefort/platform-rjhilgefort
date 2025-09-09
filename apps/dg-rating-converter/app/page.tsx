@@ -30,13 +30,12 @@ export default function Home() {
   const [showReferences, setShowReferences] = useState(false)
   const [formula, setFormula] = useState<'linear' | 'poly'>('poly')
   const [lastEdited, setLastEdited] = useState<null | 'udisc' | 'pdga'>(null)
-  const [isFormulaOpen, setIsFormulaOpen] = useState(false)
 
   const uDiscTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pdgaTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const uDiscInputRef = useRef<HTMLInputElement | null>(null)
   const pdgaInputRef = useRef<HTMLInputElement | null>(null)
-  const formulaRef = useRef<HTMLDivElement | null>(null)
+  const dropdownTriggerRef = useRef<HTMLDivElement | null>(null)
 
   // Effect: initialize formula from URL or localStorage
   useEffect(() => {
@@ -90,21 +89,6 @@ export default function Home() {
     return () => {
       if (uDiscTimeoutRef.current) clearTimeout(uDiscTimeoutRef.current)
       if (pdgaTimeoutRef.current) clearTimeout(pdgaTimeoutRef.current)
-    }
-  }, [])
-
-  // Close custom dropdown on outside click/tap
-  useEffect(() => {
-    const onDown = (e: MouseEvent | TouchEvent) => {
-      if (!formulaRef.current) return
-      const target = e.target as Node
-      if (!formulaRef.current.contains(target)) setIsFormulaOpen(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('touchstart', onDown)
-    return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('touchstart', onDown)
     }
   }, [])
 
@@ -242,70 +226,71 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-0">
               <MdArrowBack
-                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl"
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -mr-1.5"
                 aria-hidden="true"
               />
-              <div
-                ref={formulaRef}
-                className="relative inline-block min-w-[9rem]"
-              >
-                <label id="formula-label" className="sr-only">
-                  Formula
-                </label>
-                <button
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={isFormulaOpen}
-                  aria-labelledby="formula-label"
-                  onClick={() => setIsFormulaOpen((x) => !x)}
-                  className="w-full px-3 py-1 text-sm rounded-md bg-gray-800 text-gray-200 border border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex items-center justify-between"
+              <div className="dropdown dropdown-center w-[9ch]">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  ref={dropdownTriggerRef}
+                  className="btn btn-sm md:btn-md w-full rounded-md bg-gray-400 border border-gray-400 text-gray-800 hover:bg-white hover:border-white shadow-none min-h-0 h-auto px-3 py-1"
                 >
-                  <span>{formula === 'poly' ? 'Polynomial' : 'Linear'}</span>
-                  <span className="ml-2 text-xs">▾</span>
-                </button>
-                {isFormulaOpen && (
-                  <div
-                    role="listbox"
-                    aria-labelledby="formula-label"
-                    className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-xl z-20 overflow-hidden"
-                  >
+                  {formula === 'poly' ? 'Polynomial' : 'Linear'}
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu bg-gray-800 text-gray-200 rounded-md z-10 mt-1 w-full p-1 border border-gray-700 shadow-xl"
+                >
+                  <li>
                     <button
-                      role="option"
-                      aria-selected={formula === 'linear'}
+                      type="button"
                       onClick={() => {
                         handleFormulaChange('linear')
-                        setIsFormulaOpen(false)
+                        // close dropdown by removing focus
+                        requestAnimationFrame(() => {
+                          const active =
+                            document.activeElement as HTMLElement | null
+                          if (active) active.blur()
+                          dropdownTriggerRef.current?.blur()
+                        })
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm ${
+                      className={`rounded px-2 ${
                         formula === 'linear'
-                          ? 'bg-blue-600 text-white'
-                          : 'hover:bg-gray-700'
+                          ? 'bg-gray-400 text-gray-800'
+                          : 'hover:bg-gray-700 text-gray-200'
                       }`}
                     >
                       Linear
                     </button>
+                  </li>
+                  <li>
                     <button
-                      role="option"
-                      aria-selected={formula === 'poly'}
+                      type="button"
                       onClick={() => {
                         handleFormulaChange('poly')
-                        setIsFormulaOpen(false)
+                        requestAnimationFrame(() => {
+                          const active =
+                            document.activeElement as HTMLElement | null
+                          if (active) active.blur()
+                          dropdownTriggerRef.current?.blur()
+                        })
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm ${
+                      className={`rounded px-2 ${
                         formula === 'poly'
-                          ? 'bg-blue-600 text-white'
-                          : 'hover:bg-gray-700'
+                          ? 'bg-gray-400 text-gray-800'
+                          : 'hover:bg-gray-700 text-gray-200'
                       }`}
                     >
                       Polynomial
                     </button>
-                  </div>
-                )}
+                  </li>
+                </ul>
               </div>
               <MdArrowForward
-                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl"
+                className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -ml-2"
                 aria-hidden="true"
               />
             </div>
