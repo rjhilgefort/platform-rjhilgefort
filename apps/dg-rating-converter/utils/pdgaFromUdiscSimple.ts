@@ -9,4 +9,5 @@ export const pdgaFromUdiscSimple = (udiscRating: number) =>
       maximum: UDISC_MAX,
     }),
     (x) => x * 2 + 500,
+    Number.round(0),
   )

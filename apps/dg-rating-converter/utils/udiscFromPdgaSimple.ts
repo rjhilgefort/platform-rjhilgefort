@@ -9,4 +9,5 @@ export const udiscFromPdgaSimple = (pdgaRating: number) =>
       maximum: PDGA_MAX,
     }),
     (x) => (x - 500) / 2,
+    Number.round(0),
   )
