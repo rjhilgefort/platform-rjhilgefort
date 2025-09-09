@@ -199,7 +199,7 @@ export default function Home() {
         Rating Converter
       </h1>
 
-      <div className="bg-gray-800 p-4 rounded-lg shadow-xl w-full max-w-2xl mb-6">
+      <div className="bg-gray-800 p-4 pt-8 rounded-lg shadow-xl w-full max-w-2xl mb-6">
         <div className="flex flex-col md:flex-row items-stretch justify-between md:space-x-6 space-y-3 md:space-y-0">
           <div className="flex-1 flex justify-center items-center">
             <div className="flex items-center justify-center w-full gap-0">
