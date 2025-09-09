@@ -1,5 +1,11 @@
 # @repo/bergen-meadow
 
+## 0.1.4
+
+### Patch Changes
+
+- f7bed82: Updated Next
+
 ## 0.1.3
 
 ### Patch Changes

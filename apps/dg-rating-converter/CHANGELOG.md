@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.1.0
+
+### Minor Changes
+
+- bf0e708: Added a polynomial formula and dropdown to select it
+
 ## 1.0.7
 
 ### Patch Changes

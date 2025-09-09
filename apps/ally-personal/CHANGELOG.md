@@ -1,5 +1,11 @@
 # @repo/ally-personal
 
+## 1.2.9
+
+### Patch Changes
+
+- f7bed82: Updated Next
+
 ## 1.2.8
 
 ### Patch Changes
