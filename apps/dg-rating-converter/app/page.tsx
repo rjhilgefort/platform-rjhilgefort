@@ -4,16 +4,17 @@ import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { GiDiscGolfBasket } from 'react-icons/gi'
 import { MdRocketLaunch } from 'react-icons/md'
+import { pipe } from 'effect'
 import { LearnMore } from '../components/LearnMore'
-
-const MIN_UDISC = 0
-const MAX_UDISC = 300
-const MIN_PDGA = 500
-const MAX_PDGA = 1100
-const DEBOUNCE_DELAY = 300 // ms
-
-const clamp = (num: number, min: number, max: number): number =>
-  Math.max(min, Math.min(max, num))
+import {
+  UDISC_MIN,
+  UDISC_MAX,
+  PDGA_MIN,
+  PDGA_MAX,
+  DEBOUNCE_DELAY,
+} from '../utils/const'
+import { pdgaFromUdiscSimple } from '../utils/pdgaFromUdiscSimple'
+import { udiscFromPdgaSimple } from '../utils/udiscFromPdgaSimple'
 
 export default function Home() {
   // const initialUDisc = '175'
@@ -79,13 +80,11 @@ export default function Home() {
       } else {
         const numValue = parseFloat(valueStr)
         if (!isNaN(numValue)) {
-          if (numValue < MIN_UDISC || numValue > MAX_UDISC) {
+          if (numValue < UDISC_MIN || numValue > UDISC_MAX) {
             currentWarning =
               'uDisc Rating outside 0-300 range. Calculation uses nearest limit.'
           }
-          const clampedUDisc = clamp(numValue, MIN_UDISC, MAX_UDISC)
-          const calculatedPdga = clampedUDisc * 2 + 500
-          setDisplayPdga(String(calculatedPdga))
+          pipe(numValue, pdgaFromUdiscSimple, (x) => String(x), setDisplayPdga)
         } else {
           // Handle invalid number input (e.g., '-', '1.2.3')
           setDisplayPdga('')
@@ -110,13 +109,11 @@ export default function Home() {
       } else {
         const numValue = parseFloat(valueStr)
         if (!isNaN(numValue)) {
-          if (numValue < MIN_PDGA || numValue > MAX_PDGA) {
+          if (numValue < PDGA_MIN || numValue > PDGA_MAX) {
             currentWarning =
               'PDGA Rating outside 500-1100 range. Calculation uses nearest limit.'
           }
-          const clampedPdga = clamp(numValue, MIN_PDGA, MAX_PDGA)
-          const calculatedUDisc = (clampedPdga - 500) / 2
-          setDisplayUDisc(String(calculatedUDisc))
+          pipe(numValue, udiscFromPdgaSimple, (x) => String(x), setDisplayUDisc)
         } else {
           setDisplayUDisc('')
         }
