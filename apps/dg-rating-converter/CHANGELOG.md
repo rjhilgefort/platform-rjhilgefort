@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.0.6
+
+### Patch Changes
+
+- 0d0dd3d: fix tabbing between inputs
+
 ## 1.0.5
 
 ### Patch Changes
