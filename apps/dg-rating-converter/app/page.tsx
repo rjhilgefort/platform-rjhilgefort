@@ -228,13 +228,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center">
-            <div className="flex items-center justify-center gap-0">
+          <div className="flex flex-col items-center justify-center my-2 md:my-0">
+            <div className="flex items-center justify-center gap-0 mb-2 md:mb-0">
               <MdArrowBack
                 className="pointer-events-none text-gray-400 text-2xl sm:text-3xl -mr-1.5"
                 aria-hidden="true"
               />
-              <div className="dropdown dropdown-center w-[11ch]">
+              <div className="dropdown dropdown-center w-[10ch] sm:w-[11ch]">
                 <div
                   tabIndex={0}
                   role="button"
