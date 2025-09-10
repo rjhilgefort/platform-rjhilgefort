@@ -24,6 +24,7 @@ import { pdgaFromUdiscSimple } from '../utils/pdgaFromUdiscSimple'
 import { udiscFromPdgaSimple } from '../utils/udiscFromPdgaSimple'
 import { pdgaFromUdiscPolynomial } from '../utils/pdgaFromUdiscPolynomial'
 import { udiscFromPdgaPolynomial } from '../utils/udiscFromPdgaPolynomial'
+import { FaEnvelope } from 'react-icons/fa'
 
 export default function Home() {
   // const initialUDisc = '175'
@@ -373,12 +374,18 @@ export default function Home() {
             <MdRocketLaunch className="mr-1" />
             Built By
             <a
+              href="mailto:rjhilgefort@gmail.com"
+              className="inline-flex items-center gap-1 leading-none hover:text-gray-300 hover:cursor-pointer border-b border-current pb-[2px]"
+            >
+              <FaEnvelope /> Rob Hilgefort
+            </a>
+            <a
               href="https://www.pdga.com/player/306677"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-gray-300 hover:cursor-pointer underline underline-offset-2 hover:underline"
             >
-              Rob Hilgefort #306677
+              #306677
             </a>
           </div>
         </div>
