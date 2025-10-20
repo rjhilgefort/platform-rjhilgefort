@@ -1,5 +1,11 @@
 # @repo/dg-rating-converter
 
+## 1.1.3
+
+### Patch Changes
+
+- e29cd99: add seo and opengraph
+
 ## 1.1.2
 
 ### Patch Changes
