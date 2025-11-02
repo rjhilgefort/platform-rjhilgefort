@@ -40,6 +40,42 @@ Start a specific app:
 npm run dev --filter=@repo/bright-future
 ```
 
+### Deployment
+
+Deployment is handled by GitHub Actions.
+
+- Make changes to an app and commit those changes.
+- `npm run changeset` to create a changeset.
+  - Note, if you make changes directly on the `main` branch, `changeset` won't be able to tell what package you've changed as it diffs against `main` to figure out what's changed. If you want that convenience, make your changes on a branch.
+- `npm run version` to version the packages.
+- `git push`.
+- `git checkout deploy/production`
+- `git merge main` (or `git merge -` if coming from main)
+- `git push`
+
+That will kick off a deployment pipeline for the app that has changed (the jobs filter based on which `app` was changed).
+
+### Deployment Environment Variables
+
+Portainer is used to deploy the apps (docker compose files). To setup environment variables, map them in your docker compose and then add them below the compose file in the Portainer stack UI.
+
+Example docker compose file:
+
+```yaml
+services:
+  bright-future-site:
+    image: rjhilgefort/bright-future:latest
+    container_name: bright-future-site
+    environment:
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_APP_PASSWORD=${SMTP_APP_PASSWORD}
+      - SMTP_CONTACT_EMAIL_TO=${SMTP_CONTACT_EMAIL_TO}
+    ports:
+      - 3001:3000
+    restart: unless-stopped
+    network_mode: bridge
+```
+
 ## Project Structure
 
 ```

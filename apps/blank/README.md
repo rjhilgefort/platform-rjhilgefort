@@ -1,29 +1,26 @@
-# @repo/blank
+# Blank
 
-## Getting Started
+Blank template app.
 
-1. Install dependencies
+## Quick Start
 
-```
-npm install
-```
+Run this app in development:
 
-2. Run the dev server
-
-```
-npm run dev
+```bash
+npm run dev --filter=@repo/blank
 ```
 
-Or build for production:
+Visit: http://localhost:3000
 
-```
-npm run build
-npm run start
-```
+## Environment Variables
 
-3. Docker
+No environment variables required.
 
-```
-docker build -t rjhilgefort/bright-future:latest .
-docker push rjhilgefort/bright-future:latest
-```
+## More Info
+
+See the [root README](../../README.md) for:
+
+- Installation & setup
+- Monorepo commands
+- Working with shared packages
+- Contributing guidelines

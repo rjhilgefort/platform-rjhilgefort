@@ -1,29 +1,28 @@
-# @repo/bergen-meadow
+# Bergen Meadow
 
-## Getting Started
+Bergen Meadow update site.
 
-1. Install dependencies
+## Quick Start
 
-```
-npm install
-```
+Run this app in development:
 
-2. Run the dev server
-
-```
-npm run dev
+```bash
+npm run dev --filter=@repo/bergen-meadow
 ```
 
-Or build for production:
+Visit: http://localhost:3003
 
-```
-npm run build
-npm run start
-```
+**Live URL**: https://bergenmeadowupdate.com/
 
-3. Dockers
+## Environment Variables
 
-```
-docker build -t rjhilgefort/bergen-meadow:latest .
-docker push rjhilgefort/bergen-meadow:latest
-```
+No environment variables required.
+
+## More Info
+
+See the [root README](../../README.md) for:
+
+- Installation & setup
+- Monorepo commands
+- Working with shared packages
+- Contributing guidelines

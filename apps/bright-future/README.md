@@ -1,29 +1,41 @@
 # Bright Future
 
-## Getting Started
+Bright Future preschool website with contact form.
 
-1. Install dependencies
+## Quick Start
 
-```
-npm install
-```
+Run this app in development:
 
-2. Run the dev server
-
-```
-npm run dev
+```bash
+npm run dev --filter=@repo/bright-future
 ```
 
-Or build for production:
+Visit: http://localhost:3001
 
-```
-npm run build
-npm run start
+**Live URL**: https://brightfuture-preschool.com/contact
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local` and configure:
+
+```bash
+# Gmail SMTP Configuration for Contact Form
+SMTP_EMAIL=""                 # Your Gmail address
+SMTP_APP_PASSWORD=""          # Gmail App Password (16 chars from Google Account settings)
+SMTP_CONTACT_EMAIL_TO=""      # Email address to receive submissions (defaults to SMTP_EMAIL)
 ```
 
-3. Docker
+**Setup Instructions:**
 
-```
-docker build -t rjhilgefort/bright-future:latest .
-docker push rjhilgefort/bright-future:latest
-```
+1. Enable 2-Factor Authentication on your Google Account
+2. Generate an App Password at: https://myaccount.google.com/apppasswords
+3. Copy the 16-character App Password (remove spaces)
+
+## More Info
+
+See the [root README](../../README.md) for:
+
+- Installation & setup
+- Monorepo commands
+- Working with shared packages
+- Contributing guidelines

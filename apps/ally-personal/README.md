@@ -1,29 +1,28 @@
-# Ally Hilgefort
+# Ally Personal
 
-## Getting Startedd
+Personal portfolio site for Ally.
 
-1. Install dependencies
+## Quick Start
 
-```
-npm install
-```
+Run this app in development:
 
-2. Run the dev server
-
-```
-npm run dev
+```bash
+npm run dev --filter=@repo/ally-personal
 ```
 
-Or build for production:
+Visit: http://localhost:3002
 
-```
-npm run build
-npm run start
-```
+**Live URL**: https://ally.hilgefort.me/
 
-3. Docker
+## Environment Variables
 
-```
-docker build -t rjhilgefort/ally-personal:latest .
-docker push rjhilgefort/ally-personal:latest
-```
+No environment variables required.
+
+## More Info
+
+See the [root README](../../README.md) for:
+
+- Installation & setup
+- Monorepo commands
+- Working with shared packages
+- Contributing guidelines
