@@ -91,12 +91,9 @@ const Footer = () => {
                   d="M3.5 8.5L12 15l8.5-6.5"
                 />
               </svg>
-              <a
-                href="mailto:info@brightfuturekids.com"
-                className="link link-hover"
-              >
-                info@brightfuturekids.com
-              </a>
+              <Link href="/contact" className="link link-hover">
+                Contact Us
+              </Link>
             </div>
             <div className="flex items-center gap-1">
               <svg

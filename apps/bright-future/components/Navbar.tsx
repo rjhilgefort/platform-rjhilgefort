@@ -54,12 +54,12 @@ const Navbar = () => {
               <Link href="/">Home</Link>
             </li>
             <li>
-              <Link href="/about">About Us</Link>
-            </li>
-            <li>
               <a href="#programs-section" onClick={scrollToPrograms}>
                 Programs
               </a>
+            </li>
+            <li>
+              <Link href="/about">About Us</Link>
             </li>
           </ul>
         </div>
@@ -93,13 +93,13 @@ const Navbar = () => {
         </ul>
       </div>
       <div className="navbar-end">
-        <a
-          href={phoneNumberLink}
+        <Link
+          href="/contact"
           className="btn btn-primary flex items-center gap-2"
         >
           <FaPhone className="h-4 w-4" />
-          {phoneNumberPretty}
-        </a>
+          Contact Us
+        </Link>
       </div>
     </div>
   )

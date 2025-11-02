@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { FaQuoteLeft } from 'react-icons/fa'
 
 interface TestimonialProps {
   quote: string
@@ -20,15 +21,35 @@ const Testimonial = ({ quote, author, rating, date }: TestimonialProps) => {
   return (
     <div className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow w-full">
       <div className="card-body p-6">
-        <div className="flex items-center mb-4">
-          <div className="avatar placeholder mr-4">
-            <div className="bg-primary text-primary-content rounded-full w-12">
-              <span className="text-xl">{author.charAt(0)}</span>
-            </div>
-          </div>
+        {/* Quote Icon */}
+        <div className="flex justify-start mb-3">
+          <FaQuoteLeft className="text-primary text-2xl opacity-40" />
+        </div>
+
+        {/* Quote Text */}
+        <div className="relative mb-6">
+          <p className="text-base whitespace-pre-line italic text-gray-700">
+            {truncatedQuote}
+          </p>
+
+          {isLongQuote && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-primary hover:text-primary-focus text-sm font-medium mt-2"
+            >
+              {expanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="divider my-2"></div>
+
+        {/* Author Info */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h4 className="font-medium text-lg">{author}</h4>
-            <div className="flex items-center gap-2">
+            <h4 className="font-semibold text-lg text-gray-900">{author}</h4>
+            <div className="flex items-center gap-2 mt-1">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <svg
@@ -42,34 +63,21 @@ const Testimonial = ({ quote, author, rating, date }: TestimonialProps) => {
                   </svg>
                 ))}
               </div>
-              {date && <span className="text-xs text-gray-500">{date}</span>}
+              {date && (
+                <span className="text-xs text-gray-500 ml-1">{date}</span>
+              )}
             </div>
           </div>
-        </div>
 
-        <div className="relative">
-          <p className="text-base whitespace-pre-line">{truncatedQuote}</p>
-
-          {isLongQuote && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-primary hover:text-primary-focus text-sm font-medium mt-2"
-            >
-              {expanded ? 'Show less' : 'Show more'}
-            </button>
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center">
           <a
             href="https://www.google.com/maps/place/Bright+Future+Child+Enrichment/@39.0032551,-84.5853886,857m/data=!3m2!1e3!4b1!4m6!3m5!1s0x8841b8418492cdd7:0xf03a67a4fca9ab77!8m2!3d39.0032551!4d-84.5828083!16s%2Fg%2F1td_cc7g"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:text-primary flex items-center gap-1"
+            className="badge badge-outline badge-primary gap-1 p-3"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-3 w-3"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -81,7 +89,7 @@ const Testimonial = ({ quote, author, rating, date }: TestimonialProps) => {
                 d="M14 5l7 7m0 0l-7 7m7-7H3"
               />
             </svg>
-            <span>View on Google Maps</span>
+            <span className="text-xs">View on Google</span>
           </a>
         </div>
       </div>

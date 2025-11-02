@@ -1,5 +1,6 @@
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Outfit } from 'next/font/google'
+import { Toaster } from 'react-hot-toast'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import './globals.css'
@@ -19,6 +20,7 @@ export default function RootLayout({
           <main className="flex-grow">{children}</main>
           <Footer />
         </div>
+        <Toaster />
         <GoogleAnalytics gaId="TODO" />
       </body>
     </html>
