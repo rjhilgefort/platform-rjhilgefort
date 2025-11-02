@@ -1,21 +1,162 @@
-# Platform RJHilgefort
+# `rjhilgefort`'s Platform Monorepo
 
-## Development
+A monorepo containing multiple Next.js applications and shared packages, managed with [Turborepo](https://turbo.build/) and npm workspaces.
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with React 19
+- **Styling**: Tailwind CSS 4, DaisyUI
+- **Language**: TypeScript 5.7
+- **Build Tool**: Turborepo
+- **Package Manager**: npm workspaces
+- **Versioning**: Changesets
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- npm 10.8.2 (or compatible)
+
+### Installation
+
+Install all dependencies across the monorepo:
 
 ```bash
 npm install
 ```
 
+### Development
+
+Start all apps in development mode with hot reload:
+
 ```bash
 npm run dev
 ```
 
-## Ports
+Start a specific app:
 
-| App                 | Port                   |
-| ------------------- | ---------------------- |
-| Blank               | http://localhost:3000/ |
-| Bright Future       | http://localhost:3001/ |
-| Ally Personal       | http://localhost:3002/ |
-| Bergen Meadow       | http://localhost:3003/ |
-| DG Rating Converter | http://localhost:3004/ |
+```bash
+npm run dev --filter=@repo/bright-future
+```
+
+## Project Structure
+
+```
+platform-rjhilgefort/
+├── apps/                                # Next.js applications
+│   ├── ally-personal/                   # Personal portfolio site for Ally
+│   ├── bergen-meadow/                   # Bergen Meadow update site
+│   ├── blank/                           # Blank template app
+│   ├── bright-future/                   # Bright Future preschool site
+│   └── dg-rating-converter/             # DG Rating Converter tool
+├── packages/                            # Shared packages
+│   ├── eslint-config/                   # Shared ESLint configuration
+│   ├── portainer-stack-redeploy/        # Stack redeployment utilities
+│   ├── portainer-stack-redeploy-action/ # GitHub Action for deployment
+│   ├── tailwind-config/                 # Shared Tailwind configuration
+│   ├── typescript-config/               # Shared TypeScript configuration
+│   └── ui/                              # Shared UI components
+├── .changeset/                          # Changeset configuration for versioning
+└── turbo.json                           # Turborepo configuration
+```
+
+### Apps
+
+Each app is a standalone Next.js application.
+
+### Packages
+
+Shared packages are used across multiple apps:
+
+- **@repo/ui**: Reusable React components with Tailwind CSS
+- **@repo/eslint-config**: Shared ESLint rules
+- **@repo/tailwind-config**: Shared Tailwind configuration
+- **@repo/typescript-config**: Shared TypeScript settings
+- **portainer-stack-redeploy**: Utilities for Portainer deployments
+- **portainer-stack-redeploy-action**: GitHub Action for CI/CD
+
+## Development Ports / Live URLs
+
+| App                 | Port                   | Live URL                                   |
+| ------------------- | ---------------------- | ------------------------------------------ |
+| Blank               | http://localhost:3000/ |                                            |
+| Bright Future       | http://localhost:3001/ | https://brightfuture-preschool.com/contact |
+| Ally Personal       | http://localhost:3002/ | https://ally.hilgefort.me/                 |
+| Bergen Meadow       | http://localhost:3003/ | https://bergenmeadowupdate.com/            |
+| DG Rating Converter | http://localhost:3004/ | https://dgratingconverter.com/             |
+
+## Available Scripts
+
+### Root Level
+
+```bash
+npm run dev           # Start all apps in development mode
+npm run build         # Build all apps and packages
+npm run lint          # Lint all packages
+npm run lint:fix      # Fix linting issues
+npm run check-types   # Run TypeScript type checking
+npm run format        # Format code with Prettier
+```
+
+### Turborepo Filtering
+
+Run commands for specific workspaces:
+
+```bash
+# Run dev for a specific app
+npm run dev --filter=@repo/bright-future
+
+# Build only one app and its dependencies
+npm run build --filter=@repo/ally-personal
+
+# Run lint on all packages except apps
+npm run lint --filter=./packages/*
+```
+
+## Working with Packages
+
+### Adding a New Shared Package
+
+1. Create a new directory in `packages/`
+2. Add a `package.json` with name `@repo/package-name`
+3. Update the package's exports in `package.json`
+4. Reference it in app dependencies as `"@repo/package-name": "*"`
+
+### Using Shared Packages
+
+In any app's `package.json`:
+
+```json
+{
+  "dependencies": {
+    "@repo/ui": "*"
+  }
+}
+```
+
+## Versioning & Publishing
+
+This monorepo uses [Changesets](https://github.com/changesets/changesets) for version management:
+
+### Creating a Changeset
+
+```bash
+npm run changeset
+```
+
+Follow the prompts to describe your changes.
+
+### Versioning Packages
+
+```bash
+npm run version
+```
+
+## Type Checking
+
+Run TypeScript type checking across all packages:
+
+```bash
+npm run check-types
+```
