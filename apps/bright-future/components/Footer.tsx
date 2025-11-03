@@ -51,7 +51,7 @@ const Footer = () => {
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span>240 Main St, Florence, KY 41042</span>
+              <span>3410 Turkeyfoot Road, Erlanger, Ky 41018</span>
             </div>
             <div className="flex items-center gap-1">
               <svg

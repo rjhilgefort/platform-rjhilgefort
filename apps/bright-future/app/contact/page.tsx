@@ -1,5 +1,6 @@
 import ContactForm from '../../components/ContactForm'
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock } from 'react-icons/fa'
+import { phoneNumberLink, phoneNumberPretty } from '../../utils/const'
 
 export default function ContactPage() {
   return (
@@ -11,8 +12,8 @@ export default function ContactPage() {
             Get in Touch
           </h1>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-            Have questions about our programs? Ready to schedule a tour? We'd
-            love to hear from you!
+            Have questions about our programs? Ready to schedule a tour?
+            We&apos;d love to hear from you!
           </p>
         </div>
 
@@ -47,10 +48,10 @@ export default function ContactPage() {
                         Phone
                       </h3>
                       <a
-                        href="tel:+18593443663"
+                        href={phoneNumberLink}
                         className="text-primary hover:underline"
                       >
-                        (859) 344-3663
+                        {phoneNumberPretty}
                       </a>
                     </div>
                   </div>
@@ -87,7 +88,7 @@ export default function ContactPage() {
                         Location
                       </h3>
                       <p className="text-gray-700">
-                        3206 Dixie Highway
+                        3410 Turkeyfoot Road
                         <br />
                         Erlanger, KY 41018
                       </p>
@@ -108,7 +109,7 @@ export default function ContactPage() {
                       <p className="text-gray-700">
                         Monday - Friday
                         <br />
-                        6:00 AM - 6:00 PM
+                        6:30 AM - 6:00 PM
                       </p>
                     </div>
                   </div>
@@ -122,12 +123,12 @@ export default function ContactPage() {
                 <h2 className="card-title text-2xl">Schedule a Tour</h2>
                 <p className="mb-4">
                   The best way to experience Bright Future is to visit us in
-                  person. We'd love to show you around and introduce you to our
-                  team! Use the contact form to schedule a tour.
+                  person. We&apos;d love to show you around and introduce you to
+                  our team! Use the contact form to schedule a tour.
                 </p>
                 {/* <div className="card-actions justify-end">
                   <a
-                    href="tel:+18593443663"
+                    href={phoneNumberLink}
                     className="btn btn-secondary w-full sm:w-auto"
                   >
                     <FaPhone />
