@@ -5,7 +5,6 @@ Next.js website for Proof & Pour, a premium bourbon tasting event company servin
 ## Quick Start
 
 ```bash
-# From monorepo root
 npm install
 
 # Set up environment variables

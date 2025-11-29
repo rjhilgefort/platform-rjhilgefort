@@ -10,7 +10,7 @@ on:
     branches:
       - "deploy/production"
     paths:
-      - "apps/proof-and-pour/**"
+      - "apps/proof-n-pour/**"
 
 jobs:
   build-and-deploy:
