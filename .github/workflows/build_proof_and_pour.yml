@@ -1,16 +1,16 @@
-name: DG Rating Converter - Build and Deploy
+name: Proof & Pour - Build and Deploy
 
 env:
-  APP_NAME: dg-rating-converter
-  STACK_NAME: dg-rating-converter-site
-  NOTIFICATION_PREFIX: "[deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for [DG Rating Converter](https://dgratingconverter.com/)"
+  APP_NAME: proof-and-pour
+  STACK_NAME: proof-and-pour-site
+  NOTIFICATION_PREFIX: "[deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for [Proof & Pour](https://proofandpour.com/)"
 
 on:
   push:
     branches:
       - "deploy/production"
     paths:
-      - "apps/dg-rating-converter/**"
+      - "apps/proof-and-pour/**"
 
 jobs:
   build-and-deploy:

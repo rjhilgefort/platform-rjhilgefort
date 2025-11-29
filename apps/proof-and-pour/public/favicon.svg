@@ -1,0 +1,17 @@
+<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="32" height="32" fill="#1a1a1a"/>
+
+  <!-- Bourbon glass simple icon -->
+  <g transform="translate(16, 10)">
+    <!-- Glass -->
+    <path d="M-6,0 L-5,10 L5,10 L6,0 Z" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+    <!-- Liquid -->
+    <path d="M-5.5,6 L-5,10 L5,10 L5.5,6 Z" fill="#8B4513"/>
+  </g>
+
+  <!-- Small "P" text -->
+  <text x="16" y="28" font-family="serif" font-size="14" font-weight="bold" fill="#d4af37" text-anchor="middle">
+    P
+  </text>
+</svg>
