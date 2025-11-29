@@ -29,7 +29,7 @@ Complete checklist for launching your Proof & Pour site.
 ### 4. Domain & Deployment
 
 - [ ] Purchase domain (e.g., proofandpour.com)
-- [ ] Create Portainer stack: `proof-and-pour-site`
+- [ ] Create Portainer stack: `proof-n-pour-site`
 - [ ] Configure environment variables in Portainer
 - [ ] Set up SSL certificate
 - [ ] Configure reverse proxy/port mapping

@@ -194,7 +194,7 @@ This document outlines all images needed for the Proof & Pour website.
 1. **Prepare your images** following the specs above
 2. **Place them in the correct folders**:
    ```
-   /apps/proof-and-pour/public/images/[folder]/[filename]
+   /apps/proof-n-pour/public/images/[folder]/[filename]
    ```
 3. **Images will automatically display** once files are added (code is ready)
 4. **No code changes needed** - just drop files in correct locations with correct names

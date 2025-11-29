@@ -8,12 +8,12 @@ Next.js website for Proof & Pour, a premium bourbon tasting event company servin
 npm install
 
 # Set up environment variables
-cd apps/proof-and-pour
+cd apps/proof-n-pour
 cp .env.example .env.local
 # Edit .env.local with your credentials
 
 # Run development server
-npm run dev --filter=@repo/proof-and-pour
+npm run dev --filter=@repo/proof-n-pour
 # Visit http://localhost:3005
 ```
 
@@ -46,7 +46,7 @@ npm run dev --filter=@repo/proof-and-pour
 **4. Domain & Deployment**
 
 - [ ] Purchase domain (e.g., proofandpour.com)
-- [ ] Create Portainer stack: `proof-and-pour-site`
+- [ ] Create Portainer stack: `proof-n-pour-site`
 - [ ] Configure environment variables in Portainer
 - [ ] Set up SSL certificate
 - [ ] Configure reverse proxy/port mapping
@@ -165,7 +165,7 @@ Required (see `.env.example`):
 
 ## Deployment
 
-Deploys via GitHub Actions to `proof-and-pour-site` stack:
+Deploys via GitHub Actions to `proof-n-pour-site` stack:
 
 ```bash
 git push origin main:deploy/production

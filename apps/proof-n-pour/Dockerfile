@@ -9,7 +9,7 @@ RUN yarn global add turbo@^2
 COPY . .
 
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
-RUN turbo prune @repo/proof-and-pour --docker
+RUN turbo prune @repo/proof-n-pour --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
@@ -35,8 +35,8 @@ USER nextjs
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=installer --chown=nextjs:nodejs /app/apps/proof-and-pour/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/proof-and-pour/.next/static ./apps/proof-and-pour/.next/static
-COPY --from=installer --chown=nextjs:nodejs /app/apps/proof-and-pour/public ./apps/proof-and-pour/public
+COPY --from=installer --chown=nextjs:nodejs /app/apps/proof-n-pour/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/proof-n-pour/.next/static ./apps/proof-n-pour/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/proof-n-pour/public ./apps/proof-n-pour/public
 
-CMD ["node", "--experimental-modules", "apps/proof-and-pour/server.js"]
+CMD ["node", "--experimental-modules", "apps/proof-n-pour/server.js"]
