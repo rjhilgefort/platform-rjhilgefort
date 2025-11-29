@@ -1,8 +1,8 @@
 name: Proof & Pour - Build and Deploy
 
 env:
-  APP_NAME: proof-and-pour
-  STACK_NAME: proof-and-pour-site
+  APP_NAME: proof-n-pour
+  STACK_NAME: proof-n-pour-site
   NOTIFICATION_PREFIX: "[deployment pipeline](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for [Proof & Pour](https://proofandpour.com/)"
 
 on:
