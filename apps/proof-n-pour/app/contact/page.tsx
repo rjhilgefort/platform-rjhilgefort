@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock } from 'react-icons/fa'
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock, FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa'
 import ContactForm from '../../components/ContactForm'
 import HeroImage from '../../components/HeroImage'
 
@@ -120,39 +120,36 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Social Media Placeholders */}
+              {/* Social Media */}
               <div className="card bg-base-200">
                 <div className="card-body">
                   <h3 className="font-bold mb-3">Follow Us</h3>
                   <div className="flex gap-4">
                     <a
-                      href="https://instagram.com/proofnpour"
+                      href="https://instagram.com/proofnpourbourbon"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-circle btn-outline"
+                      className="btn btn-circle btn-outline hover:btn-primary"
                     >
-                      IG
+                      <FaInstagram className="w-5 h-5" />
                     </a>
                     <a
-                      href="https://tiktok.com/@proofandpour"
+                      href="https://tiktok.com/@proofnpourbourbon"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-circle btn-outline"
+                      className="btn btn-circle btn-outline hover:btn-primary"
                     >
-                      TT
+                      <FaTiktok className="w-5 h-5" />
                     </a>
                     <a
-                      href="https://youtube.com/@proofandpour"
+                      href="https://youtube.com/@proofnpourbourbon"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-circle btn-outline"
+                      className="btn btn-circle btn-outline hover:btn-primary"
                     >
-                      YT
+                      <FaYoutube className="w-5 h-5" />
                     </a>
                   </div>
-                  <p className="text-sm text-base-content/70 mt-2">
-                    Social channels launching soon
-                  </p>
                 </div>
               </div>
             </div>

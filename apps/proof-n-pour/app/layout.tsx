@@ -2,6 +2,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import { Outfit } from 'next/font/google'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa'
 import './globals.css'
 
 const outfit = Outfit({ subsets: ['latin'] })
@@ -75,15 +76,15 @@ export default function RootLayout({
             <Link href="/partnerships" className="link link-hover">Partnerships</Link>
           </nav>
           <nav>
-            <div className="grid grid-flow-col gap-4">
-              <a href="https://twitter.com/proofandpour" target="_blank" rel="noopener noreferrer" className="link">
-                Twitter
+            <div className="grid grid-flow-col gap-6">
+              <a href="https://instagram.com/proofnpourbourbon" target="_blank" rel="noopener noreferrer" className="link hover:text-primary transition-colors">
+                <FaInstagram className="w-6 h-6" />
               </a>
-              <a href="https://instagram.com/proofandpour" target="_blank" rel="noopener noreferrer" className="link">
-                Instagram
+              <a href="https://tiktok.com/@proofnpourbourbon" target="_blank" rel="noopener noreferrer" className="link hover:text-primary transition-colors">
+                <FaTiktok className="w-6 h-6" />
               </a>
-              <a href="https://youtube.com/@proofandpour" target="_blank" rel="noopener noreferrer" className="link">
-                YouTube
+              <a href="https://youtube.com/@proofnpourbourbon" target="_blank" rel="noopener noreferrer" className="link hover:text-primary transition-colors">
+                <FaYoutube className="w-6 h-6" />
               </a>
             </div>
           </nav>
