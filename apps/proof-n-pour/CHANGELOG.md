@@ -1,5 +1,11 @@
 # @repo/blank
 
+## 0.0.3
+
+### Patch Changes
+
+- 8c17a80: update social icons, fix hero image
+
 ## 0.0.2
 
 ### Patch Changes
