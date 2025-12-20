@@ -1,5 +1,11 @@
 # @repo/blank
 
+## 0.0.4
+
+### Patch Changes
+
+- 8def1cb: update favicon
+
 ## 0.0.3
 
 ### Patch Changes
