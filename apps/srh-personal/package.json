@@ -1,6 +1,6 @@
 {
   "name": "@repo/srh-personal",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3006 --turbopack",
