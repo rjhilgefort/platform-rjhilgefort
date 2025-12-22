@@ -40,6 +40,9 @@ const Header = () => {
                   <a href={item.href}>{item.name}</a>
                 </li>
               ))}
+              <li>
+                <a href="mailto:ally.hilgefort@gmail.com">Reach Out!</a>
+              </li>
             </ul>
           </div>
           <Link className="btn btn-ghost text-xl" href="/">
@@ -61,11 +64,11 @@ const Header = () => {
         <div className="navbar-end">
           <a
             href="mailto:ally.hilgefort@gmail.com"
-            className="btn btn-primary gap-2"
+            className="btn btn-primary gap-2 hidden lg:flex"
             aria-label="Reach out via email"
           >
             <FaEnvelope />
-            <span className="hidden md:inline">Reach Out!</span>
+            Reach Out!
           </a>
         </div>
       </nav>
