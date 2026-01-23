@@ -1,5 +1,12 @@
 import { Metadata } from 'next'
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock, FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa'
+import {
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaClock,
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+} from 'react-icons/fa'
 import ContactForm from '../../components/ContactForm'
 import HeroImage from '../../components/HeroImage'
 
