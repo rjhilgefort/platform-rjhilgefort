@@ -1,0 +1,104 @@
+import { NextResponse } from 'next/server'
+import { eq } from 'drizzle-orm'
+import { db } from '../../../../db/client'
+import { activeTimers, kids, budgetTypes, earningTypes } from '../../../../db/schema'
+import { getOrCreateTodayBalance } from '../../../../lib/balance'
+
+export async function POST(request: Request) {
+  const { kidId, budgetTypeId, earningTypeId } = await request.json()
+
+  if (!kidId || !budgetTypeId) {
+    return NextResponse.json(
+      { error: 'kidId and budgetTypeId required' },
+      { status: 400 }
+    )
+  }
+
+  // Verify kid exists
+  const kid = await db.query.kids.findFirst({
+    where: eq(kids.id, kidId),
+  })
+
+  if (!kid) {
+    return NextResponse.json({ error: 'Kid not found' }, { status: 404 })
+  }
+
+  // Verify budget type exists
+  const budgetType = await db.query.budgetTypes.findFirst({
+    where: eq(budgetTypes.id, budgetTypeId),
+  })
+
+  if (!budgetType) {
+    return NextResponse.json({ error: 'Budget type not found' }, { status: 404 })
+  }
+
+  // If earning timer, verify earning type exists
+  let earningType = null
+  if (earningTypeId) {
+    earningType = await db.query.earningTypes.findFirst({
+      where: eq(earningTypes.id, earningTypeId),
+    })
+    if (!earningType) {
+      return NextResponse.json({ error: 'Earning type not found' }, { status: 404 })
+    }
+  }
+
+  // Check for existing active timer
+  const existingTimer = await db.query.activeTimers.findFirst({
+    where: eq(activeTimers.kidId, kidId),
+  })
+
+  if (existingTimer) {
+    return NextResponse.json(
+      { error: 'Timer already active for this kid' },
+      { status: 409 }
+    )
+  }
+
+  // Ensure today's balance exists
+  const balance = await getOrCreateTodayBalance(kidId)
+
+  // For consumption timers (no earningTypeId), check if there's time remaining
+  if (!earningTypeId) {
+    const typeBalance = balance.typeBalances.find((tb) => tb.budgetTypeId === budgetTypeId)
+    if (!typeBalance || typeBalance.remainingSeconds <= 0) {
+      return NextResponse.json(
+        { error: 'No time remaining for this budget' },
+        { status: 400 }
+      )
+    }
+  }
+
+  // Create active timer
+  const result = await db
+    .insert(activeTimers)
+    .values({
+      kidId,
+      budgetTypeId,
+      earningTypeId: earningTypeId ?? null,
+      startedAt: new Date(),
+    })
+    .returning()
+
+  const timer = result[0]
+  if (!timer) {
+    return NextResponse.json({ error: 'Failed to create timer' }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    timer: {
+      id: timer.id,
+      kidId: timer.kidId,
+      budgetTypeId: timer.budgetTypeId,
+      budgetTypeSlug: budgetType.slug,
+      budgetTypeDisplayName: budgetType.displayName,
+      earningTypeId: timer.earningTypeId,
+      earningTypeSlug: earningType?.slug ?? null,
+      earningTypeDisplayName: earningType?.displayName ?? null,
+      startedAt: timer.startedAt.toISOString(),
+    },
+    balance: {
+      typeBalances: balance.typeBalances,
+    },
+  })
+}

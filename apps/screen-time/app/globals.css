@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+  themes: bumblebee --default, dark;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: oklch(var(--p)); }
+  50% { border-color: oklch(var(--s)); }
+}
+
+.timer-running {
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+.timer-warning {
+  @apply text-error;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-8px); }
+}
