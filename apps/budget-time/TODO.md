@@ -8,7 +8,7 @@
 - [x] in the settings page for the current balance for a kid, the order of the timers should match how it is on the main screen. That means the extra budget timer should be last in the list. Same goes for daily defaults.
 - [x] show the timer icon for the timer is in the settings page.
 - [x] Clarify "default time per day" - make clear it's time appended at start of next day and whatever they had from the previous day will carryover. Might be nice to have a little explainer about that on the settings page.
-- [ ] save notifications are blocking the back button on the settings page. When you click a notification, it should dismiss.
+- [x] save notifications are blocking the back button on the settings page. When you click a notification, it should dismiss.
 - [ ] Fix timer display on mobile when >1hr (too wide for tile)
 - [ ] Compact layout for tablet - reduce height, compress tiles
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?)

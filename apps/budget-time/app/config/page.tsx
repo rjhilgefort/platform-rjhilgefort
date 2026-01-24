@@ -974,9 +974,14 @@ export default function ConfigPage() {
       </div>
 
       {toasts.length > 0 && (
-        <div className="toast toast-end toast-top">
+        <div className="toast toast-end toast-top pointer-events-none">
           {toasts.map((t) => (
-            <div key={t.id} className="alert alert-success">
+            <button
+              type="button"
+              key={t.id}
+              className="alert alert-success pointer-events-auto cursor-pointer"
+              onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 shrink-0"
@@ -992,7 +997,7 @@ export default function ConfigPage() {
                 />
               </svg>
               <span>{t.message}</span>
-            </div>
+            </button>
           ))}
         </div>
       )}
