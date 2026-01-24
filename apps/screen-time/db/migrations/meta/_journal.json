@@ -8,6 +8,13 @@
       "when": 1769208903476,
       "tag": "0000_complex_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769211811710,
+      "tag": "0001_nifty_giant_man",
+      "breakpoints": true
     }
   ]
 }

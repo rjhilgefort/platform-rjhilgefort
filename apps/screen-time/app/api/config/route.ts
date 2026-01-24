@@ -153,6 +153,17 @@ export async function PUT(request: Request) {
         return NextResponse.json({ error: 'budgetTypeId required' }, { status: 400 })
       }
 
+      // Check if this is the protected earning pool budget type
+      const budgetTypeToDelete = await db.query.budgetTypes.findFirst({
+        where: eq(budgetTypes.id, budgetTypeId),
+      })
+      if (budgetTypeToDelete?.isEarningPool) {
+        return NextResponse.json(
+          { error: 'Cannot delete the earning pool budget type' },
+          { status: 400 }
+        )
+      }
+
       await db.delete(budgetTypes).where(eq(budgetTypes.id, budgetTypeId))
       return NextResponse.json({ success: true })
     }

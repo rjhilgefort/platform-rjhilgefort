@@ -5,11 +5,12 @@ import { activeTimers, kids, budgetTypes, earningTypes } from '../../../../db/sc
 import { getOrCreateTodayBalance } from '../../../../lib/balance'
 
 export async function POST(request: Request) {
-  const { kidId, budgetTypeId, earningTypeId } = await request.json()
+  const { kidId, budgetTypeId: requestedBudgetTypeId, earningTypeId } = await request.json()
 
-  if (!kidId || !budgetTypeId) {
+  // For earning timers, budgetTypeId is optional (will use Extra)
+  if (!kidId || (!earningTypeId && !requestedBudgetTypeId)) {
     return NextResponse.json(
-      { error: 'kidId and budgetTypeId required' },
+      { error: 'kidId required, budgetTypeId required for consumption timers' },
       { status: 400 }
     )
   }
@@ -23,23 +24,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Kid not found' }, { status: 404 })
   }
 
-  // Verify budget type exists
-  const budgetType = await db.query.budgetTypes.findFirst({
-    where: eq(budgetTypes.id, budgetTypeId),
-  })
-
-  if (!budgetType) {
-    return NextResponse.json({ error: 'Budget type not found' }, { status: 404 })
-  }
-
-  // If earning timer, verify earning type exists
+  // If earning timer, verify earning type and get Extra budget type
   let earningType = null
+  let budgetTypeId = requestedBudgetTypeId
+  let budgetType = null
+
   if (earningTypeId) {
     earningType = await db.query.earningTypes.findFirst({
       where: eq(earningTypes.id, earningTypeId),
     })
     if (!earningType) {
       return NextResponse.json({ error: 'Earning type not found' }, { status: 404 })
+    }
+
+    // Force earning timers to use the earning pool budget type
+    budgetType = await db.query.budgetTypes.findFirst({
+      where: eq(budgetTypes.isEarningPool, true),
+    })
+    if (!budgetType) {
+      return NextResponse.json({ error: 'Earning pool budget type not found' }, { status: 500 })
+    }
+    budgetTypeId = budgetType.id
+  } else {
+    // Verify budget type exists for consumption timers
+    budgetType = await db.query.budgetTypes.findFirst({
+      where: eq(budgetTypes.id, budgetTypeId),
+    })
+    if (!budgetType) {
+      return NextResponse.json({ error: 'Budget type not found' }, { status: 404 })
     }
   }
 

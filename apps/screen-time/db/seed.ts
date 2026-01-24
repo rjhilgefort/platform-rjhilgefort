@@ -18,6 +18,7 @@ const main = async () => {
     .values([
       { slug: 'tv', displayName: 'TV', allowCarryover: true, sortOrder: 1 },
       { slug: 'game', displayName: 'Games', allowCarryover: true, sortOrder: 2 },
+      { slug: 'extra', displayName: 'Extra', allowCarryover: true, sortOrder: 99, isEarningPool: true },
     ])
     .onConflictDoNothing()
     .returning()
@@ -54,7 +55,7 @@ const main = async () => {
     allBudgetTypes.map((bt) => ({
       kidId: kid.id,
       budgetTypeId: bt.id,
-      dailyBudgetMinutes: 60,
+      dailyBudgetMinutes: bt.isEarningPool ? 0 : 60,
     }))
   )
 

@@ -19,6 +19,7 @@ export interface TypeBalance {
   remainingSeconds: number
   carryoverSeconds: number
   allowCarryover: boolean
+  isEarningPool: boolean
 }
 
 export interface FullDailyBalance {
@@ -174,6 +175,7 @@ function buildFullBalance(
         remainingSeconds: tb.remainingSeconds,
         carryoverSeconds: tb.carryoverSeconds,
         allowCarryover: bt?.allowCarryover ?? true,
+        isEarningPool: bt?.isEarningPool ?? false,
       }
     }),
   }

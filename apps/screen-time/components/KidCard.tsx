@@ -12,6 +12,7 @@ interface TypeBalance {
   remainingSeconds: number
   carryoverSeconds: number
   allowCarryover: boolean
+  isEarningPool: boolean
 }
 
 interface BudgetType {
@@ -57,21 +58,30 @@ interface KidCardProps {
 export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCardProps) {
   const [showBonus, setShowBonus] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [selectedEarnBudgetTypeId, setSelectedEarnBudgetTypeId] = useState<number>(
-    budgetTypes[0]?.id ?? 0
-  )
 
   const hasActiveTimer = status.activeTimer !== null
-  const isEarningTimer = status.activeTimer?.earningTypeId !== null
+  const isEarningTimer = status.activeTimer?.earningTypeId != null
+  const extraBalance = status.typeBalances.find((tb) => tb.isEarningPool)?.remainingSeconds ?? 0
 
-  const startTimer = async (budgetTypeId: number, earningTypeId?: number) => {
+  // Calculate pending earned seconds when earning timer is running
+  const activeEarningType = isEarningTimer
+    ? earningTypes.find((et) => et.id === status.activeTimer?.earningTypeId)
+    : null
+  const pendingEarnedSeconds = activeEarningType
+    ? Math.floor(
+        ((status.activeTimer?.elapsedSeconds ?? 0) * activeEarningType.ratioDenominator) /
+          activeEarningType.ratioNumerator
+      )
+    : 0
+
+  const startTimer = async (budgetTypeId: number | null, earningTypeId?: number) => {
     setLoading(true)
     await fetch('/api/timers/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         kidId: status.kidId,
-        budgetTypeId,
+        budgetTypeId: budgetTypeId ?? undefined,
         earningTypeId: earningTypeId ?? null,
       }),
     })
@@ -114,35 +124,23 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
               <CountdownTimer
                 key={tb.budgetTypeId}
                 budgetTypeId={tb.budgetTypeId}
+                isEarningPool={tb.isEarningPool}
                 label={tb.budgetTypeDisplayName}
                 remainingSeconds={tb.remainingSeconds}
                 isRunning={isThisTimerRunning}
+                isEarning={tb.isEarningPool && isEarningTimer}
                 onStart={() => startTimer(tb.budgetTypeId)}
                 onStop={stopTimer}
                 disabled={loading || (hasActiveTimer && !isThisTimerRunning)}
+                extraBalance={tb.isEarningPool ? 0 : extraBalance}
+                pendingEarnedSeconds={tb.isEarningPool ? pendingEarnedSeconds : 0}
               />
             )
           })}
         </div>
 
         {/* Earn Time Section */}
-        <div className="divider text-xs text-base-content/50">Earn Time</div>
-
-        {/* Budget Type Selector for Earning */}
-        <div className="flex gap-2 mb-3">
-          {budgetTypes.map((bt) => (
-            <button
-              key={bt.id}
-              type="button"
-              className={`btn btn-sm flex-1 ${
-                selectedEarnBudgetTypeId === bt.id ? 'btn-primary' : 'btn-outline'
-              }`}
-              onClick={() => setSelectedEarnBudgetTypeId(bt.id)}
-            >
-              {bt.displayName}
-            </button>
-          ))}
-        </div>
+        <div className="divider text-xs text-base-content/50">Earn Time → Extra</div>
 
         {/* Earning Timers */}
         <div className="grid grid-cols-2 gap-3">
@@ -153,17 +151,9 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
               <EarningTimer
                 key={et.id}
                 earningType={et}
-                selectedBudgetTypeId={selectedEarnBudgetTypeId}
                 isRunning={isThisEarningRunning}
                 elapsedSeconds={isThisEarningRunning ? status.activeTimer?.elapsedSeconds ?? 0 : 0}
-                activeBudgetTypeName={
-                  isThisEarningRunning
-                    ? budgetTypes.find((bt) => bt.id === status.activeTimer?.budgetTypeId)?.displayName ?? null
-                    : null
-                }
-                onStart={(earningTypeId) =>
-                  startTimer(selectedEarnBudgetTypeId, earningTypeId)
-                }
+                onStart={(earningTypeId) => startTimer(null, earningTypeId)}
                 onStop={stopTimer}
                 disabled={loading || (hasActiveTimer && !isThisEarningRunning)}
               />

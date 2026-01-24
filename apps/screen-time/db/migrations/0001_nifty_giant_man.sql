@@ -1,0 +1,2 @@
+ALTER TABLE "budget_types" ADD COLUMN "is_earning_pool" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX "unique_earning_pool" ON "budget_types" USING btree ("is_earning_pool") WHERE "budget_types"."is_earning_pool" = true;

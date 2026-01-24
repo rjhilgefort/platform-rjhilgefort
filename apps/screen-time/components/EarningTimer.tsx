@@ -12,10 +12,8 @@ interface EarningType {
 
 interface EarningTimerProps {
   earningType: EarningType
-  selectedBudgetTypeId: number
   isRunning: boolean
   elapsedSeconds: number
-  activeBudgetTypeName: string | null
   onStart: (earningTypeId: number) => void
   onStop: () => void
   disabled?: boolean
@@ -25,15 +23,10 @@ export function EarningTimer({
   earningType,
   isRunning,
   elapsedSeconds,
-  activeBudgetTypeName,
   onStart,
   onStop,
   disabled = false,
 }: EarningTimerProps) {
-  const earnedSeconds = Math.floor(
-    (elapsedSeconds * earningType.ratioDenominator) / earningType.ratioNumerator
-  )
-
   return (
     <div
       className={`card bg-success/10 border-2 ${
@@ -42,16 +35,9 @@ export function EarningTimer({
     >
       <div className="card-body p-4">
         <h3 className="text-sm font-medium text-success">{earningType.displayName}</h3>
-        <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-mono font-bold text-success">
-            {formatTime(elapsedSeconds)}
-          </span>
-          {isRunning && activeBudgetTypeName && (
-            <span className="text-sm text-success/70">
-              = {formatTime(earnedSeconds)} {activeBudgetTypeName}
-            </span>
-          )}
-        </div>
+        <span className="text-3xl font-mono font-bold text-success">
+          {formatTime(elapsedSeconds)}
+        </span>
 
         <div className="mt-2">
           {isRunning ? (
@@ -59,8 +45,9 @@ export function EarningTimer({
               type="button"
               className="btn btn-success btn-sm w-full"
               onClick={onStop}
+              disabled={disabled}
             >
-              Done - Earn {formatTime(earnedSeconds)}
+              Done
             </button>
           ) : (
             <button
@@ -74,11 +61,9 @@ export function EarningTimer({
           )}
         </div>
 
-        {!isRunning && (
-          <p className="text-xs text-base-content/50 mt-1">
-            {earningType.ratioNumerator} min = {earningType.ratioDenominator} min screen
-          </p>
-        )}
+        <p className="text-xs text-base-content/50 mt-1">
+          {earningType.ratioNumerator} min = {earningType.ratioDenominator} min
+        </p>
       </div>
     </div>
   )

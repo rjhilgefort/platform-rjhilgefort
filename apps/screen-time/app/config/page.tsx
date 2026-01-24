@@ -22,6 +22,7 @@ interface BudgetType {
   displayName: string
   allowCarryover: boolean
   sortOrder: number
+  isEarningPool: boolean
 }
 
 interface EarningType {
@@ -579,14 +580,22 @@ export default function ConfigPage() {
                     }
                     onBlur={() => updateBudgetType(bt.id, bt.displayName)}
                   />
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm btn-square text-error"
-                    onClick={() => deleteBudgetType(bt.id, bt.displayName)}
-                    title="Delete"
-                  >
-                    x
-                  </button>
+                  {bt.isEarningPool ? (
+                    <div className="tooltip tooltip-left" data-tip="This is the earning pool and cannot be deleted">
+                      <span className="btn btn-ghost btn-sm btn-square text-base-content/30 cursor-help">
+                        ?
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm btn-square text-error"
+                      onClick={() => deleteBudgetType(bt.id, bt.displayName)}
+                      title="Delete"
+                    >
+                      x
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

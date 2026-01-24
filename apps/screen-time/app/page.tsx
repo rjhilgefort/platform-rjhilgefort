@@ -12,6 +12,7 @@ interface TypeBalance {
   remainingSeconds: number
   carryoverSeconds: number
   allowCarryover: boolean
+  isEarningPool: boolean
 }
 
 interface BudgetType {
@@ -20,6 +21,7 @@ interface BudgetType {
   displayName: string
   allowCarryover: boolean
   sortOrder: number
+  isEarningPool: boolean
 }
 
 interface EarningType {

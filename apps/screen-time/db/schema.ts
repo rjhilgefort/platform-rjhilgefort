@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import {
   integer,
   pgTable,
@@ -6,17 +7,27 @@ import {
   timestamp,
   date,
   unique,
+  uniqueIndex,
   boolean,
 } from 'drizzle-orm/pg-core'
 
 // Budget types - things kids spend time on (TV, Games, etc.)
-export const budgetTypes = pgTable('budget_types', {
-  id: serial('id').primaryKey(),
-  slug: text('slug').notNull().unique(),
-  displayName: text('display_name').notNull(),
-  allowCarryover: boolean('allow_carryover').notNull().default(true),
-  sortOrder: integer('sort_order').notNull().default(0),
-})
+export const budgetTypes = pgTable(
+  'budget_types',
+  {
+    id: serial('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
+    displayName: text('display_name').notNull(),
+    allowCarryover: boolean('allow_carryover').notNull().default(true),
+    sortOrder: integer('sort_order').notNull().default(0),
+    // Pool where all earning timers credit time - only one can be true
+    isEarningPool: boolean('is_earning_pool').notNull().default(false),
+  },
+  (t) => [
+    // Partial unique index: only one budget type can be the earning pool
+    uniqueIndex('unique_earning_pool').on(t.isEarningPool).where(sql`${t.isEarningPool} = true`),
+  ]
+)
 
 // Earning types - activities that earn time (Chores, Reading, etc.)
 export const earningTypes = pgTable('earning_types', {
