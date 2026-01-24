@@ -72,6 +72,7 @@ export default function ConfigPage() {
     currentIcon: string | null
   } | null>(null)
   const [resetConfirm, setResetConfirm] = useState<Set<number>>(new Set())
+  const [deleteConfirm, setDeleteConfirm] = useState<Set<string>>(new Set())
   const [savedInputs, setSavedInputs] = useState<Set<string>>(new Set())
   const saveTimeouts = useRef<Record<string, NodeJS.Timeout>>({})
 
@@ -276,7 +277,27 @@ export default function ConfigPage() {
   }
 
   const deleteBudgetType = async (budgetTypeId: number, name: string) => {
-    if (!confirm(`Delete "${name}"? This will remove all related balances.`)) return
+    const key = `bt-${budgetTypeId}`
+
+    // First click: show confirmation
+    if (!deleteConfirm.has(key)) {
+      setDeleteConfirm((prev) => new Set(prev).add(key))
+      setTimeout(() => {
+        setDeleteConfirm((prev) => {
+          const next = new Set(prev)
+          next.delete(key)
+          return next
+        })
+      }, 5000)
+      return
+    }
+
+    // Second click: execute delete
+    setDeleteConfirm((prev) => {
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
     setError('')
 
     const response = await fetch('/api/config', {
@@ -336,7 +357,27 @@ export default function ConfigPage() {
   }
 
   const deleteEarningType = async (earningTypeId: number, name: string) => {
-    if (!confirm(`Delete "${name}"?`)) return
+    const key = `et-${earningTypeId}`
+
+    // First click: show confirmation
+    if (!deleteConfirm.has(key)) {
+      setDeleteConfirm((prev) => new Set(prev).add(key))
+      setTimeout(() => {
+        setDeleteConfirm((prev) => {
+          const next = new Set(prev)
+          next.delete(key)
+          return next
+        })
+      }, 5000)
+      return
+    }
+
+    // Second click: execute delete
+    setDeleteConfirm((prev) => {
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
     setError('')
 
     const response = await fetch('/api/config', {
@@ -726,11 +767,11 @@ export default function ConfigPage() {
                     ) : (
                       <button
                         type="button"
-                        className="btn btn-ghost btn-sm btn-square text-error"
+                        className={`btn btn-sm ${deleteConfirm.has(`bt-${bt.id}`) ? 'btn-error' : 'btn-ghost btn-square text-error'}`}
                         onClick={() => deleteBudgetType(bt.id, bt.displayName)}
                         title="Delete"
                       >
-                        x
+                        {deleteConfirm.has(`bt-${bt.id}`) ? 'Sure?' : 'x'}
                       </button>
                     )}
                   </div>
@@ -870,11 +911,11 @@ export default function ConfigPage() {
                     </div>
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm btn-square text-error"
+                      className={`btn btn-sm ${deleteConfirm.has(`et-${et.id}`) ? 'btn-error' : 'btn-ghost btn-square text-error'}`}
                       onClick={() => deleteEarningType(et.id, et.displayName)}
                       title="Delete"
                     >
-                      x
+                      {deleteConfirm.has(`et-${et.id}`) ? 'Sure?' : 'x'}
                     </button>
                   </div>
                 )
