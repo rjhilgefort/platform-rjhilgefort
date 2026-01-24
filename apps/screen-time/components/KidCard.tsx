@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { CountdownTimer } from './CountdownTimer'
 import { EarningTimer } from './EarningTimer'
 import { BonusModal } from './BonusModal'
+import { ActiveTimerOverlay } from './ActiveTimerOverlay'
 
 interface TypeBalance {
   budgetTypeId: number
@@ -61,6 +62,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
 
   const hasActiveTimer = status.activeTimer !== null
   const isEarningTimer = status.activeTimer?.earningTypeId != null
+  const activeScreenTimer = hasActiveTimer && !isEarningTimer ? status.activeTimer : null
   const extraBalance = status.typeBalances.find((tb) => tb.isEarningPool)?.remainingSeconds ?? 0
 
   // Calculate pending earned seconds when earning timer is running
@@ -101,8 +103,8 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
   }
 
   return (
-    <div className="card bg-base-100 shadow-xl">
-      <div className="card-body">
+    <div className="card bg-base-100 shadow-xl h-full flex flex-col">
+      <div className="card-body flex-1 flex flex-col">
         <div className="flex justify-between items-center">
           <h2 className="card-title text-2xl">{status.kidName}</h2>
           <button
@@ -115,50 +117,73 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
           </button>
         </div>
 
-        {/* Budget Type Timers (Screen Time) */}
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          {status.typeBalances.map((tb) => {
-            const isThisTimerRunning =
-              status.activeTimer?.budgetTypeId === tb.budgetTypeId && !isEarningTimer
-            return (
-              <CountdownTimer
-                key={tb.budgetTypeId}
-                budgetTypeId={tb.budgetTypeId}
-                isEarningPool={tb.isEarningPool}
-                label={tb.budgetTypeDisplayName}
-                remainingSeconds={tb.remainingSeconds}
-                isRunning={isThisTimerRunning}
-                isEarning={tb.isEarningPool && isEarningTimer}
-                onStart={() => startTimer(tb.budgetTypeId)}
-                onStop={stopTimer}
-                disabled={loading || (hasActiveTimer && !isThisTimerRunning)}
-                extraBalance={tb.isEarningPool ? 0 : extraBalance}
-                pendingEarnedSeconds={tb.isEarningPool ? pendingEarnedSeconds : 0}
-              />
-            )
-          })}
-        </div>
+        <div className="relative flex-1">
+          {/* Normal grid - always rendered to preserve height, invisible when timer active */}
+          <div className={activeScreenTimer ? 'invisible' : ''}>
+            {/* Budget Type Timers (Screen Time) */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              {status.typeBalances.map((tb) => {
+                const isThisTimerRunning =
+                  status.activeTimer?.budgetTypeId === tb.budgetTypeId && !isEarningTimer
+                return (
+                  <CountdownTimer
+                    key={tb.budgetTypeId}
+                    budgetTypeId={tb.budgetTypeId}
+                    isEarningPool={tb.isEarningPool}
+                    label={tb.budgetTypeDisplayName}
+                    remainingSeconds={tb.remainingSeconds}
+                    isRunning={isThisTimerRunning}
+                    isEarning={tb.isEarningPool && isEarningTimer}
+                    onStart={() => startTimer(tb.budgetTypeId)}
+                    onStop={stopTimer}
+                    disabled={loading || (hasActiveTimer && !isThisTimerRunning)}
+                    extraBalance={tb.isEarningPool ? 0 : extraBalance}
+                    pendingEarnedSeconds={tb.isEarningPool ? pendingEarnedSeconds : 0}
+                  />
+                )
+              })}
+            </div>
 
-        {/* Earn Time Section */}
-        <div className="divider text-xs text-base-content/50">Earn Time → Extra</div>
+            {/* Earn Time Section */}
+            <div className="divider text-xs text-base-content/50">Earn Time → Extra</div>
 
-        {/* Earning Timers */}
-        <div className="grid grid-cols-2 gap-3">
-          {earningTypes.map((et) => {
-            const isThisEarningRunning =
-              status.activeTimer?.earningTypeId === et.id
-            return (
-              <EarningTimer
-                key={et.id}
-                earningType={et}
-                isRunning={isThisEarningRunning}
-                elapsedSeconds={isThisEarningRunning ? status.activeTimer?.elapsedSeconds ?? 0 : 0}
-                onStart={(earningTypeId) => startTimer(null, earningTypeId)}
+            {/* Earning Timers */}
+            <div className="grid grid-cols-2 gap-3">
+              {earningTypes.map((et) => {
+                const isThisEarningRunning =
+                  status.activeTimer?.earningTypeId === et.id
+                return (
+                  <EarningTimer
+                    key={et.id}
+                    earningType={et}
+                    isRunning={isThisEarningRunning}
+                    elapsedSeconds={isThisEarningRunning ? status.activeTimer?.elapsedSeconds ?? 0 : 0}
+                    onStart={(earningTypeId) => startTimer(null, earningTypeId)}
+                    onStop={stopTimer}
+                    disabled={loading || (hasActiveTimer && !isThisEarningRunning)}
+                  />
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Timer overlay - absolutely positioned on top when active */}
+          {activeScreenTimer && (
+            <div className="absolute inset-0">
+              <ActiveTimerOverlay
+                budgetTypeSlug={activeScreenTimer.budgetTypeSlug}
+                budgetTypeDisplayName={activeScreenTimer.budgetTypeDisplayName}
+                remainingSeconds={
+                  status.typeBalances.find(
+                    (tb) => tb.budgetTypeId === activeScreenTimer.budgetTypeId
+                  )?.remainingSeconds ?? 0
+                }
+                isEarningToExtra={false}
                 onStop={stopTimer}
-                disabled={loading || (hasActiveTimer && !isThisEarningRunning)}
+                disabled={loading}
               />
-            )
-          })}
+            </div>
+          )}
         </div>
       </div>
 
