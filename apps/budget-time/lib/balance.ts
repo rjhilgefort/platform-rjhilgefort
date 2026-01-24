@@ -31,11 +31,11 @@ export interface FullDailyBalance {
 }
 
 /**
- * Get all budget types ordered by sortOrder
+ * Get all budget types ordered by displayName
  */
 export async function getAllBudgetTypes(): Promise<BudgetType[]> {
   return db.query.budgetTypes.findMany({
-    orderBy: (bt, { asc }) => asc(bt.sortOrder),
+    orderBy: (bt, { asc }) => asc(bt.displayName),
   })
 }
 

@@ -13,7 +13,7 @@ export async function GET() {
   })
   const allBudgetTypes = await getAllBudgetTypes()
   const allEarningTypes = await db.query.earningTypes.findMany({
-    orderBy: (et, { asc }) => asc(et.sortOrder),
+    orderBy: (et, { asc }) => asc(et.displayName),
   })
   const now = new Date()
 

@@ -20,7 +20,6 @@ export const budgetTypes = pgTable(
     slug: text('slug').notNull().unique(),
     displayName: text('display_name').notNull(),
     allowCarryover: boolean('allow_carryover').notNull().default(true),
-    sortOrder: integer('sort_order').notNull().default(0),
     // Pool where all earning timers credit time - only one can be true
     isEarningPool: boolean('is_earning_pool').notNull().default(false),
     icon: text('icon'),
@@ -38,7 +37,6 @@ export const earningTypes = pgTable('earning_types', {
   displayName: text('display_name').notNull(),
   ratioNumerator: real('ratio_numerator').notNull().default(1),
   ratioDenominator: real('ratio_denominator').notNull().default(1),
-  sortOrder: integer('sort_order').notNull().default(0),
   icon: text('icon'),
 })
 

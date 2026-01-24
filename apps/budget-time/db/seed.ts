@@ -16,9 +16,9 @@ const main = async () => {
   const insertedBudgetTypes = await db
     .insert(budgetTypes)
     .values([
-      { slug: 'tv', displayName: 'TV', allowCarryover: true, sortOrder: 1 },
-      { slug: 'game', displayName: 'Games', allowCarryover: true, sortOrder: 2 },
-      { slug: 'extra', displayName: 'Extra', allowCarryover: true, sortOrder: 99, isEarningPool: true },
+      { slug: 'tv', displayName: 'TV', allowCarryover: true },
+      { slug: 'game', displayName: 'Games', allowCarryover: true },
+      { slug: 'extra', displayName: 'Extra', allowCarryover: true, isEarningPool: true },
     ])
     .onConflictDoNothing()
     .returning()
@@ -27,8 +27,8 @@ const main = async () => {
   await db
     .insert(earningTypes)
     .values([
-      { slug: 'chore', displayName: 'Chores', ratioNumerator: 1, ratioDenominator: 2, sortOrder: 1 },
-      { slug: 'reading', displayName: 'Reading', ratioNumerator: 1, ratioDenominator: 1, sortOrder: 2 },
+      { slug: 'chore', displayName: 'Chores', ratioNumerator: 1, ratioDenominator: 2 },
+      { slug: 'reading', displayName: 'Reading', ratioNumerator: 1, ratioDenominator: 1 },
     ])
     .onConflictDoNothing()
 

@@ -12,7 +12,6 @@ CREATE TABLE "budget_types" (
 	"slug" text NOT NULL,
 	"display_name" text NOT NULL,
 	"allow_carryover" boolean DEFAULT true NOT NULL,
-	"sort_order" integer DEFAULT 0 NOT NULL,
 	"is_earning_pool" boolean DEFAULT false NOT NULL,
 	"icon" text,
 	CONSTRAINT "budget_types_slug_unique" UNIQUE("slug")
@@ -40,7 +39,6 @@ CREATE TABLE "earning_types" (
 	"display_name" text NOT NULL,
 	"ratio_numerator" real DEFAULT 1 NOT NULL,
 	"ratio_denominator" real DEFAULT 1 NOT NULL,
-	"sort_order" integer DEFAULT 0 NOT NULL,
 	"icon" text,
 	CONSTRAINT "earning_types_slug_unique" UNIQUE("slug")
 );

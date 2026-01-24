@@ -24,7 +24,6 @@ interface BudgetType {
   slug: string
   displayName: string
   allowCarryover: boolean
-  sortOrder: number
   isEarningPool: boolean
   icon: string | null
 }
@@ -35,7 +34,6 @@ interface EarningType {
   displayName: string
   ratioNumerator: number
   ratioDenominator: number
-  sortOrder: number
   icon: string | null
 }
 
@@ -75,6 +73,12 @@ export default function ConfigPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Set<string>>(new Set())
   const [savedInputs, setSavedInputs] = useState<Set<string>>(new Set())
   const saveTimeouts = useRef<Record<string, NodeJS.Timeout>>({})
+
+  // Sort budget types: Extra (earning pool) first, then alphabetically by name
+  const sortedBudgetTypes = [...budgetTypes].sort((a, b) => {
+    if (a.isEarningPool !== b.isEarningPool) return a.isEarningPool ? -1 : 1
+    return a.displayName.localeCompare(b.displayName)
+  })
 
   const flashSaved = (key: string) => {
     setSavedInputs((prev) => new Set(prev).add(key))
@@ -612,7 +616,7 @@ export default function ConfigPage() {
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    {budgetTypes.map((bt) => (
+                    {sortedBudgetTypes.map((bt) => (
                       <div key={bt.id} className="form-control">
                         <label className="label">
                           <span className="label-text">{bt.displayName} (min)</span>
@@ -716,7 +720,7 @@ export default function ConfigPage() {
               </p>
             </div>
             <div className="space-y-3 mt-4">
-              {budgetTypes.map((bt) => {
+              {sortedBudgetTypes.map((bt) => {
                 const BtIcon = getIconComponent(bt.icon ?? 'TbStarFilled')
                 return (
                   <div

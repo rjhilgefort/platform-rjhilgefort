@@ -1,5 +1,5 @@
 {
-  "id": "e431813e-dab3-4d21-b282-a38cee75dc2d",
+  "id": "7eda7e47-ee72-496f-a3b7-1414fb9d11f7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -123,13 +123,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": true
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
         },
         "is_earning_pool": {
           "name": "is_earning_pool",
@@ -347,13 +340,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": 1
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
         },
         "icon": {
           "name": "icon",

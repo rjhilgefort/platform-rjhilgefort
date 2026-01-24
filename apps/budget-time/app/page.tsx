@@ -21,7 +21,6 @@ interface BudgetType {
   slug: string
   displayName: string
   allowCarryover: boolean
-  sortOrder: number
   isEarningPool: boolean
   icon: string | null
 }
@@ -32,7 +31,6 @@ interface EarningType {
   displayName: string
   ratioNumerator: number
   ratioDenominator: number
-  sortOrder: number
   icon: string | null
 }
 
