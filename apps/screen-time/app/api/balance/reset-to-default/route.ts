@@ -36,8 +36,9 @@ export async function POST(request: Request) {
   // Also get all budget types to handle any without explicit defaults
   const allBudgetTypes = await db.query.budgetTypes.findMany()
 
-  // Reset each budget type to its default
+  // Reset each budget type to its default (skip earning pool)
   for (const bt of allBudgetTypes) {
+    if (bt.isEarningPool) continue
     const defaultConfig = defaults.find((d) => d.budgetTypeId === bt.id)
     const defaultMinutes = defaultConfig?.dailyBudgetMinutes ?? 60
     await setBalance(kidId, bt.id, defaultMinutes * 60)

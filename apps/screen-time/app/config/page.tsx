@@ -576,36 +576,33 @@ export default function ConfigPage() {
                         <label className="label">
                           <span className="label-text">{bt.displayName} (min)</span>
                         </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="number"
-                            className="input input-bordered input-sm flex-1"
-                            value={balanceInputs[kid.id]?.[bt.id] ?? ''}
-                            onChange={(e) =>
-                              setBalanceInputs((prev) => ({
-                                ...prev,
-                                [kid.id]: {
-                                  ...prev[kid.id],
-                                  [bt.id]: e.target.value,
-                                },
-                              }))
-                            }
-                          />
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-primary"
-                            disabled={disabledButtons.has(`${kid.id}-${bt.id}`)}
-                            onClick={() =>
-                              setCurrentBalance(
-                                kid.id,
-                                bt.id,
-                                parseInt(balanceInputs[kid.id]?.[bt.id] || '0')
-                              )
-                            }
-                          >
-                            Set
-                          </button>
-                        </div>
+                        <input
+                          type="number"
+                          className={`input input-bordered input-sm transition-colors duration-1000 ${savedInputs.has(`balance-${kid.id}-${bt.id}`) ? 'bg-success/20' : ''}`}
+                          value={balanceInputs[kid.id]?.[bt.id] ?? ''}
+                          onChange={(e) => {
+                            const newValue = e.target.value
+                            setBalanceInputs((prev) => ({
+                              ...prev,
+                              [kid.id]: {
+                                ...prev[kid.id],
+                                [bt.id]: newValue,
+                              },
+                            }))
+                            scheduleAutoSave(`balance-${kid.id}-${bt.id}`, () =>
+                              setCurrentBalance(kid.id, bt.id, parseInt(newValue) || 0)
+                            )
+                          }}
+                          onBlur={() => {
+                            cancelAutoSave(`balance-${kid.id}-${bt.id}`)
+                            setCurrentBalance(
+                              kid.id,
+                              bt.id,
+                              parseInt(balanceInputs[kid.id]?.[bt.id] || '0')
+                            )
+                            flashSaved(`balance-${kid.id}-${bt.id}`)
+                          }}
+                        />
                       </div>
                     ))}
                   </div>
