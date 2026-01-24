@@ -36,6 +36,7 @@ export function CountdownTimer({
 }: CountdownTimerProps) {
   const Icon = getBudgetIcon(budgetTypeSlug, icon)
   const displaySeconds = remainingSeconds + pendingEarnedSeconds
+  const hasHours = Math.abs(displaySeconds) >= 3600
   const isWarning = displaySeconds <= 300 && displaySeconds > 0
   const isExpired = displaySeconds <= 0
 
@@ -59,7 +60,7 @@ export function CountdownTimer({
         <div className="flex items-baseline gap-2">
           <TimeDisplay
             seconds={displaySeconds}
-            className={`text-3xl ${
+            className={`${hasHours ? 'text-2xl' : 'text-3xl'} ${
               isEarning
                 ? 'text-success'
                 : isExpired
