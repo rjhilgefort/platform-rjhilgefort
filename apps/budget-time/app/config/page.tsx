@@ -663,6 +663,9 @@ export default function ConfigPage() {
 
                 {/* Daily Defaults Section */}
                 <div className="divider text-sm">Daily Defaults</div>
+                <p className="text-xs text-base-content/50 -mt-2 mb-2">
+                  Added at midnight each day. Unused time carries over.
+                </p>
 
                 <div className="grid grid-cols-2 gap-4">
                   {[...kid.budgetDefaults].sort((a, b) => {
