@@ -6,6 +6,8 @@ import { EarningTimer } from './EarningTimer'
 import { BonusModal } from './BonusModal'
 import { ActiveTimerOverlay } from './ActiveTimerOverlay'
 import { useCountdown, useElapsed } from '../hooks/useCountdown'
+import { formatTime } from '../lib/timer-logic'
+import { getBudgetIcon, getEarningIcon } from '../lib/budget-icons'
 
 interface TypeBalance {
   budgetTypeId: number
@@ -138,7 +140,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
 
         <div className="relative flex-1">
           {/* Normal grid - always rendered to preserve height, invisible when timer active */}
-          <div className={activeScreenTimer ? 'invisible' : ''}>
+          <div className={activeScreenTimer || isEarningTimer ? 'invisible' : ''}>
             {/* Budget Type Timers (Screen Time) */}
             <div className="grid grid-cols-2 gap-3 mt-4">
               {sortedTypeBalances.map((tb) => {
@@ -200,6 +202,52 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
               />
             </div>
           )}
+
+          {/* Earning timer layout - enlarged Extra + divider + enlarged earning timer */}
+          {activeEarningTimer && activeEarningType && (() => {
+            const ExtraIcon = getBudgetIcon('extra')
+            const EarningIcon = getEarningIcon(activeEarningType.slug)
+            return (
+              <div className="absolute inset-0 flex flex-col">
+                {/* Enlarged Extra timer */}
+                <div className="flex-1 flex flex-col items-center justify-center bg-success/10 rounded-lg p-4">
+                  <ExtraIcon size={120} className="text-success animate-pulse" />
+                  <p className="text-2xl text-success font-medium mt-1">Extra</p>
+                  <div className="text-7xl font-mono font-bold text-success">
+                    {formatTime(extraBalance + pendingEarnedSeconds)}
+                  </div>
+                  <p className="text-base text-success/70 mt-1">
+                    +{formatTime(pendingEarnedSeconds)} earned
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="divider text-xs text-base-content/50 my-1">Earn Time → Extra</div>
+
+                {/* Enlarged earning timer */}
+                <div className="flex-1 flex flex-col items-center justify-center bg-success/10 rounded-lg p-4">
+                  <EarningIcon size={120} className="text-success animate-pulse" />
+                  <p className="text-2xl text-success font-medium mt-1">
+                    {activeEarningType.displayName}
+                  </p>
+                  <div className="text-7xl font-mono font-bold text-success">
+                    {formatTime(earningElapsed)}
+                  </div>
+                  <p className="text-base text-base-content/50 mt-1">
+                    {activeEarningType.ratioNumerator} min = {activeEarningType.ratioDenominator} min extra
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-success btn-lg w-full mt-3"
+                    onClick={stopTimer}
+                    disabled={loading}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
 
