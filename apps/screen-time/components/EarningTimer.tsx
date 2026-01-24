@@ -38,12 +38,16 @@ export function EarningTimer({
     >
       <div className="card-body p-4">
         <div className="flex items-center gap-2">
-          <Icon size={20} className="text-success" />
-          <h3 className="text-sm font-medium text-success">{earningType.displayName}</h3>
+          <Icon size={isRunning ? 20 : 28} className="text-success" />
+          <h3 className={`font-medium text-success ${isRunning ? 'text-sm' : 'text-xl'}`}>
+            {earningType.displayName}
+          </h3>
         </div>
-        <span className="text-3xl font-mono font-bold text-success">
-          {formatTime(elapsedSeconds)}
-        </span>
+        {isRunning && (
+          <span className="text-3xl font-mono font-bold text-success">
+            {formatTime(elapsedSeconds)}
+          </span>
+        )}
 
         <div className="mt-2">
           {isRunning ? (
