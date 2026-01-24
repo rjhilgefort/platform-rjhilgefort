@@ -619,10 +619,15 @@ export default function ConfigPage() {
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    {sortedBudgetTypes.map((bt) => (
+                    {sortedBudgetTypes.map((bt) => {
+                      const BtIcon = getIconComponent(bt.icon ?? 'TbStarFilled')
+                      return (
                       <div key={bt.id} className="form-control">
                         <label className="label">
-                          <span className="label-text">{bt.displayName} (min)</span>
+                          <span className="label-text flex items-center gap-1">
+                            <BtIcon size={16} />
+                            {bt.displayName} (min)
+                          </span>
                         </label>
                         <input
                           type="number"
@@ -652,7 +657,7 @@ export default function ConfigPage() {
                           }}
                         />
                       </div>
-                    ))}
+                    )})}
                   </div>
                 </div>
 
@@ -665,10 +670,14 @@ export default function ConfigPage() {
                     const bIsExtra = budgetTypes.find((bt) => bt.id === b.budgetTypeId)?.isEarningPool ?? false
                     if (aIsExtra !== bIsExtra) return aIsExtra ? 1 : -1
                     return a.budgetTypeDisplayName.localeCompare(b.budgetTypeDisplayName)
-                  }).map((bd) => (
+                  }).map((bd) => {
+                    const bdType = budgetTypes.find((bt) => bt.id === bd.budgetTypeId)
+                    const BdIcon = getIconComponent(bdType?.icon ?? 'TbStarFilled')
+                    return (
                     <div key={bd.budgetTypeId} className="form-control">
                       <label className="label">
-                        <span className="label-text">
+                        <span className="label-text flex items-center gap-1">
+                          <BdIcon size={16} />
                           Daily {bd.budgetTypeDisplayName} (min)
                         </span>
                       </label>
@@ -707,7 +716,7 @@ export default function ConfigPage() {
                         }}
                       />
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
             </div>
