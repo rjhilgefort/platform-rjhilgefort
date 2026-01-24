@@ -56,6 +56,8 @@ export default function ConfigPage() {
   const [loading, setLoading] = useState(true)
   const [pin, setPin] = useState('')
   const [pinVerified, setPinVerified] = useState(false)
+  const [pinError, setPinError] = useState('')
+  const [pinChecking, setPinChecking] = useState(false)
   const [error, setError] = useState('')
   const [toasts, setToasts] = useState<{ message: string; id: number }[]>([])
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(new Set())
@@ -92,12 +94,6 @@ export default function ConfigPage() {
         }
       }
       setBalanceInputs(inputMap)
-    }
-  }
-
-  const handlePinSubmit = () => {
-    if (pin.length === 4) {
-      setPinVerified(true)
     }
   }
 
@@ -395,38 +391,70 @@ export default function ConfigPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map(
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'back'].map(
                 (digit, i) =>
                   digit ? (
-                    <button
-                      key={digit}
-                      type="button"
-                      className="btn btn-neutral"
-                      onClick={() => {
-                        if (digit === '⌫') setPin((p) => p.slice(0, -1))
-                        else if (pin.length < 4) setPin((p) => p + digit)
-                      }}
-                    >
-                      {digit}
-                    </button>
+                    digit === 'back' ? (
+                      pin.length === 0 ? (
+                        <Link key="cancel" href="/" className="btn btn-ghost">
+                          Cancel
+                        </Link>
+                      ) : (
+                        <button
+                          key="backspace"
+                          type="button"
+                          className="btn btn-neutral"
+                          disabled={pinChecking}
+                          onClick={() => {
+                            setPinError('')
+                            setPin((p) => p.slice(0, -1))
+                          }}
+                        >
+                          ⌫
+                        </button>
+                      )
+                    ) : (
+                      <button
+                        key={digit}
+                        type="button"
+                        className="btn btn-neutral"
+                        disabled={pinChecking}
+                        onClick={async () => {
+                          if (pin.length < 4) {
+                            setPinError('')
+                            const newPin = pin + digit
+                            setPin(newPin)
+                            if (newPin.length === 4) {
+                              setPinChecking(true)
+                              const response = await fetch('/api/auth/validate-pin', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pin: newPin }),
+                              })
+                              const data = await response.json()
+                              setPinChecking(false)
+                              if (data.valid) {
+                                setPinVerified(true)
+                              } else {
+                                setPinError('Incorrect PIN')
+                                setPin('')
+                              }
+                            }
+                          }
+                        }}
+                      >
+                        {digit}
+                      </button>
+                    )
                   ) : (
                     <div key={i} />
                   )
               )}
             </div>
 
-            <button
-              type="button"
-              className="btn btn-primary btn-wide mt-4"
-              onClick={handlePinSubmit}
-              disabled={pin.length !== 4}
-            >
-              Enter
-            </button>
-
-            <Link href="/" className="btn btn-ghost btn-sm mt-2">
-              Back
-            </Link>
+            {pinError && (
+              <p className="text-error text-sm mt-4">{pinError}</p>
+            )}
           </div>
         </div>
       </div>
