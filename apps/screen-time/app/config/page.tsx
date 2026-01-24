@@ -71,6 +71,7 @@ export default function ConfigPage() {
     id: number
     currentIcon: string | null
   } | null>(null)
+  const [resetConfirm, setResetConfirm] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     fetchConfig()
@@ -384,6 +385,72 @@ export default function ConfigPage() {
     }
   }
 
+  const resetToDefault = async (kidId: number) => {
+    const buttonKey = `reset-${kidId}`
+    if (disabledButtons.has(buttonKey)) return
+
+    // First click: show confirmation
+    if (!resetConfirm.has(kidId)) {
+      setResetConfirm((prev) => new Set(prev).add(kidId))
+      setTimeout(() => {
+        setResetConfirm((prev) => {
+          const next = new Set(prev)
+          next.delete(kidId)
+          return next
+        })
+      }, 5000)
+      return
+    }
+
+    // Second click: execute reset
+    setResetConfirm((prev) => {
+      const next = new Set(prev)
+      next.delete(kidId)
+      return next
+    })
+    setDisabledButtons((prev) => new Set(prev).add(buttonKey))
+    setError('')
+
+    const response = await fetch('/api/balance/reset-to-default', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kidId, pin }),
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      const newInputs: Record<number, string> = {}
+      for (const tb of data.balance.typeBalances as TypeBalance[]) {
+        newInputs[tb.budgetTypeId] = Math.floor(tb.remainingSeconds / 60).toString()
+      }
+      setBalanceInputs((prev) => ({
+        ...prev,
+        [kidId]: newInputs,
+      }))
+      const kid = kids.find((k) => k.id === kidId)
+      showToast(`${kid?.name}'s balances reset to defaults`)
+      setTimeout(() => {
+        setDisabledButtons((prev) => {
+          const next = new Set(prev)
+          next.delete(buttonKey)
+          return next
+        })
+      }, 5000)
+    } else {
+      setDisabledButtons((prev) => {
+        const next = new Set(prev)
+        next.delete(buttonKey)
+        return next
+      })
+      const data = await response.json()
+      setError(data.error || 'Failed to reset')
+      if (data.error === 'Invalid PIN') {
+        setPinVerified(false)
+        setPin('')
+      }
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-200">
@@ -449,9 +516,19 @@ export default function ConfigPage() {
 
                 {/* Current Balance Section */}
                 <div className="bg-base-200 rounded-lg p-4 mt-2">
-                  <h3 className="text-sm font-semibold mb-3">
-                    Current Balance (today)
-                  </h3>
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-sm font-semibold">
+                      Current Balance (today)
+                    </h3>
+                    <button
+                      type="button"
+                      className={`btn btn-xs ${resetConfirm.has(kid.id) ? 'btn-error' : 'btn-ghost'}`}
+                      disabled={disabledButtons.has(`reset-${kid.id}`)}
+                      onClick={() => resetToDefault(kid.id)}
+                    >
+                      {resetConfirm.has(kid.id) ? 'Are you sure?' : 'Reset to Default'}
+                    </button>
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     {budgetTypes.map((bt) => (
                       <div key={bt.id} className="form-control">
