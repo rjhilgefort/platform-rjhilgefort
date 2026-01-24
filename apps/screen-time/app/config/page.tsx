@@ -435,7 +435,7 @@ export default function ConfigPage() {
 
   return (
     <div className="min-h-screen bg-base-200 p-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Settings</h1>
           <Link href="/" className="btn btn-ghost btn-sm">
@@ -450,7 +450,7 @@ export default function ConfigPage() {
         )}
 
         {/* Kid Settings */}
-        <div className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {kids.map((kid) => (
             <div key={kid.id} className="card bg-base-100 shadow-xl">
               <div className="card-body">
@@ -553,14 +553,19 @@ export default function ConfigPage() {
           ))}
         </div>
 
-        {/* Budget Types Section */}
-        <div className="card bg-base-100 shadow-xl mt-6">
-          <div className="card-body">
-            <h2 className="card-title">Screen Time Types</h2>
-            <p className="text-sm text-base-content/60">
-              Types of screen time kids can use (TV, Games, etc.)
-            </p>
+        {/* General Settings Divider */}
+        <div className="divider text-base-content/50 mt-8 mb-4">General Settings</div>
 
+        <div className="grid lg:grid-cols-2 gap-4">
+        {/* Budget Types Section */}
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <div>
+              <h2 className="card-title">Screen Time Types</h2>
+              <p className="text-sm text-base-content/60">
+                Types of screen time kids can use (TV, Games, etc.)
+              </p>
+            </div>
             <div className="space-y-3 mt-4">
               {budgetTypes.map((bt) => (
                 <div
@@ -622,13 +627,14 @@ export default function ConfigPage() {
         </div>
 
         {/* Earning Types Section */}
-        <div className="card bg-base-100 shadow-xl mt-6">
+        <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
-            <h2 className="card-title">Earning Types</h2>
-            <p className="text-sm text-base-content/60">
-              Activities that earn screen time
-            </p>
-
+            <div>
+              <h2 className="card-title">Earning Types</h2>
+              <p className="text-sm text-base-content/60">
+                Activities that earn screen time
+              </p>
+            </div>
             <div className="space-y-3 mt-4">
               {earningTypes.map((et) => (
                 <div
@@ -731,6 +737,7 @@ export default function ConfigPage() {
               Ratio: minutes of activity = minutes of screen time earned
             </p>
           </div>
+        </div>
         </div>
       </div>
 
