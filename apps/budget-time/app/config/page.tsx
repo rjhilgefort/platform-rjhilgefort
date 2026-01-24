@@ -74,9 +74,9 @@ export default function ConfigPage() {
   const [savedInputs, setSavedInputs] = useState<Set<string>>(new Set())
   const saveTimeouts = useRef<Record<string, NodeJS.Timeout>>({})
 
-  // Sort budget types: Extra (earning pool) first, then alphabetically by name
+  // Sort budget types: Extra (earning pool) last, then alphabetically by name
   const sortedBudgetTypes = [...budgetTypes].sort((a, b) => {
-    if (a.isEarningPool !== b.isEarningPool) return a.isEarningPool ? -1 : 1
+    if (a.isEarningPool !== b.isEarningPool) return a.isEarningPool ? 1 : -1
     return a.displayName.localeCompare(b.displayName)
   })
 
@@ -660,7 +660,12 @@ export default function ConfigPage() {
                 <div className="divider text-sm">Daily Defaults</div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  {kid.budgetDefaults.map((bd) => (
+                  {[...kid.budgetDefaults].sort((a, b) => {
+                    const aIsExtra = budgetTypes.find((bt) => bt.id === a.budgetTypeId)?.isEarningPool ?? false
+                    const bIsExtra = budgetTypes.find((bt) => bt.id === b.budgetTypeId)?.isEarningPool ?? false
+                    if (aIsExtra !== bIsExtra) return aIsExtra ? 1 : -1
+                    return a.budgetTypeDisplayName.localeCompare(b.budgetTypeDisplayName)
+                  }).map((bd) => (
                     <div key={bd.budgetTypeId} className="form-control">
                       <label className="label">
                         <span className="label-text">
