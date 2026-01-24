@@ -1,11 +1,14 @@
 'use client'
 
 import { formatTime } from '../lib/timer-logic'
+import { getBudgetIcon } from '../lib/budget-icons'
 
 interface CountdownTimerProps {
   budgetTypeId: number
+  budgetTypeSlug: string
   isEarningPool: boolean
   label: string
+  icon: string | null
   remainingSeconds: number
   isRunning: boolean
   isEarning?: boolean
@@ -17,8 +20,10 @@ interface CountdownTimerProps {
 }
 
 export function CountdownTimer({
+  budgetTypeSlug,
   isEarningPool,
   label,
+  icon,
   remainingSeconds,
   isRunning,
   isEarning = false,
@@ -28,6 +33,7 @@ export function CountdownTimer({
   extraBalance = 0,
   pendingEarnedSeconds = 0,
 }: CountdownTimerProps) {
+  const Icon = getBudgetIcon(budgetTypeSlug, icon)
   const displaySeconds = remainingSeconds + pendingEarnedSeconds
   const isWarning = displaySeconds <= 300 && displaySeconds > 0
   const isExpired = displaySeconds <= 0
@@ -44,10 +50,10 @@ export function CountdownTimer({
     >
       <div className="card-body p-4">
         <div className="flex items-center gap-2">
+          <Icon size={20} className={isEarning ? 'text-success' : 'text-base-content/70'} />
           <h3 className={`text-sm font-medium ${isEarning ? 'text-success' : 'text-base-content/70'}`}>
             {label}
           </h3>
-          {isEarning && <span>🎉</span>}
         </div>
         <div
           className={`text-3xl font-mono font-bold ${

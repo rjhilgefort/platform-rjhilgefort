@@ -90,7 +90,7 @@ export async function PUT(request: Request) {
     }
 
     case 'createBudgetType': {
-      const { slug, displayName, allowCarryover, sortOrder } = body
+      const { slug, displayName, allowCarryover, sortOrder, icon } = body
       if (!slug || !displayName) {
         return NextResponse.json(
           { error: 'slug and displayName required' },
@@ -105,6 +105,7 @@ export async function PUT(request: Request) {
           displayName,
           allowCarryover: allowCarryover ?? true,
           sortOrder: sortOrder ?? 0,
+          icon: icon ?? 'TbStarFilled',
         })
         .returning()
 
@@ -124,7 +125,7 @@ export async function PUT(request: Request) {
     }
 
     case 'updateBudgetType': {
-      const { budgetTypeId, displayName, allowCarryover, sortOrder } = body
+      const { budgetTypeId, displayName, allowCarryover, sortOrder, icon } = body
       if (!budgetTypeId) {
         return NextResponse.json({ error: 'budgetTypeId required' }, { status: 400 })
       }
@@ -133,6 +134,7 @@ export async function PUT(request: Request) {
       if (typeof displayName === 'string') updates.displayName = displayName
       if (typeof allowCarryover === 'boolean') updates.allowCarryover = allowCarryover
       if (typeof sortOrder === 'number') updates.sortOrder = sortOrder
+      if (typeof icon === 'string') updates.icon = icon
 
       if (Object.keys(updates).length === 0) {
         return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
@@ -169,7 +171,7 @@ export async function PUT(request: Request) {
     }
 
     case 'createEarningType': {
-      const { slug, displayName, ratioNumerator, ratioDenominator, sortOrder } = body
+      const { slug, displayName, ratioNumerator, ratioDenominator, sortOrder, icon } = body
       if (!slug || !displayName) {
         return NextResponse.json(
           { error: 'slug and displayName required' },
@@ -185,6 +187,7 @@ export async function PUT(request: Request) {
           ratioNumerator: ratioNumerator ?? 1,
           ratioDenominator: ratioDenominator ?? 1,
           sortOrder: sortOrder ?? 0,
+          icon: icon ?? 'TbStarsFilled',
         })
         .returning()
 
@@ -192,7 +195,7 @@ export async function PUT(request: Request) {
     }
 
     case 'updateEarningType': {
-      const { earningTypeId, displayName, ratioNumerator, ratioDenominator, sortOrder } = body
+      const { earningTypeId, displayName, ratioNumerator, ratioDenominator, sortOrder, icon } = body
       if (!earningTypeId) {
         return NextResponse.json({ error: 'earningTypeId required' }, { status: 400 })
       }
@@ -202,6 +205,7 @@ export async function PUT(request: Request) {
       if (typeof ratioNumerator === 'number') updates.ratioNumerator = ratioNumerator
       if (typeof ratioDenominator === 'number') updates.ratioDenominator = ratioDenominator
       if (typeof sortOrder === 'number') updates.sortOrder = sortOrder
+      if (typeof icon === 'string') updates.icon = icon
 
       if (Object.keys(updates).length === 0) {
         return NextResponse.json({ error: 'No fields to update' }, { status: 400 })

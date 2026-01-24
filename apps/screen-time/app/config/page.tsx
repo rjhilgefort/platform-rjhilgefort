@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { IconPickerModal } from '../../components/IconPickerModal'
+import { getIconComponent } from '../../lib/icon-registry'
 
 interface BudgetDefault {
   budgetTypeId: number
@@ -23,6 +25,7 @@ interface BudgetType {
   allowCarryover: boolean
   sortOrder: number
   isEarningPool: boolean
+  icon: string | null
 }
 
 interface EarningType {
@@ -32,6 +35,7 @@ interface EarningType {
   ratioNumerator: number
   ratioDenominator: number
   sortOrder: number
+  icon: string | null
 }
 
 interface TypeBalance {
@@ -63,6 +67,11 @@ export default function ConfigPage() {
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(new Set())
   const [newBudgetTypeName, setNewBudgetTypeName] = useState('')
   const [newEarningTypeName, setNewEarningTypeName] = useState('')
+  const [iconPickerTarget, setIconPickerTarget] = useState<{
+    type: 'budget' | 'earning'
+    id: number
+    currentIcon: string | null
+  } | null>(null)
 
   useEffect(() => {
     fetchConfig()
@@ -196,7 +205,10 @@ export default function ConfigPage() {
     }
   }
 
-  const updateBudgetType = async (budgetTypeId: number, displayName: string) => {
+  const updateBudgetType = async (
+    budgetTypeId: number,
+    updates: Partial<BudgetType>
+  ) => {
     setError('')
 
     const response = await fetch('/api/config', {
@@ -206,7 +218,7 @@ export default function ConfigPage() {
         pin,
         action: 'updateBudgetType',
         budgetTypeId,
-        displayName,
+        ...updates,
       }),
     })
 
@@ -307,6 +319,17 @@ export default function ConfigPage() {
         setPin('')
       }
     }
+  }
+
+  const handleIconSelect = async (iconName: string) => {
+    if (!iconPickerTarget) return
+
+    if (iconPickerTarget.type === 'budget') {
+      await updateBudgetType(iconPickerTarget.id, { icon: iconName })
+    } else {
+      await updateEarningType(iconPickerTarget.id, { icon: iconName })
+    }
+    setIconPickerTarget(null)
   }
 
   const setCurrentBalance = async (
@@ -595,42 +618,59 @@ export default function ConfigPage() {
               </p>
             </div>
             <div className="space-y-3 mt-4">
-              {budgetTypes.map((bt) => (
-                <div
-                  key={bt.id}
-                  className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
-                >
-                  <input
-                    type="text"
-                    className="input input-bordered input-sm flex-1"
-                    value={bt.displayName}
-                    onChange={(e) =>
-                      setBudgetTypes((prev) =>
-                        prev.map((t) =>
-                          t.id === bt.id ? { ...t, displayName: e.target.value } : t
-                        )
-                      )
-                    }
-                    onBlur={() => updateBudgetType(bt.id, bt.displayName)}
-                  />
-                  {bt.isEarningPool ? (
-                    <div className="tooltip tooltip-left" data-tip="This is the earning pool and cannot be deleted">
-                      <span className="btn btn-ghost btn-sm btn-square text-base-content/30 cursor-help">
-                        ?
-                      </span>
-                    </div>
-                  ) : (
+              {budgetTypes.map((bt) => {
+                const BtIcon = getIconComponent(bt.icon ?? 'TbStarFilled')
+                return (
+                  <div
+                    key={bt.id}
+                    className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
+                  >
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm btn-square text-error"
-                      onClick={() => deleteBudgetType(bt.id, bt.displayName)}
-                      title="Delete"
+                      className="btn btn-outline btn-sm btn-square"
+                      onClick={() =>
+                        setIconPickerTarget({
+                          type: 'budget',
+                          id: bt.id,
+                          currentIcon: bt.icon,
+                        })
+                      }
+                      title="Change icon"
                     >
-                      x
+                      <BtIcon size={20} />
                     </button>
-                  )}
-                </div>
-              ))}
+                    <input
+                      type="text"
+                      className="input input-bordered input-sm flex-1"
+                      value={bt.displayName}
+                      onChange={(e) =>
+                        setBudgetTypes((prev) =>
+                          prev.map((t) =>
+                            t.id === bt.id ? { ...t, displayName: e.target.value } : t
+                          )
+                        )
+                      }
+                      onBlur={() => updateBudgetType(bt.id, { displayName: bt.displayName })}
+                    />
+                    {bt.isEarningPool ? (
+                      <div className="tooltip tooltip-left" data-tip="This is the earning pool and cannot be deleted">
+                        <span className="btn btn-ghost btn-sm btn-square text-base-content/30 cursor-help">
+                          ?
+                        </span>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm btn-square text-error"
+                        onClick={() => deleteBudgetType(bt.id, bt.displayName)}
+                        title="Delete"
+                      >
+                        x
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
 
             <div className="flex gap-2 mt-4">
@@ -664,82 +704,99 @@ export default function ConfigPage() {
               </p>
             </div>
             <div className="space-y-3 mt-4">
-              {earningTypes.map((et) => (
-                <div
-                  key={et.id}
-                  className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
-                >
-                  <input
-                    type="text"
-                    className="input input-bordered input-sm flex-1"
-                    value={et.displayName}
-                    onChange={(e) =>
-                      setEarningTypes((prev) =>
-                        prev.map((t) =>
-                          t.id === et.id ? { ...t, displayName: e.target.value } : t
-                        )
-                      )
-                    }
-                    onBlur={() =>
-                      updateEarningType(et.id, { displayName: et.displayName })
-                    }
-                  />
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      className="input input-bordered input-sm w-14"
-                      value={et.ratioNumerator}
-                      min={1}
-                      onChange={(e) =>
-                        setEarningTypes((prev) =>
-                          prev.map((t) =>
-                            t.id === et.id
-                              ? { ...t, ratioNumerator: parseInt(e.target.value) || 1 }
-                              : t
-                          )
-                        )
-                      }
-                      onBlur={() =>
-                        updateEarningType(et.id, {
-                          ratioNumerator: et.ratioNumerator,
-                        })
-                      }
-                    />
-                    <span className="text-sm">:</span>
-                    <input
-                      type="number"
-                      className="input input-bordered input-sm w-14"
-                      value={et.ratioDenominator}
-                      min={1}
-                      onChange={(e) =>
-                        setEarningTypes((prev) =>
-                          prev.map((t) =>
-                            t.id === et.id
-                              ? {
-                                  ...t,
-                                  ratioDenominator: parseInt(e.target.value) || 1,
-                                }
-                              : t
-                          )
-                        )
-                      }
-                      onBlur={() =>
-                        updateEarningType(et.id, {
-                          ratioDenominator: et.ratioDenominator,
-                        })
-                      }
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm btn-square text-error"
-                    onClick={() => deleteEarningType(et.id, et.displayName)}
-                    title="Delete"
+              {earningTypes.map((et) => {
+                const EtIcon = getIconComponent(et.icon ?? 'TbStarsFilled')
+                return (
+                  <div
+                    key={et.id}
+                    className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
                   >
-                    x
-                  </button>
-                </div>
-              ))}
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm btn-square"
+                      onClick={() =>
+                        setIconPickerTarget({
+                          type: 'earning',
+                          id: et.id,
+                          currentIcon: et.icon,
+                        })
+                      }
+                      title="Change icon"
+                    >
+                      <EtIcon size={20} />
+                    </button>
+                    <input
+                      type="text"
+                      className="input input-bordered input-sm flex-1"
+                      value={et.displayName}
+                      onChange={(e) =>
+                        setEarningTypes((prev) =>
+                          prev.map((t) =>
+                            t.id === et.id ? { ...t, displayName: e.target.value } : t
+                          )
+                        )
+                      }
+                      onBlur={() =>
+                        updateEarningType(et.id, { displayName: et.displayName })
+                      }
+                    />
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        className="input input-bordered input-sm w-14"
+                        value={et.ratioNumerator}
+                        min={1}
+                        onChange={(e) =>
+                          setEarningTypes((prev) =>
+                            prev.map((t) =>
+                              t.id === et.id
+                                ? { ...t, ratioNumerator: parseInt(e.target.value) || 1 }
+                                : t
+                            )
+                          )
+                        }
+                        onBlur={() =>
+                          updateEarningType(et.id, {
+                            ratioNumerator: et.ratioNumerator,
+                          })
+                        }
+                      />
+                      <span className="text-sm">:</span>
+                      <input
+                        type="number"
+                        className="input input-bordered input-sm w-14"
+                        value={et.ratioDenominator}
+                        min={1}
+                        onChange={(e) =>
+                          setEarningTypes((prev) =>
+                            prev.map((t) =>
+                              t.id === et.id
+                                ? {
+                                    ...t,
+                                    ratioDenominator: parseInt(e.target.value) || 1,
+                                  }
+                                : t
+                            )
+                          )
+                        }
+                        onBlur={() =>
+                          updateEarningType(et.id, {
+                            ratioDenominator: et.ratioDenominator,
+                          })
+                        }
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm btn-square text-error"
+                      onClick={() => deleteEarningType(et.id, et.displayName)}
+                      title="Delete"
+                    >
+                      x
+                    </button>
+                  </div>
+                )
+              })}
             </div>
 
             <div className="flex gap-2 mt-4">
@@ -792,6 +849,13 @@ export default function ConfigPage() {
           ))}
         </div>
       )}
+
+      <IconPickerModal
+        isOpen={iconPickerTarget !== null}
+        onClose={() => setIconPickerTarget(null)}
+        onSelect={handleIconSelect}
+        currentIcon={iconPickerTarget?.currentIcon ?? null}
+      />
     </div>
   )
 }

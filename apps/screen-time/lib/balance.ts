@@ -16,6 +16,7 @@ export interface TypeBalance {
   budgetTypeId: number
   budgetTypeSlug: string
   budgetTypeDisplayName: string
+  budgetTypeIcon: string | null
   remainingSeconds: number
   carryoverSeconds: number
   allowCarryover: boolean
@@ -172,6 +173,7 @@ function buildFullBalance(
         budgetTypeId: tb.budgetTypeId,
         budgetTypeSlug: bt?.slug ?? '',
         budgetTypeDisplayName: bt?.displayName ?? '',
+        budgetTypeIcon: bt?.icon ?? null,
         remainingSeconds: tb.remainingSeconds,
         carryoverSeconds: tb.carryoverSeconds,
         allowCarryover: bt?.allowCarryover ?? true,

@@ -6,6 +6,7 @@ import { formatTime } from '../lib/timer-logic'
 interface ActiveTimerOverlayProps {
   budgetTypeSlug: string
   budgetTypeDisplayName: string
+  budgetTypeIcon?: string | null
   remainingSeconds: number
   isEarningToExtra: boolean
   onStop: () => void
@@ -15,12 +16,13 @@ interface ActiveTimerOverlayProps {
 export function ActiveTimerOverlay({
   budgetTypeSlug,
   budgetTypeDisplayName,
+  budgetTypeIcon,
   remainingSeconds,
   isEarningToExtra,
   onStop,
   disabled = false,
 }: ActiveTimerOverlayProps) {
-  const Icon = getBudgetIcon(budgetTypeSlug)
+  const Icon = getBudgetIcon(budgetTypeSlug, budgetTypeIcon)
   const isWarning = remainingSeconds <= 300 && remainingSeconds > 0
   const isExpired = remainingSeconds <= 0
 

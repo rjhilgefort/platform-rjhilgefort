@@ -22,6 +22,7 @@ export const budgetTypes = pgTable(
     sortOrder: integer('sort_order').notNull().default(0),
     // Pool where all earning timers credit time - only one can be true
     isEarningPool: boolean('is_earning_pool').notNull().default(false),
+    icon: text('icon'),
   },
   (t) => [
     // Partial unique index: only one budget type can be the earning pool
@@ -37,6 +38,7 @@ export const earningTypes = pgTable('earning_types', {
   ratioNumerator: integer('ratio_numerator').notNull().default(1),
   ratioDenominator: integer('ratio_denominator').notNull().default(1),
   sortOrder: integer('sort_order').notNull().default(0),
+  icon: text('icon'),
 })
 
 export const kids = pgTable('kids', {

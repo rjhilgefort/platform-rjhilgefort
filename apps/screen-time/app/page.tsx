@@ -9,6 +9,7 @@ interface TypeBalance {
   budgetTypeId: number
   budgetTypeSlug: string
   budgetTypeDisplayName: string
+  budgetTypeIcon: string | null
   remainingSeconds: number
   carryoverSeconds: number
   allowCarryover: boolean
@@ -22,6 +23,7 @@ interface BudgetType {
   allowCarryover: boolean
   sortOrder: number
   isEarningPool: boolean
+  icon: string | null
 }
 
 interface EarningType {
@@ -31,6 +33,7 @@ interface EarningType {
   ratioNumerator: number
   ratioDenominator: number
   sortOrder: number
+  icon: string | null
 }
 
 interface KidStatus {
@@ -41,9 +44,11 @@ interface KidStatus {
     budgetTypeId: number
     budgetTypeSlug: string
     budgetTypeDisplayName: string
+    budgetTypeIcon: string | null
     earningTypeId: number | null
     earningTypeSlug: string | null
     earningTypeDisplayName: string | null
+    earningTypeIcon: string | null
     startedAt: string
     elapsedSeconds: number
   } | null

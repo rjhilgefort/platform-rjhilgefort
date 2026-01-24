@@ -41,9 +41,11 @@ export async function GET() {
           budgetTypeId: timer.budgetTypeId,
           budgetTypeSlug: budgetType?.slug ?? '',
           budgetTypeDisplayName: budgetType?.displayName ?? '',
+          budgetTypeIcon: budgetType?.icon ?? null,
           earningTypeId: timer.earningTypeId,
           earningTypeSlug: earningType?.slug ?? null,
           earningTypeDisplayName: earningType?.displayName ?? null,
+          earningTypeIcon: earningType?.icon ?? null,
           startedAt: timer.startedAt.toISOString(),
           elapsedSeconds,
         }

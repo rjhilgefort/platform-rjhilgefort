@@ -1,6 +1,7 @@
 'use client'
 
 import { formatTime } from '../lib/timer-logic'
+import { getEarningIcon } from '../lib/budget-icons'
 
 interface EarningType {
   id: number
@@ -8,6 +9,7 @@ interface EarningType {
   displayName: string
   ratioNumerator: number
   ratioDenominator: number
+  icon: string | null
 }
 
 interface EarningTimerProps {
@@ -27,6 +29,7 @@ export function EarningTimer({
   onStop,
   disabled = false,
 }: EarningTimerProps) {
+  const Icon = getEarningIcon(earningType.slug, earningType.icon)
   return (
     <div
       className={`card bg-success/10 border-2 ${
@@ -34,7 +37,10 @@ export function EarningTimer({
       }`}
     >
       <div className="card-body p-4">
-        <h3 className="text-sm font-medium text-success">{earningType.displayName}</h3>
+        <div className="flex items-center gap-2">
+          <Icon size={20} className="text-success" />
+          <h3 className="text-sm font-medium text-success">{earningType.displayName}</h3>
+        </div>
         <span className="text-3xl font-mono font-bold text-success">
           {formatTime(elapsedSeconds)}
         </span>

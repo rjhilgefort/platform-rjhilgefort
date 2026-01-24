@@ -13,6 +13,7 @@ interface TypeBalance {
   budgetTypeId: number
   budgetTypeSlug: string
   budgetTypeDisplayName: string
+  budgetTypeIcon: string | null
   remainingSeconds: number
   carryoverSeconds: number
   allowCarryover: boolean
@@ -25,6 +26,7 @@ interface BudgetType {
   displayName: string
   allowCarryover: boolean
   sortOrder: number
+  icon: string | null
 }
 
 interface EarningType {
@@ -34,6 +36,7 @@ interface EarningType {
   ratioNumerator: number
   ratioDenominator: number
   sortOrder: number
+  icon: string | null
 }
 
 interface KidStatus {
@@ -44,9 +47,11 @@ interface KidStatus {
     budgetTypeId: number
     budgetTypeSlug: string
     budgetTypeDisplayName: string
+    budgetTypeIcon: string | null
     earningTypeId: number | null
     earningTypeSlug: string | null
     earningTypeDisplayName: string | null
+    earningTypeIcon: string | null
     startedAt: string
     elapsedSeconds: number
   } | null
@@ -151,8 +156,10 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                   <CountdownTimer
                     key={tb.budgetTypeId}
                     budgetTypeId={tb.budgetTypeId}
+                    budgetTypeSlug={tb.budgetTypeSlug}
                     isEarningPool={tb.isEarningPool}
                     label={tb.budgetTypeDisplayName}
+                    icon={tb.budgetTypeIcon}
                     remainingSeconds={displaySeconds}
                     isRunning={isThisTimerRunning}
                     isEarning={tb.isEarningPool && isEarningTimer}
@@ -195,6 +202,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
               <ActiveTimerOverlay
                 budgetTypeSlug={activeScreenTimer.budgetTypeSlug}
                 budgetTypeDisplayName={activeScreenTimer.budgetTypeDisplayName}
+                budgetTypeIcon={activeScreenTimer.budgetTypeIcon}
                 remainingSeconds={activeTimerCountdown}
                 isEarningToExtra={false}
                 onStop={stopTimer}
@@ -205,8 +213,9 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
 
           {/* Earning timer layout - enlarged Extra + divider + enlarged earning timer */}
           {activeEarningTimer && activeEarningType && (() => {
-            const ExtraIcon = getBudgetIcon('extra')
-            const EarningIcon = getEarningIcon(activeEarningType.slug)
+            const extraBudgetType = status.typeBalances.find((tb) => tb.isEarningPool)
+            const ExtraIcon = getBudgetIcon('extra', extraBudgetType?.budgetTypeIcon)
+            const EarningIcon = getEarningIcon(activeEarningType.slug, activeEarningType.icon)
             return (
               <div className="absolute inset-0 flex flex-col">
                 {/* Enlarged Extra timer */}

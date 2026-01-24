@@ -15,6 +15,13 @@
       "when": 1769211811710,
       "tag": "0001_nifty_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769218074134,
+      "tag": "0002_nifty_clea",
+      "breakpoints": true
     }
   ]
 }
