@@ -112,6 +112,9 @@ export default function ConfigPage() {
   useEffect(() => {
     fetchConfig()
     fetchBalances()
+    // Refresh balances periodically to stay in sync with main page
+    const interval = setInterval(fetchBalances, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   // Cleanup auto-save timeouts on unmount

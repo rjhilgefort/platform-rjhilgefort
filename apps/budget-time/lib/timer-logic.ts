@@ -25,7 +25,8 @@ export function calculateElapsedSeconds(startedAt: Date, now: Date = new Date())
 }
 
 /**
- * Calculate remaining time for a budget type, accounting for active timer if running
+ * Calculate remaining time for a budget type, accounting for active timer if running.
+ * Handles overflow: non-Extra budgets clamp at 0, Extra absorbs overflow (can go negative).
  */
 export function calculateRemainingTime(
   balance: FullDailyBalance,
@@ -41,7 +42,26 @@ export function calculateRemainingTime(
   // Only subtract if this is a consumption timer (no earningTypeId) for this budget type
   if (activeTimer && activeTimer.budgetTypeId === budgetTypeId && !activeTimer.earningTypeId) {
     const elapsed = calculateElapsedSeconds(activeTimer.startedAt, now)
+    // Non-Extra budgets clamp at 0, Extra (isEarningPool) can go negative
+    if (typeBalance.isEarningPool) {
+      return baseRemaining - elapsed
+    }
     return Math.max(0, baseRemaining - elapsed)
+  }
+
+  // Check if another budget is overflowing into Extra (this budget is Extra, and another is being consumed)
+  if (
+    typeBalance.isEarningPool &&
+    activeTimer &&
+    !activeTimer.earningTypeId &&
+    activeTimer.budgetTypeId !== budgetTypeId
+  ) {
+    const activeBudget = balance.typeBalances.find((tb) => tb.budgetTypeId === activeTimer.budgetTypeId)
+    if (activeBudget && !activeBudget.isEarningPool) {
+      const elapsed = calculateElapsedSeconds(activeTimer.startedAt, now)
+      const overflow = Math.max(0, elapsed - activeBudget.remainingSeconds)
+      return baseRemaining - overflow
+    }
   }
 
   return baseRemaining

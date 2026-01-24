@@ -264,3 +264,12 @@ export async function getBudgetTypeById(id: number): Promise<BudgetType | undefi
     where: eq(budgetTypes.id, id),
   })
 }
+
+/**
+ * Get the earning pool budget type (Extra)
+ */
+export async function getEarningPoolBudgetType(): Promise<BudgetType | undefined> {
+  return db.query.budgetTypes.findFirst({
+    where: eq(budgetTypes.isEarningPool, true),
+  })
+}

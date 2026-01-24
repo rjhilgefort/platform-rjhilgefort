@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../../db/client'
 import { activeTimers, timerHistory, budgetTypes, earningTypes } from '../../../../db/schema'
-import { updateBalance, getOrCreateTodayBalance } from '../../../../lib/balance'
+import {
+  updateBalance,
+  getOrCreateTodayBalance,
+  getEarningPoolBudgetType,
+} from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateEarnings } from '../../../../lib/timer-logic'
 
 export async function POST(request: Request) {
@@ -81,16 +85,71 @@ export async function POST(request: Request) {
     })
   } else {
     // Consumption timer: subtract elapsed time from budget
-    await updateBalance(kidId, timer.budgetTypeId, -elapsedSeconds)
+    // Get current balance to determine overflow
+    const currentBalance = await getOrCreateTodayBalance(kidId)
+    const currentTypeBalance = currentBalance.typeBalances.find(
+      (tb) => tb.budgetTypeId === timer.budgetTypeId
+    )
 
-    // Log to history
-    await db.insert(timerHistory).values({
-      kidId,
-      eventType: 'budget_used',
-      budgetTypeId: timer.budgetTypeId,
-      earningTypeId: null,
-      seconds: elapsedSeconds,
-    })
+    if (!currentTypeBalance) {
+      return NextResponse.json({ error: 'Type balance not found' }, { status: 404 })
+    }
+
+    const remainingSeconds = currentTypeBalance.remainingSeconds
+    const earningPool = await getEarningPoolBudgetType()
+
+    // Check if this IS the earning pool (Extra) - let it go negative directly
+    if (budgetType.isEarningPool) {
+      await updateBalance(kidId, timer.budgetTypeId, -elapsedSeconds)
+
+      await db.insert(timerHistory).values({
+        kidId,
+        eventType: 'budget_used',
+        budgetTypeId: timer.budgetTypeId,
+        earningTypeId: null,
+        seconds: elapsedSeconds,
+      })
+    } else if (elapsedSeconds <= remainingSeconds) {
+      // No overflow - deduct normally
+      await updateBalance(kidId, timer.budgetTypeId, -elapsedSeconds)
+
+      await db.insert(timerHistory).values({
+        kidId,
+        eventType: 'budget_used',
+        budgetTypeId: timer.budgetTypeId,
+        earningTypeId: null,
+        seconds: elapsedSeconds,
+      })
+    } else {
+      // Overflow: deduct all remaining from original, overflow from Extra
+      const overflow = elapsedSeconds - remainingSeconds
+
+      // Deduct all remaining from original budget (sets to 0)
+      await updateBalance(kidId, timer.budgetTypeId, -remainingSeconds)
+
+      // Log original budget usage
+      await db.insert(timerHistory).values({
+        kidId,
+        eventType: 'budget_used',
+        budgetTypeId: timer.budgetTypeId,
+        earningTypeId: null,
+        seconds: remainingSeconds,
+      })
+
+      // Deduct overflow from Extra (earning pool) if it exists
+      if (earningPool) {
+        await updateBalance(kidId, earningPool.id, -overflow)
+
+        // Log overflow to Extra
+        await db.insert(timerHistory).values({
+          kidId,
+          eventType: 'budget_used',
+          budgetTypeId: earningPool.id,
+          earningTypeId: null,
+          seconds: overflow,
+        })
+      }
+    }
 
     // Delete active timer
     await db.delete(activeTimers).where(eq(activeTimers.id, timer.id))

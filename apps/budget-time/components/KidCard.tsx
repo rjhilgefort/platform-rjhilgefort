@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CountdownTimer } from './CountdownTimer'
 import { EarningTimer } from './EarningTimer'
 import { BonusModal } from './BonusModal'
@@ -71,20 +71,65 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
   const activeBudgetTimer = hasActiveTimer && !isEarningTimer ? status.activeTimer : null
   const activeEarningTimer = hasActiveTimer && isEarningTimer ? status.activeTimer : null
   const sortedTypeBalances = [...status.typeBalances].sort((a, b) => Number(a.isEarningPool) - Number(b.isEarningPool))
-  const extraBalance = status.typeBalances.find((tb) => tb.isEarningPool)?.remainingSeconds ?? 0
+  const extraTypeBalance = status.typeBalances.find((tb) => tb.isEarningPool)
+  const extraBalance = extraTypeBalance?.remainingSeconds ?? 0
 
   // Client-side countdown for active budget timer
   const activeTimerBalance = activeBudgetTimer
     ? status.typeBalances.find((tb) => tb.budgetTypeId === activeBudgetTimer.budgetTypeId)
     : null
-  const activeTimerBaseSeconds = activeTimerBalance
+
+  // Cache original budget AND Extra balance at timer start to prevent flicker on server polls.
+  // Once overflow starts, server returns remainingSeconds=0, so we'd lose the original values.
+  const timerCacheRef = useRef<{ startedAt: string; budgetSeconds: number; extraSeconds: number } | null>(null)
+  const calculatedBaseSeconds = activeTimerBalance
     ? activeTimerBalance.remainingSeconds + (status.activeTimer?.elapsedSeconds ?? 0)
     : 0
+
+  // Update cache when timer starts or changes
+  useEffect(() => {
+    if (activeBudgetTimer) {
+      // Only set cache if this is a new timer (different startedAt)
+      if (timerCacheRef.current?.startedAt !== activeBudgetTimer.startedAt) {
+        timerCacheRef.current = {
+          startedAt: activeBudgetTimer.startedAt,
+          budgetSeconds: calculatedBaseSeconds,
+          extraSeconds: extraBalance,
+        }
+      }
+    } else {
+      timerCacheRef.current = null
+    }
+  }, [activeBudgetTimer?.startedAt, calculatedBaseSeconds, extraBalance])
+
+  // Use cached values if available, otherwise use calculated
+  const timerCache = timerCacheRef.current
+  const activeTimerBaseSeconds =
+    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt
+      ? timerCache.budgetSeconds
+      : calculatedBaseSeconds
+  const cachedExtraSeconds =
+    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt
+      ? timerCache.extraSeconds
+      : extraBalance
+
   const activeTimerCountdown = useCountdown(
     activeBudgetTimer?.startedAt ?? null,
     activeTimerBaseSeconds,
     activeBudgetTimer !== null
   )
+
+  // Track overflow into Extra time (when original budget depleted)
+  const activeTimerElapsed = useElapsed(
+    activeBudgetTimer?.startedAt ?? null,
+    activeBudgetTimer !== null
+  )
+  const isUsingExtraTime = activeBudgetTimer !== null &&
+    !activeTimerBalance?.isEarningPool &&
+    activeTimerElapsed > activeTimerBaseSeconds
+  const overflowSeconds = isUsingExtraTime
+    ? activeTimerElapsed - activeTimerBaseSeconds
+    : 0
 
   // Client-side elapsed for earning timer
   const earningElapsed = useElapsed(
@@ -203,6 +248,9 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                 budgetTypeIcon={activeBudgetTimer.budgetTypeIcon}
                 remainingSeconds={activeTimerCountdown}
                 isEarningToExtra={false}
+                isUsingExtraTime={isUsingExtraTime}
+                extraRemainingSeconds={cachedExtraSeconds - overflowSeconds}
+                extraTypeIcon={extraTypeBalance?.budgetTypeIcon}
                 onStop={stopTimer}
                 disabled={loading}
               />
