@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] I need a icon for this app. Can you link me some options or ideas? I'll also need this to be able to be the Favicon.
 - [ ] Compact layout for tablet in landscape mode - reduce height, compress tiles somehow. I'm thinking we don't need the buttons to say start, and the timer display title can be in the button. For the extra times I think that saves a lot of space, for the budget timers, I'm wondering if the button should be moved to the left of the timer. Or, if there's another way to make more efficient use of the space. Give me some options.
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?)
 - [ ] Allow configuring profile picture per kid (TBD: where to store/display)
