@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.1.1
+
+### Patch Changes
+
+- eb4140f: Add COOKIE_SECURE env var to control auth cookie secure flag for HTTP deployments
+
 ## 0.1.0
 
 ### Minor Changes
