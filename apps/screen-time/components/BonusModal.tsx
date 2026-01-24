@@ -80,7 +80,7 @@ export function BonusModal({
   if (pendingMinutes !== null) {
     return (
       <dialog className="modal modal-open">
-        <div className="modal-box">
+        <div className="modal-box w-80">
           <PinPad
             title={`+${pendingMinutes} min ${selectedBudgetType?.displayName ?? ''}`}
             onSubmit={handlePinSubmit}

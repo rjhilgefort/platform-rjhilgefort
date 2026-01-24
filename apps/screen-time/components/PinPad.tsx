@@ -80,12 +80,8 @@ export function PinPad({
         ))}
       </div>
 
-      {displayError && (
-        <p className="text-error text-sm mb-4">{displayError}</p>
-      )}
-
       {/* Keypad */}
-      <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
+      <div className="grid grid-cols-3 gap-3 w-72">
         {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'back'].map(
           (digit, i) =>
             digit ? (
@@ -94,7 +90,7 @@ export function PinPad({
                   <button
                     key="cancel"
                     type="button"
-                    className="btn btn-ghost"
+                    className="btn btn-lg btn-ghost"
                     onClick={onCancel}
                     disabled={isDisabled}
                   >
@@ -104,7 +100,7 @@ export function PinPad({
                   <button
                     key="backspace"
                     type="button"
-                    className="btn btn-neutral"
+                    className="btn btn-lg btn-neutral"
                     onClick={handleBackspace}
                     disabled={isDisabled}
                   >
@@ -115,7 +111,7 @@ export function PinPad({
                 <button
                   key={digit}
                   type="button"
-                  className="btn btn-neutral"
+                  className="btn btn-lg btn-neutral"
                   onClick={() => handleDigit(digit)}
                   disabled={isDisabled}
                 >
@@ -130,6 +126,10 @@ export function PinPad({
 
       {checking && (
         <span className="loading loading-spinner loading-sm mt-4" />
+      )}
+
+      {displayError && pin.length === 0 && (
+        <p className="text-error text-sm mt-4">{displayError}</p>
       )}
     </div>
   )
