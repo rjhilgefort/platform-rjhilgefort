@@ -95,3 +95,41 @@ export function formatTime(seconds: number): string {
   }
   return `${prefix}${minutes}:${secs.toString().padStart(2, '0')}`
 }
+
+export interface TimeParts {
+  prefix: string
+  hours: number
+  minutes: number
+  seconds: number
+  hasHours: boolean
+  /** Main part (hours:minutes or just minutes) */
+  main: string
+  /** Seconds with leading zero */
+  secs: string
+}
+
+/**
+ * Parse seconds into parts for custom rendering
+ */
+export function formatTimeParts(seconds: number): TimeParts {
+  const absSeconds = Math.abs(Math.floor(seconds))
+  const hours = Math.floor(absSeconds / 3600)
+  const minutes = Math.floor((absSeconds % 3600) / 60)
+  const secs = absSeconds % 60
+  const prefix = seconds < 0 ? '-' : ''
+  const hasHours = hours > 0
+
+  const main = hasHours
+    ? `${prefix}${hours}:${minutes.toString().padStart(2, '0')}`
+    : `${prefix}${minutes}`
+
+  return {
+    prefix,
+    hours,
+    minutes,
+    seconds: secs,
+    hasHours,
+    main,
+    secs: secs.toString().padStart(2, '0'),
+  }
+}

@@ -1,7 +1,7 @@
 'use client'
 
-import { formatTime } from '../lib/timer-logic'
 import { getEarningIcon } from '../lib/budget-icons'
+import { TimeDisplay } from './TimeDisplay'
 
 interface EarningType {
   id: number
@@ -44,9 +44,7 @@ export function EarningTimer({
           </h3>
         </div>
         {isRunning && (
-          <span className="text-3xl font-mono font-bold text-success">
-            {formatTime(elapsedSeconds)}
-          </span>
+          <TimeDisplay seconds={elapsedSeconds} className="text-3xl text-success" />
         )}
 
         <div className="mt-2">

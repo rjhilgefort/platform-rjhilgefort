@@ -2,6 +2,7 @@
 
 import { formatTime } from '../lib/timer-logic'
 import { getBudgetIcon } from '../lib/budget-icons'
+import { TimeDisplay } from './TimeDisplay'
 
 interface CountdownTimerProps {
   budgetTypeId: number
@@ -55,8 +56,9 @@ export function CountdownTimer({
             {label}
           </h3>
         </div>
-        <div
-          className={`text-3xl font-mono font-bold ${
+        <TimeDisplay
+          seconds={displaySeconds}
+          className={`text-3xl ${
             isEarning
               ? 'text-success'
               : isExpired
@@ -65,9 +67,7 @@ export function CountdownTimer({
                   ? 'text-warning'
                   : 'text-base-content'
           }`}
-        >
-          {formatTime(displaySeconds)}
-        </div>
+        />
         <div className="mt-2">
           {isRunning ? (
             <button

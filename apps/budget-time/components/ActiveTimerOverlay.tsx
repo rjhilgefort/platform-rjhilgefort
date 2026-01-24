@@ -1,7 +1,7 @@
 'use client'
 
 import { getBudgetIcon } from '../lib/budget-icons'
-import { formatTime } from '../lib/timer-logic'
+import { TimeDisplay } from './TimeDisplay'
 
 interface ActiveTimerOverlayProps {
   budgetTypeSlug: string
@@ -55,13 +55,12 @@ export function ActiveTimerOverlay({
               Using Extra Time
             </span>
           </div>
-          <div
-            className={`text-8xl font-mono font-bold ${
+          <TimeDisplay
+            seconds={extraRemainingSeconds}
+            className={`text-8xl ${
               extraIsNegative ? 'text-error' : extraIsWarning ? 'text-error' : 'text-warning'
             }`}
-          >
-            {formatTime(extraRemainingSeconds)}
-          </div>
+          />
         </div>
 
         <button
@@ -98,8 +97,9 @@ export function ActiveTimerOverlay({
         </p>
       </div>
 
-      <div
-        className={`text-8xl font-mono font-bold ${
+      <TimeDisplay
+        seconds={remainingSeconds}
+        className={`text-8xl ${
           isEarningToExtra
             ? 'text-success'
             : isExpired
@@ -108,9 +108,7 @@ export function ActiveTimerOverlay({
                 ? 'text-warning'
                 : 'text-base-content'
         }`}
-      >
-        {formatTime(remainingSeconds)}
-      </div>
+      />
 
       <button
         type="button"

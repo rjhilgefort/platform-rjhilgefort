@@ -8,6 +8,7 @@ import { ActiveTimerOverlay } from './ActiveTimerOverlay'
 import { useCountdown, useElapsed } from '../hooks/useCountdown'
 import { formatTime } from '../lib/timer-logic'
 import { getBudgetIcon, getEarningIcon } from '../lib/budget-icons'
+import { TimeDisplay } from './TimeDisplay'
 
 interface TypeBalance {
   budgetTypeId: number
@@ -268,9 +269,10 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                 <div className="flex-1 flex flex-col items-center justify-center bg-success/10 rounded-lg p-4">
                   <ExtraIcon size={120} className="text-success animate-pulse" />
                   <p className="text-2xl text-success font-medium mt-1">Extra</p>
-                  <div className="text-7xl font-mono font-bold text-success">
-                    {formatTime(extraBalance + pendingEarnedSeconds)}
-                  </div>
+                  <TimeDisplay
+                    seconds={extraBalance + pendingEarnedSeconds}
+                    className="text-7xl text-success"
+                  />
                   <p className="text-base text-success/70 mt-1">
                     +{formatTime(pendingEarnedSeconds)} earned
                   </p>
@@ -285,9 +287,10 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                   <p className="text-2xl text-success font-medium mt-1">
                     {activeEarningType.displayName}
                   </p>
-                  <div className="text-7xl font-mono font-bold text-success">
-                    {formatTime(earningElapsed)}
-                  </div>
+                  <TimeDisplay
+                    seconds={earningElapsed}
+                    className="text-7xl text-success"
+                  />
                   <p className="text-base text-base-content/50 mt-1">
                     {activeEarningType.ratioNumerator} min = {activeEarningType.ratioDenominator} min extra
                   </p>
