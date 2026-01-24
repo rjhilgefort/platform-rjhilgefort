@@ -70,22 +70,22 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
 
   const hasActiveTimer = status.activeTimer !== null
   const isEarningTimer = status.activeTimer?.earningTypeId != null
-  const activeScreenTimer = hasActiveTimer && !isEarningTimer ? status.activeTimer : null
+  const activeBudgetTimer = hasActiveTimer && !isEarningTimer ? status.activeTimer : null
   const activeEarningTimer = hasActiveTimer && isEarningTimer ? status.activeTimer : null
   const sortedTypeBalances = [...status.typeBalances].sort((a, b) => Number(a.isEarningPool) - Number(b.isEarningPool))
   const extraBalance = status.typeBalances.find((tb) => tb.isEarningPool)?.remainingSeconds ?? 0
 
-  // Client-side countdown for active screen timer
-  const activeTimerBalance = activeScreenTimer
-    ? status.typeBalances.find((tb) => tb.budgetTypeId === activeScreenTimer.budgetTypeId)
+  // Client-side countdown for active budget timer
+  const activeTimerBalance = activeBudgetTimer
+    ? status.typeBalances.find((tb) => tb.budgetTypeId === activeBudgetTimer.budgetTypeId)
     : null
   const activeTimerBaseSeconds = activeTimerBalance
     ? activeTimerBalance.remainingSeconds + (status.activeTimer?.elapsedSeconds ?? 0)
     : 0
   const activeTimerCountdown = useCountdown(
-    activeScreenTimer?.startedAt ?? null,
+    activeBudgetTimer?.startedAt ?? null,
     activeTimerBaseSeconds,
-    activeScreenTimer !== null
+    activeBudgetTimer !== null
   )
 
   // Client-side elapsed for earning timer
@@ -145,8 +145,8 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
 
         <div className="relative flex-1">
           {/* Normal grid - always rendered to preserve height, invisible when timer active */}
-          <div className={activeScreenTimer || isEarningTimer ? 'invisible' : ''}>
-            {/* Budget Type Timers (Screen Time) */}
+          <div className={activeBudgetTimer || isEarningTimer ? 'invisible' : ''}>
+            {/* Budget Type Timers */}
             <div className="grid grid-cols-2 gap-3 mt-4">
               {sortedTypeBalances.map((tb) => {
                 const isThisTimerRunning =
@@ -197,12 +197,12 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
           </div>
 
           {/* Timer overlay - absolutely positioned on top when active */}
-          {activeScreenTimer && (
+          {activeBudgetTimer && (
             <div className="absolute inset-0">
               <ActiveTimerOverlay
-                budgetTypeSlug={activeScreenTimer.budgetTypeSlug}
-                budgetTypeDisplayName={activeScreenTimer.budgetTypeDisplayName}
-                budgetTypeIcon={activeScreenTimer.budgetTypeIcon}
+                budgetTypeSlug={activeBudgetTimer.budgetTypeSlug}
+                budgetTypeDisplayName={activeBudgetTimer.budgetTypeDisplayName}
+                budgetTypeIcon={activeBudgetTimer.budgetTypeIcon}
                 remainingSeconds={activeTimerCountdown}
                 isEarningToExtra={false}
                 onStop={stopTimer}

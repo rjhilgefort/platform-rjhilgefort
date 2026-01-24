@@ -26,7 +26,7 @@ export default function LoginPage() {
       <div className="card bg-base-100 shadow-xl w-full max-w-sm">
         <div className="card-body items-center">
           <PinPad
-            title="Screen Time"
+            title="Budget Time"
             onSubmit={handleSubmit}
           />
         </div>

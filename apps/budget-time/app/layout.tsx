@@ -5,8 +5,8 @@ import './globals.css'
 const outfit = Outfit({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Screen Time Manager',
-  description: 'Manage screen time budgets for Jesselin & Raelin',
+  title: 'Budget Time',
+  description: 'Manage time budgets for Jesselin & Raelin',
 }
 
 export default function RootLayout({

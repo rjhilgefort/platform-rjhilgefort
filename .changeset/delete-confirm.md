@@ -1,5 +1,5 @@
 ---
-"@repo/screen-time": patch
+"@repo/budget-time": patch
 ---
 
 config: delete buttons require two-click confirmation

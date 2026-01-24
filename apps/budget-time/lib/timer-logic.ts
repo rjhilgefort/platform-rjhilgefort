@@ -48,14 +48,14 @@ export function calculateRemainingTime(
 }
 
 /**
- * Calculate earned screen time from earning activity using earning type ratio
+ * Calculate earned budget time from earning activity using earning type ratio
  */
 export function calculateEarnings(
   elapsedSeconds: number,
   earningType: EarningType
 ): number {
-  // ratio: numerator:denominator means numerator min activity = denominator min screen
-  // e.g. 1:2 means 1 min chores = 2 min screen time
+  // ratio: numerator:denominator means numerator min activity = denominator min budget
+  // e.g. 1:2 means 1 min chores = 2 min budget time
   return Math.floor((elapsedSeconds * earningType.ratioDenominator) / earningType.ratioNumerator)
 }
 

@@ -710,9 +710,9 @@ export default function ConfigPage() {
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <div>
-              <h2 className="card-title">Screen Time Types</h2>
+              <h2 className="card-title">Budget Types</h2>
               <p className="text-sm text-base-content/60">
-                Types of screen time kids can use (TV, Games, etc.)
+                Types of budget time kids can use (TV, Games, etc.)
               </p>
             </div>
             <div className="space-y-3 mt-4">
@@ -783,7 +783,7 @@ export default function ConfigPage() {
               <input
                 type="text"
                 className="input input-bordered input-sm flex-1"
-                placeholder="New screen time type..."
+                placeholder="New budget type..."
                 value={newBudgetTypeName}
                 onChange={(e) => setNewBudgetTypeName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && createBudgetType()}
@@ -806,7 +806,7 @@ export default function ConfigPage() {
             <div>
               <h2 className="card-title">Earning Types</h2>
               <p className="text-sm text-base-content/60">
-                Activities that earn screen time
+                Activities that earn budget time
               </p>
             </div>
             <div className="space-y-3 mt-4">
@@ -942,7 +942,7 @@ export default function ConfigPage() {
             </div>
 
             <p className="text-xs text-base-content/50 mt-2">
-              Ratio: minutes of activity = minutes of screen time earned
+              Ratio: minutes of activity = minutes of budget time earned
             </p>
           </div>
         </div>

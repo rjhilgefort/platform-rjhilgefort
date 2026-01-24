@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Check for auth cookie
-  const authCookie = request.cookies.get('screentime_auth')
+  const authCookie = request.cookies.get('budgettime_auth')
 
   if (authCookie?.value !== 'authenticated') {
     // Redirect to login

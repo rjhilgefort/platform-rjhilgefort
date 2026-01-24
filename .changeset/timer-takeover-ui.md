@@ -1,5 +1,5 @@
 ---
-"@repo/screen-time": patch
+"@repo/budget-time": patch
 ---
 
 Timer takeover UI: screen time timers take over kid card with large icon + countdown display

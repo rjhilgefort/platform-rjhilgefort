@@ -10,7 +10,7 @@ import {
   DailyTypeBalance,
   BudgetType,
 } from '../db/schema'
-import { getScreenTimeDate, getPreviousScreenTimeDate } from './day-boundary'
+import { getBudgetDate, getPreviousBudgetDate } from './day-boundary'
 
 export interface TypeBalance {
   budgetTypeId: number
@@ -44,7 +44,7 @@ export async function getAllBudgetTypes(): Promise<BudgetType[]> {
  * Handles carryover from previous day for all budget types
  */
 export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyBalance> {
-  const today = getScreenTimeDate()
+  const today = getBudgetDate()
 
   // Check if today's balance exists
   const existing = await db.query.dailyBalances.findFirst({
@@ -98,7 +98,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
   const defaults = await getKidBudgetDefaults(kidId)
 
   // Get yesterday's balance for carryover
-  const yesterday = getPreviousScreenTimeDate()
+  const yesterday = getPreviousBudgetDate()
   const yesterdayBalance = await db.query.dailyBalances.findFirst({
     where: and(eq(dailyBalances.kidId, kidId), eq(dailyBalances.date, yesterday)),
   })

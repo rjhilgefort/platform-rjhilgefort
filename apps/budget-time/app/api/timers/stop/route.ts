@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     // Log to history
     await db.insert(timerHistory).values({
       kidId,
-      eventType: 'screen_used',
+      eventType: 'budget_used',
       budgetTypeId: timer.budgetTypeId,
       earningTypeId: null,
       seconds: elapsedSeconds,
