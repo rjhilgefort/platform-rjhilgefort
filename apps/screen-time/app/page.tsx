@@ -80,7 +80,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchStatus()
-    const interval = setInterval(fetchStatus, 1000)
+    const interval = setInterval(fetchStatus, 30000) // Sync every 30s, client handles countdown
     return () => clearInterval(interval)
   }, [fetchStatus])
 

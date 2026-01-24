@@ -5,6 +5,7 @@ import { CountdownTimer } from './CountdownTimer'
 import { EarningTimer } from './EarningTimer'
 import { BonusModal } from './BonusModal'
 import { ActiveTimerOverlay } from './ActiveTimerOverlay'
+import { useCountdown, useElapsed } from '../hooks/useCountdown'
 
 interface TypeBalance {
   budgetTypeId: number
@@ -63,17 +64,35 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
   const hasActiveTimer = status.activeTimer !== null
   const isEarningTimer = status.activeTimer?.earningTypeId != null
   const activeScreenTimer = hasActiveTimer && !isEarningTimer ? status.activeTimer : null
+  const activeEarningTimer = hasActiveTimer && isEarningTimer ? status.activeTimer : null
+  const sortedTypeBalances = [...status.typeBalances].sort((a, b) => Number(a.isEarningPool) - Number(b.isEarningPool))
   const extraBalance = status.typeBalances.find((tb) => tb.isEarningPool)?.remainingSeconds ?? 0
+
+  // Client-side countdown for active screen timer
+  const activeTimerBalance = activeScreenTimer
+    ? status.typeBalances.find((tb) => tb.budgetTypeId === activeScreenTimer.budgetTypeId)
+    : null
+  const activeTimerBaseSeconds = activeTimerBalance
+    ? activeTimerBalance.remainingSeconds + (status.activeTimer?.elapsedSeconds ?? 0)
+    : 0
+  const activeTimerCountdown = useCountdown(
+    activeScreenTimer?.startedAt ?? null,
+    activeTimerBaseSeconds,
+    activeScreenTimer !== null
+  )
+
+  // Client-side elapsed for earning timer
+  const earningElapsed = useElapsed(
+    activeEarningTimer?.startedAt ?? null,
+    activeEarningTimer !== null
+  )
 
   // Calculate pending earned seconds when earning timer is running
   const activeEarningType = isEarningTimer
     ? earningTypes.find((et) => et.id === status.activeTimer?.earningTypeId)
     : null
   const pendingEarnedSeconds = activeEarningType
-    ? Math.floor(
-        ((status.activeTimer?.elapsedSeconds ?? 0) * activeEarningType.ratioDenominator) /
-          activeEarningType.ratioNumerator
-      )
+    ? Math.floor((earningElapsed * activeEarningType.ratioDenominator) / activeEarningType.ratioNumerator)
     : 0
 
   const startTimer = async (budgetTypeId: number | null, earningTypeId?: number) => {
@@ -122,16 +141,17 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
           <div className={activeScreenTimer ? 'invisible' : ''}>
             {/* Budget Type Timers (Screen Time) */}
             <div className="grid grid-cols-2 gap-3 mt-4">
-              {status.typeBalances.map((tb) => {
+              {sortedTypeBalances.map((tb) => {
                 const isThisTimerRunning =
                   status.activeTimer?.budgetTypeId === tb.budgetTypeId && !isEarningTimer
+                const displaySeconds = isThisTimerRunning ? activeTimerCountdown : tb.remainingSeconds
                 return (
                   <CountdownTimer
                     key={tb.budgetTypeId}
                     budgetTypeId={tb.budgetTypeId}
                     isEarningPool={tb.isEarningPool}
                     label={tb.budgetTypeDisplayName}
-                    remainingSeconds={tb.remainingSeconds}
+                    remainingSeconds={displaySeconds}
                     isRunning={isThisTimerRunning}
                     isEarning={tb.isEarningPool && isEarningTimer}
                     onStart={() => startTimer(tb.budgetTypeId)}
@@ -157,7 +177,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                     key={et.id}
                     earningType={et}
                     isRunning={isThisEarningRunning}
-                    elapsedSeconds={isThisEarningRunning ? status.activeTimer?.elapsedSeconds ?? 0 : 0}
+                    elapsedSeconds={isThisEarningRunning ? earningElapsed : 0}
                     onStart={(earningTypeId) => startTimer(null, earningTypeId)}
                     onStop={stopTimer}
                     disabled={loading || (hasActiveTimer && !isThisEarningRunning)}
@@ -173,11 +193,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
               <ActiveTimerOverlay
                 budgetTypeSlug={activeScreenTimer.budgetTypeSlug}
                 budgetTypeDisplayName={activeScreenTimer.budgetTypeDisplayName}
-                remainingSeconds={
-                  status.typeBalances.find(
-                    (tb) => tb.budgetTypeId === activeScreenTimer.budgetTypeId
-                  )?.remainingSeconds ?? 0
-                }
+                remainingSeconds={activeTimerCountdown}
                 isEarningToExtra={false}
                 onStop={stopTimer}
                 disabled={loading}
