@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { IconPickerModal } from '../../components/IconPickerModal'
+import { PinPad } from '../../components/PinPad'
 import { getIconComponent } from '../../lib/icon-registry'
 
 interface BudgetDefault {
@@ -60,8 +61,6 @@ export default function ConfigPage() {
   const [loading, setLoading] = useState(true)
   const [pin, setPin] = useState('')
   const [pinVerified, setPinVerified] = useState(false)
-  const [pinError, setPinError] = useState('')
-  const [pinChecking, setPinChecking] = useState(false)
   const [error, setError] = useState('')
   const [toasts, setToasts] = useState<{ message: string; id: number }[]>([])
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(new Set())
@@ -394,90 +393,31 @@ export default function ConfigPage() {
   }
 
   if (!pinVerified) {
+    const handlePinSubmit = async (enteredPin: string): Promise<boolean> => {
+      const response = await fetch('/api/auth/validate-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: enteredPin }),
+      })
+      const data = await response.json()
+      if (data.valid) {
+        setPin(enteredPin)
+        setPinVerified(true)
+        return true
+      }
+      return false
+    }
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-200 p-4">
         <div className="card bg-base-100 shadow-xl w-full max-w-sm">
           <div className="card-body items-center">
-            <h1 className="card-title text-xl mb-4">Parent PIN Required</h1>
-
-            <div className="flex gap-3 mb-4">
-              {[0, 1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className={`w-4 h-4 rounded-full border-2 ${
-                    pin.length > i
-                      ? 'bg-primary border-primary'
-                      : 'border-base-300'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'back'].map(
-                (digit, i) =>
-                  digit ? (
-                    digit === 'back' ? (
-                      pin.length === 0 ? (
-                        <Link key="cancel" href="/" className="btn btn-ghost">
-                          Cancel
-                        </Link>
-                      ) : (
-                        <button
-                          key="backspace"
-                          type="button"
-                          className="btn btn-neutral"
-                          disabled={pinChecking}
-                          onClick={() => {
-                            setPinError('')
-                            setPin((p) => p.slice(0, -1))
-                          }}
-                        >
-                          ⌫
-                        </button>
-                      )
-                    ) : (
-                      <button
-                        key={digit}
-                        type="button"
-                        className="btn btn-neutral"
-                        disabled={pinChecking}
-                        onClick={async () => {
-                          if (pin.length < 4) {
-                            setPinError('')
-                            const newPin = pin + digit
-                            setPin(newPin)
-                            if (newPin.length === 4) {
-                              setPinChecking(true)
-                              const response = await fetch('/api/auth/validate-pin', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ pin: newPin }),
-                              })
-                              const data = await response.json()
-                              setPinChecking(false)
-                              if (data.valid) {
-                                setPinVerified(true)
-                              } else {
-                                setPinError('Incorrect PIN')
-                                setPin('')
-                              }
-                            }
-                          }
-                        }}
-                      >
-                        {digit}
-                      </button>
-                    )
-                  ) : (
-                    <div key={i} />
-                  )
-              )}
-            </div>
-
-            {pinError && (
-              <p className="text-error text-sm mt-4">{pinError}</p>
-            )}
+            <PinPad
+              title="Parent PIN Required"
+              onSubmit={handlePinSubmit}
+              onCancel={() => window.location.href = '/'}
+              cancelLabel="Cancel"
+            />
           </div>
         </div>
       </div>
