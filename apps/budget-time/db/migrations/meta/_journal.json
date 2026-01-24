@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1769208903476,
-      "tag": "0000_complex_spectrum",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1769211811710,
-      "tag": "0001_nifty_giant_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1769218074134,
-      "tag": "0002_nifty_clea",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1769227267285,
-      "tag": "0003_right_morg",
+      "when": 1769231895934,
+      "tag": "0000_deep_dark_phoenix",
       "breakpoints": true
     }
   ]

@@ -1,5 +1,5 @@
 {
-  "id": "3f7f11bc-28d3-41a3-84de-cd131a2331da",
+  "id": "e431813e-dab3-4d21-b282-a38cee75dc2d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -130,9 +130,39 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
+        },
+        "is_earning_pool": {
+          "name": "is_earning_pool",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "unique_earning_pool": {
+          "name": "unique_earning_pool",
+          "columns": [
+            {
+              "expression": "is_earning_pool",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"budget_types\".\"is_earning_pool\" = true",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
@@ -306,14 +336,14 @@
         },
         "ratio_numerator": {
           "name": "ratio_numerator",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "default": 1
         },
         "ratio_denominator": {
           "name": "ratio_denominator",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "default": 1
@@ -324,6 +354,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},

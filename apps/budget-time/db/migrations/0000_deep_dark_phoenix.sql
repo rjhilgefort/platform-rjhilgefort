@@ -13,6 +13,8 @@ CREATE TABLE "budget_types" (
 	"display_name" text NOT NULL,
 	"allow_carryover" boolean DEFAULT true NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
+	"is_earning_pool" boolean DEFAULT false NOT NULL,
+	"icon" text,
 	CONSTRAINT "budget_types_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
@@ -36,9 +38,10 @@ CREATE TABLE "earning_types" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"slug" text NOT NULL,
 	"display_name" text NOT NULL,
-	"ratio_numerator" integer DEFAULT 1 NOT NULL,
-	"ratio_denominator" integer DEFAULT 1 NOT NULL,
+	"ratio_numerator" real DEFAULT 1 NOT NULL,
+	"ratio_denominator" real DEFAULT 1 NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
+	"icon" text,
 	CONSTRAINT "earning_types_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
@@ -76,4 +79,5 @@ ALTER TABLE "kid_budget_defaults" ADD CONSTRAINT "kid_budget_defaults_kid_id_kid
 ALTER TABLE "kid_budget_defaults" ADD CONSTRAINT "kid_budget_defaults_budget_type_id_budget_types_id_fk" FOREIGN KEY ("budget_type_id") REFERENCES "public"."budget_types"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "timer_history" ADD CONSTRAINT "timer_history_kid_id_kids_id_fk" FOREIGN KEY ("kid_id") REFERENCES "public"."kids"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "timer_history" ADD CONSTRAINT "timer_history_budget_type_id_budget_types_id_fk" FOREIGN KEY ("budget_type_id") REFERENCES "public"."budget_types"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "timer_history" ADD CONSTRAINT "timer_history_earning_type_id_earning_types_id_fk" FOREIGN KEY ("earning_type_id") REFERENCES "public"."earning_types"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "timer_history" ADD CONSTRAINT "timer_history_earning_type_id_earning_types_id_fk" FOREIGN KEY ("earning_type_id") REFERENCES "public"."earning_types"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "unique_earning_pool" ON "budget_types" USING btree ("is_earning_pool") WHERE "budget_types"."is_earning_pool" = true;
