@@ -132,7 +132,7 @@ export default function HomePage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Screen Time</h1>
-          <Link href="/config" className="btn btn-ghost btn-sm">
+          <Link href="/config" className="btn btn-outline btn-sm">
             Settings
           </Link>
         </div>

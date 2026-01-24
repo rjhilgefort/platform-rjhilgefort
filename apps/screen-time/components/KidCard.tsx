@@ -130,7 +130,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
           <h2 className="card-title text-2xl">{status.kidName}</h2>
           <button
             type="button"
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost text-3xl font-bold leading-none"
             onClick={() => setShowBonus(true)}
             title="Add bonus time"
           >
