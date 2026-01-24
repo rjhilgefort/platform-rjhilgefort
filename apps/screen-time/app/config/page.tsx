@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { IconPickerModal } from '../../components/IconPickerModal'
 import { PinPad } from '../../components/PinPad'
@@ -72,10 +72,48 @@ export default function ConfigPage() {
     currentIcon: string | null
   } | null>(null)
   const [resetConfirm, setResetConfirm] = useState<Set<number>>(new Set())
+  const [savedInputs, setSavedInputs] = useState<Set<string>>(new Set())
+  const saveTimeouts = useRef<Record<string, NodeJS.Timeout>>({})
+
+  const flashSaved = (key: string) => {
+    setSavedInputs((prev) => new Set(prev).add(key))
+    setTimeout(() => {
+      setSavedInputs((prev) => {
+        const next = new Set(prev)
+        next.delete(key)
+        return next
+      })
+    }, 1000)
+  }
+
+  const scheduleAutoSave = (key: string, saveFn: () => void) => {
+    if (saveTimeouts.current[key]) {
+      clearTimeout(saveTimeouts.current[key])
+    }
+    saveTimeouts.current[key] = setTimeout(() => {
+      saveFn()
+      flashSaved(key)
+      delete saveTimeouts.current[key]
+    }, 5000)
+  }
+
+  const cancelAutoSave = (key: string) => {
+    if (saveTimeouts.current[key]) {
+      clearTimeout(saveTimeouts.current[key])
+      delete saveTimeouts.current[key]
+    }
+  }
 
   useEffect(() => {
     fetchConfig()
     fetchBalances()
+  }, [])
+
+  // Cleanup auto-save timeouts on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(saveTimeouts.current).forEach(clearTimeout)
+    }
   }, [])
 
   const fetchConfig = async () => {
@@ -135,6 +173,7 @@ export default function ConfigPage() {
 
     if (response.ok) {
       fetchConfig()
+      showToast('Saved')
     } else {
       const data = await response.json()
       setError(data.error || 'Failed to save')
@@ -164,6 +203,7 @@ export default function ConfigPage() {
 
     if (response.ok) {
       fetchConfig()
+      showToast('Saved')
     } else {
       const data = await response.json()
       setError(data.error || 'Failed to save')
@@ -224,6 +264,7 @@ export default function ConfigPage() {
 
     if (response.ok) {
       fetchConfig()
+      showToast('Saved')
     } else {
       const data = await response.json()
       setError(data.error || 'Failed to update')
@@ -583,9 +624,10 @@ export default function ConfigPage() {
                       </label>
                       <input
                         type="number"
-                        className="input input-bordered"
+                        className={`input input-bordered transition-colors duration-1000 ${savedInputs.has(`kid-default-${kid.id}-${bd.budgetTypeId}`) ? 'bg-success/20' : ''}`}
                         value={bd.dailyBudgetMinutes}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newValue = parseInt(e.target.value) || 0
                           setKids((prev) =>
                             prev.map((k) =>
                               k.id === kid.id
@@ -593,25 +635,26 @@ export default function ConfigPage() {
                                     ...k,
                                     budgetDefaults: k.budgetDefaults.map((d) =>
                                       d.budgetTypeId === bd.budgetTypeId
-                                        ? {
-                                            ...d,
-                                            dailyBudgetMinutes:
-                                              parseInt(e.target.value) || 0,
-                                          }
+                                        ? { ...d, dailyBudgetMinutes: newValue }
                                         : d
                                     ),
                                   }
                                 : k
                             )
                           )
-                        }
-                        onBlur={() =>
+                          scheduleAutoSave(`kid-default-${kid.id}-${bd.budgetTypeId}`, () =>
+                            updateKidBudgetDefault(kid.id, bd.budgetTypeId, newValue)
+                          )
+                        }}
+                        onBlur={() => {
+                          cancelAutoSave(`kid-default-${kid.id}-${bd.budgetTypeId}`)
                           updateKidBudgetDefault(
                             kid.id,
                             bd.budgetTypeId,
                             bd.dailyBudgetMinutes
                           )
-                        }
+                          flashSaved(`kid-default-${kid.id}-${bd.budgetTypeId}`)
+                        }}
                       />
                     </div>
                   ))}
@@ -658,16 +701,24 @@ export default function ConfigPage() {
                     </button>
                     <input
                       type="text"
-                      className="input input-bordered input-sm flex-1"
+                      className={`input input-bordered input-sm flex-1 transition-colors duration-1000 ${savedInputs.has(`bt-name-${bt.id}`) ? 'bg-success/20' : ''}`}
                       value={bt.displayName}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newValue = e.target.value
                         setBudgetTypes((prev) =>
                           prev.map((t) =>
-                            t.id === bt.id ? { ...t, displayName: e.target.value } : t
+                            t.id === bt.id ? { ...t, displayName: newValue } : t
                           )
                         )
-                      }
-                      onBlur={() => updateBudgetType(bt.id, { displayName: bt.displayName })}
+                        scheduleAutoSave(`bt-name-${bt.id}`, () =>
+                          updateBudgetType(bt.id, { displayName: newValue })
+                        )
+                      }}
+                      onBlur={() => {
+                        cancelAutoSave(`bt-name-${bt.id}`)
+                        updateBudgetType(bt.id, { displayName: bt.displayName })
+                        flashSaved(`bt-name-${bt.id}`)
+                      }}
                     />
                     {bt.isEarningPool ? (
                       <div className="tooltip tooltip-left" data-tip="This is the earning pool and cannot be deleted">
@@ -744,63 +795,80 @@ export default function ConfigPage() {
                     </button>
                     <input
                       type="text"
-                      className="input input-bordered input-sm flex-1"
+                      className={`input input-bordered input-sm flex-1 transition-colors duration-1000 ${savedInputs.has(`et-name-${et.id}`) ? 'bg-success/20' : ''}`}
                       value={et.displayName}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newValue = e.target.value
                         setEarningTypes((prev) =>
                           prev.map((t) =>
-                            t.id === et.id ? { ...t, displayName: e.target.value } : t
+                            t.id === et.id ? { ...t, displayName: newValue } : t
                           )
                         )
-                      }
-                      onBlur={() =>
+                        scheduleAutoSave(`et-name-${et.id}`, () =>
+                          updateEarningType(et.id, { displayName: newValue })
+                        )
+                      }}
+                      onBlur={() => {
+                        cancelAutoSave(`et-name-${et.id}`)
                         updateEarningType(et.id, { displayName: et.displayName })
-                      }
+                        flashSaved(`et-name-${et.id}`)
+                      }}
                     />
                     <div className="flex items-center gap-1">
                       <input
                         type="number"
-                        className="input input-bordered input-sm w-14"
+                        className={`input input-bordered input-sm w-16 transition-colors duration-1000 ${savedInputs.has(`et-num-${et.id}`) ? 'bg-success/20' : ''}`}
                         value={et.ratioNumerator}
-                        min={1}
-                        onChange={(e) =>
+                        min={0.1}
+                        step={0.1}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value) || 1
                           setEarningTypes((prev) =>
                             prev.map((t) =>
                               t.id === et.id
-                                ? { ...t, ratioNumerator: parseInt(e.target.value) || 1 }
+                                ? { ...t, ratioNumerator: newValue }
                                 : t
                             )
                           )
-                        }
-                        onBlur={() =>
+                          scheduleAutoSave(`et-num-${et.id}`, () =>
+                            updateEarningType(et.id, { ratioNumerator: newValue })
+                          )
+                        }}
+                        onBlur={() => {
+                          cancelAutoSave(`et-num-${et.id}`)
                           updateEarningType(et.id, {
                             ratioNumerator: et.ratioNumerator,
                           })
-                        }
+                          flashSaved(`et-num-${et.id}`)
+                        }}
                       />
                       <span className="text-sm">:</span>
                       <input
                         type="number"
-                        className="input input-bordered input-sm w-14"
+                        className={`input input-bordered input-sm w-16 transition-colors duration-1000 ${savedInputs.has(`et-denom-${et.id}`) ? 'bg-success/20' : ''}`}
                         value={et.ratioDenominator}
-                        min={1}
-                        onChange={(e) =>
+                        min={0.1}
+                        step={0.1}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value) || 1
                           setEarningTypes((prev) =>
                             prev.map((t) =>
                               t.id === et.id
-                                ? {
-                                    ...t,
-                                    ratioDenominator: parseInt(e.target.value) || 1,
-                                  }
+                                ? { ...t, ratioDenominator: newValue }
                                 : t
                             )
                           )
-                        }
-                        onBlur={() =>
+                          scheduleAutoSave(`et-denom-${et.id}`, () =>
+                            updateEarningType(et.id, { ratioDenominator: newValue })
+                          )
+                        }}
+                        onBlur={() => {
+                          cancelAutoSave(`et-denom-${et.id}`)
                           updateEarningType(et.id, {
                             ratioDenominator: et.ratioDenominator,
                           })
-                        }
+                          flashSaved(`et-denom-${et.id}`)
+                        }}
                       />
                     </div>
                     <button

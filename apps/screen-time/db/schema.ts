@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
   integer,
   pgTable,
+  real,
   serial,
   text,
   timestamp,
@@ -35,8 +36,8 @@ export const earningTypes = pgTable('earning_types', {
   id: serial('id').primaryKey(),
   slug: text('slug').notNull().unique(),
   displayName: text('display_name').notNull(),
-  ratioNumerator: integer('ratio_numerator').notNull().default(1),
-  ratioDenominator: integer('ratio_denominator').notNull().default(1),
+  ratioNumerator: real('ratio_numerator').notNull().default(1),
+  ratioDenominator: real('ratio_denominator').notNull().default(1),
   sortOrder: integer('sort_order').notNull().default(0),
   icon: text('icon'),
 })
