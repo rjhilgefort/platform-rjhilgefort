@@ -4,7 +4,7 @@
 - [x] Reset to default should not change Extra time value
 - [x] Allow updating Extra time value via input on settings page
 - [x] make the seconds display on all the timers be smaller than the minutes and hours.
-- [ ] move the "time in extra" hint to be next to the time when there's no time left on the budget timer
+- [x] move the "time in extra" hint to be next to the time when there's no time left on the budget timer
 - [ ] in the settings page for the current balance for a kid, the order of the timers should match how it is on the main screen. That means the extra budget timer should be last in the list. Same goes for daily defaults.
 - [ ] show the timer icon for the timer is in the settings page.
 - [ ] Fix timer display on mobile when >1hr (too wide for tile)

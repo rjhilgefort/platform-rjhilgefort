@@ -56,18 +56,25 @@ export function CountdownTimer({
             {label}
           </h3>
         </div>
-        <TimeDisplay
-          seconds={displaySeconds}
-          className={`text-3xl ${
-            isEarning
-              ? 'text-success'
-              : isExpired
-                ? 'text-error'
-                : isWarning
-                  ? 'text-warning'
-                  : 'text-base-content'
-          }`}
-        />
+        <div className="flex items-baseline gap-2">
+          <TimeDisplay
+            seconds={displaySeconds}
+            className={`text-3xl ${
+              isEarning
+                ? 'text-success'
+                : isExpired
+                  ? 'text-error'
+                  : isWarning
+                    ? 'text-warning'
+                    : 'text-base-content'
+            }`}
+          />
+          {isExpired && extraBalance > 0 && !isEarningPool && (
+            <span className="text-xs text-info whitespace-nowrap">
+              ({formatTime(extraBalance)} extra)
+            </span>
+          )}
+        </div>
         <div className="mt-2">
           {isRunning ? (
             <button
@@ -89,11 +96,6 @@ export function CountdownTimer({
             </button>
           )}
         </div>
-        {isExpired && extraBalance > 0 && !isEarningPool && (
-          <p className="text-xs text-info mt-2">
-            💡 {formatTime(extraBalance)} in Extra
-          </p>
-        )}
       </div>
     </div>
   )
