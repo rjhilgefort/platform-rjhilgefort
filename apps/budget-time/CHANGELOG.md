@@ -1,5 +1,26 @@
 # @repo/budget-time
 
+## 0.2.0
+
+### Minor Changes
+
+- 43233bc: feat: overflow from normal budgets into Extra time when depleted
+
+  - Normal budget timers (TV, Games) now overflow into Extra time when depleted
+  - Only Extra can go negative (to be earned back later)
+  - New visual indicator when using Extra time during active timer
+  - Settings page now polls balances every 30s to stay in sync
+
+### Patch Changes
+
+- 651528f: feat: add explainer text for daily defaults in settings
+- 5e606a3: fix: toasts no longer block back button, click to dismiss
+- 1dcbe1a: fix: move extra time hint inline with timer when budget depleted
+- fc0230f: feat: show timer icons in settings page for balances and defaults
+- 48cde56: fix: sort timers in settings to match main screen (Extra last)
+- 4e79663: feat: display seconds smaller than hours/minutes on all timers
+- ed6f433: fix: shrink timer text when >1hr to fit mobile tiles
+
 ## 0.1.1
 
 ### Patch Changes
