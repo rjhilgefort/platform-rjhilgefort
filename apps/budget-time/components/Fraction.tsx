@@ -6,7 +6,7 @@ interface FractionProps {
 }
 
 /**
- * Renders a number with fractions using superscript/subscript styling.
+ * Renders a number with Unicode fraction characters.
  * Supports quarter increments: 0.25, 0.5, 0.75
  */
 export function Fraction({ value, className = '' }: FractionProps) {
@@ -14,35 +14,18 @@ export function Fraction({ value, className = '' }: FractionProps) {
   const decimal = value - whole
   const roundedDecimal = Math.round(decimal * 4) / 4
 
-  let numerator: number | null = null
-  let denominator: number | null = null
+  let fractionChar = ''
+  if (roundedDecimal === 0.25) fractionChar = '¼'
+  else if (roundedDecimal === 0.5) fractionChar = '½'
+  else if (roundedDecimal === 0.75) fractionChar = '¾'
 
-  if (roundedDecimal === 0.25) {
-    numerator = 1
-    denominator = 4
-  } else if (roundedDecimal === 0.5) {
-    numerator = 1
-    denominator = 2
-  } else if (roundedDecimal === 0.75) {
-    numerator = 3
-    denominator = 4
-  }
-
-  if (!numerator || !denominator) {
+  if (!fractionChar) {
     return <span className={className}>{whole}</span>
   }
 
   if (whole === 0) {
-    return (
-      <span className={className}>
-        <sup>{numerator}</sup>/<sub>{denominator}</sub>
-      </span>
-    )
+    return <span className={className}>{fractionChar}</span>
   }
 
-  return (
-    <span className={className}>
-      {whole}<sup>{numerator}</sup>/<sub>{denominator}</sub>
-    </span>
-  )
+  return <span className={className}>{whole}{fractionChar}</span>
 }
