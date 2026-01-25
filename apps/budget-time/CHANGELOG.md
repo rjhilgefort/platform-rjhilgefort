@@ -1,5 +1,44 @@
 # @repo/budget-time
 
+## 0.3.0
+
+### Minor Changes
+
+- 54c250e: feat(budget-time): redesign active timer overlays
+
+  Active budget timer:
+
+  - Replace large icon with horizontal progress bar
+  - Layout: icon + label, large time, progress bar, stop button
+  - Progress bar depletes left-to-right as time passes
+
+  Active earning timer:
+
+  - Compact centered stacks with icon + label inline
+  - Extra section and earning activity section with divider
+  - Done button outside section boxes
+
+- 8b3c097: feat(budget-time): earning ratio fractions and tablet-friendly config
+
+  - Add formatFraction utility to display decimals as fractions (1.25 → 1¼)
+  - Earning ratios display as fractions on main screen
+  - Config page: ratio numerator fixed at 1, only denominator editable
+  - Config page: replace ratio input with +/− buttons (0.25 increments)
+  - Config page: white background for icon picker and ratio buttons
+
+- 480d839: Add PWA support for installable app on Android tablets
+
+### Patch Changes
+
+- 0c3a097: Refactor timer tiles to use shared TimerCard component with yellow/green backgrounds and subtle borders
+- 2af4afb: fix(budget-time): use compact Unicode fraction characters
+- 9b84a87: fix(budget-time): fraction display and wider timer buttons
+
+  - Add Fraction component with superscript/subscript styling
+  - Wider Start/Stop buttons on timer cards (px-6)
+
+- 3d8608d: Add app icon/favicon - green hourglass with coin
+
 ## 0.2.0
 
 ### Minor Changes
