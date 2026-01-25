@@ -72,7 +72,7 @@ export function CountdownTimer({
         isRunning ? (
           <button
             type="button"
-            className="btn btn-error btn-sm"
+            className="btn btn-error btn-sm px-6"
             onClick={onStop}
             disabled={disabled}
           >
@@ -81,7 +81,7 @@ export function CountdownTimer({
         ) : (
           <button
             type="button"
-            className={`btn btn-sm ${isEarning ? 'btn-success' : 'btn-primary'}`}
+            className={`btn btn-sm px-6 ${isEarning ? 'btn-success' : 'btn-primary'}`}
             onClick={onStart}
             disabled={disabled || isExpired}
           >

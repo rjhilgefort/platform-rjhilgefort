@@ -6,7 +6,8 @@ import { EarningTimer } from './EarningTimer'
 import { BonusModal } from './BonusModal'
 import { ActiveTimerOverlay } from './ActiveTimerOverlay'
 import { useCountdown, useElapsed } from '../hooks/useCountdown'
-import { formatTime, formatFraction } from '../lib/timer-logic'
+import { formatTime } from '../lib/timer-logic'
+import { Fraction } from './Fraction'
 import { getBudgetIcon, getEarningIcon } from '../lib/budget-icons'
 import { TimeDisplay } from './TimeDisplay'
 
@@ -299,7 +300,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                     secondsRatio={0.7}
                   />
                   <p className="text-xl text-base-content/50">
-                    1 min = {formatFraction(activeEarningType.ratioDenominator)} min extra
+                    1 min = <Fraction value={activeEarningType.ratioDenominator} /> min extra
                   </p>
                 </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { getEarningIcon } from '../lib/budget-icons'
-import { formatFraction } from '../lib/timer-logic'
+import { Fraction } from './Fraction'
 import { TimerCard } from './TimerCard'
 
 interface EarningType {
@@ -36,13 +36,13 @@ export function EarningTimer({
       variant="success"
       bottomLeft={
         <span className="text-xl font-mono text-base-content/80">
-          1:{formatFraction(earningType.ratioDenominator)}
+          1:<Fraction value={earningType.ratioDenominator} />
         </span>
       }
       button={
         <button
           type="button"
-          className="btn btn-success btn-sm"
+          className="btn btn-success btn-sm px-6"
           onClick={() => onStart(earningType.id)}
           disabled={disabled}
         >
