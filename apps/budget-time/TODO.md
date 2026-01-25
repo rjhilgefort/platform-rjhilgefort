@@ -1,7 +1,8 @@
 # TODO
 
 - [ ] I need a icon for this app. Can you link me some options or ideas? I'll also need this to be able to be the Favicon.
-- [ ] Compact layout for tablet in landscape mode - reduce height, compress tiles somehow. I'm thinking we don't need the buttons to say start, and the timer display title can be in the button. For the extra times I think that saves a lot of space, for the budget timers, I'm wondering if the button should be moved to the left of the timer. Or, if there's another way to make more efficient use of the space. Give me some options.
+- [ ] Goal: Compact layout for tablet in landscape mode - I need to reduce the overall height, compress tiles somehow. I'm thinking we don't need the buttons to say start, and the timer display title can be in the button. For the extra times I think that saves a lot of space, for the budget timers, I'm wondering if the button should be moved to the left of the timer. Or, if there's another way to make more efficient use of the space. Give me some options.
+- [ ] for the ad additional time plus button on the main page. I want to be prompted for a passcode first and then I want to be able to add or subtract time in that view. So in addition to adding time I want to be able to subtract time. I should be able to hit the buttons as many times as I want after I put the passcode in, but after I close that model, then I would need a passcode to get back in. Lastly, we need to pick a different icon. A +/- would be good.
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?)
 - [ ] Allow configuring profile picture per kid (TBD: where to store/display)
 - [ ] on a phone, we should have an accordion for the kids so you can click into each one without having to scroll so much.
