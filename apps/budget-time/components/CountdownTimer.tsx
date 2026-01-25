@@ -42,7 +42,7 @@ export function CountdownTimer({
 
   return (
     <div
-      className={`card border-2 ${
+      className={`rounded-lg border-2 px-3 py-2 ${
         isEarning
           ? 'timer-running border-success bg-success/20'
           : isRunning
@@ -50,53 +50,55 @@ export function CountdownTimer({
             : 'border-transparent bg-base-200'
       }`}
     >
-      <div className="card-body p-4">
-        <div className="flex items-center gap-2">
-          <Icon size={20} className={isEarning ? 'text-success' : 'text-base-content/70'} />
-          <h3 className={`text-sm font-medium ${isEarning ? 'text-success' : 'text-base-content/70'}`}>
-            {label}
-          </h3>
-        </div>
-        <div className="flex items-baseline gap-2">
+      {/* Row 1: Icon + Label */}
+      <div className="flex items-center gap-1.5 mb-1">
+        <Icon size={20} className={isEarning ? 'text-success' : 'text-base-content/80'} />
+        <span className={`text-lg font-medium ${isEarning ? 'text-success' : 'text-base-content/80'}`}>
+          {label}
+        </span>
+      </div>
+
+      {/* Row 2: Time + Button */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-baseline gap-1.5">
           <TimeDisplay
             seconds={displaySeconds}
-            className={`${hasHours ? 'text-2xl' : 'text-3xl'} ${
+            className={`${hasHours ? 'text-xl' : 'text-2xl'} ${
               isEarning
                 ? 'text-success'
                 : isExpired
                   ? 'text-error'
                   : isWarning
                     ? 'text-warning'
-                    : 'text-base-content'
+                    : 'text-base-content/80'
             }`}
           />
           {isExpired && extraBalance > 0 && !isEarningPool && (
             <span className="text-xs text-info whitespace-nowrap">
-              ({formatTime(extraBalance)} extra)
+              ({formatTime(extraBalance)})
             </span>
           )}
         </div>
-        <div className="mt-2">
-          {isRunning ? (
-            <button
-              type="button"
-              className="btn btn-error btn-sm w-full"
-              onClick={onStop}
-              disabled={disabled}
-            >
-              Stop
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-primary btn-sm w-full"
-              onClick={onStart}
-              disabled={disabled || isExpired}
-            >
-              {isExpired ? 'No Time' : 'Start'}
-            </button>
-          )}
-        </div>
+
+        {isRunning ? (
+          <button
+            type="button"
+            className="btn btn-error btn-sm"
+            onClick={onStop}
+            disabled={disabled}
+          >
+            Stop
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`btn btn-sm ${isEarning ? 'btn-success' : 'btn-primary'}`}
+            onClick={onStart}
+            disabled={disabled || isExpired}
+          >
+            {isExpired ? 'No Time' : 'Start'}
+          </button>
+        )}
       </div>
     </div>
   )
