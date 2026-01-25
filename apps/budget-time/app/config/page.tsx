@@ -749,7 +749,7 @@ export default function ConfigPage() {
                   >
                     <button
                       type="button"
-                      className="btn btn-outline btn-sm btn-square"
+                      className="btn btn-sm btn-square bg-base-100 border-base-300"
                       onClick={() =>
                         setIconPickerTarget({
                           type: 'budget',
@@ -843,7 +843,7 @@ export default function ConfigPage() {
                   >
                     <button
                       type="button"
-                      className="btn btn-outline btn-sm btn-square"
+                      className="btn btn-sm btn-square bg-base-100 border-base-300"
                       onClick={() =>
                         setIconPickerTarget({
                           type: 'earning',
@@ -877,42 +877,12 @@ export default function ConfigPage() {
                       }}
                     />
                     <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        className={`input input-bordered input-sm w-16 transition-colors duration-1000 ${savedInputs.has(`et-num-${et.id}`) ? 'bg-success/20' : ''}`}
-                        value={et.ratioNumerator}
-                        min={0.1}
-                        step={0.1}
-                        onChange={(e) => {
-                          const newValue = parseFloat(e.target.value) || 1
-                          setEarningTypes((prev) =>
-                            prev.map((t) =>
-                              t.id === et.id
-                                ? { ...t, ratioNumerator: newValue }
-                                : t
-                            )
-                          )
-                          scheduleAutoSave(`et-num-${et.id}`, () =>
-                            updateEarningType(et.id, { ratioNumerator: newValue })
-                          )
-                        }}
-                        onBlur={() => {
-                          cancelAutoSave(`et-num-${et.id}`)
-                          updateEarningType(et.id, {
-                            ratioNumerator: et.ratioNumerator,
-                          })
-                          flashSaved(`et-num-${et.id}`)
-                        }}
-                      />
-                      <span className="text-sm">:</span>
-                      <input
-                        type="number"
-                        className={`input input-bordered input-sm w-16 transition-colors duration-1000 ${savedInputs.has(`et-denom-${et.id}`) ? 'bg-success/20' : ''}`}
-                        value={et.ratioDenominator}
-                        min={0.1}
-                        step={0.1}
-                        onChange={(e) => {
-                          const newValue = parseFloat(e.target.value) || 1
+                      <span className="text-sm">1:</span>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-square bg-base-100 border-base-300"
+                        onClick={() => {
+                          const newValue = Math.max(0.25, et.ratioDenominator - 0.25)
                           setEarningTypes((prev) =>
                             prev.map((t) =>
                               t.id === et.id
@@ -920,18 +890,32 @@ export default function ConfigPage() {
                                 : t
                             )
                           )
-                          scheduleAutoSave(`et-denom-${et.id}`, () =>
-                            updateEarningType(et.id, { ratioDenominator: newValue })
+                          updateEarningType(et.id, { ratioDenominator: newValue })
+                        }}
+                        disabled={et.ratioDenominator <= 0.25}
+                      >
+                        −
+                      </button>
+                      <span className={`w-10 text-center font-mono transition-colors duration-1000 ${savedInputs.has(`et-denom-${et.id}`) ? 'text-success' : ''}`}>
+                        {et.ratioDenominator}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-square bg-base-100 border-base-300"
+                        onClick={() => {
+                          const newValue = et.ratioDenominator + 0.25
+                          setEarningTypes((prev) =>
+                            prev.map((t) =>
+                              t.id === et.id
+                                ? { ...t, ratioDenominator: newValue }
+                                : t
+                            )
                           )
+                          updateEarningType(et.id, { ratioDenominator: newValue })
                         }}
-                        onBlur={() => {
-                          cancelAutoSave(`et-denom-${et.id}`)
-                          updateEarningType(et.id, {
-                            ratioDenominator: et.ratioDenominator,
-                          })
-                          flashSaved(`et-denom-${et.id}`)
-                        }}
-                      />
+                      >
+                        +
+                      </button>
                     </div>
                     <button
                       type="button"

@@ -133,3 +133,25 @@ export function formatTimeParts(seconds: number): TimeParts {
     secs: secs.toString().padStart(2, '0'),
   }
 }
+
+/**
+ * Format a decimal number as a fraction string.
+ * Supports quarter increments: 0.25 → ¼, 0.5 → ½, 0.75 → ¾
+ * e.g. 1.25 → "1¼", 2.5 → "2½", 3 → "3"
+ */
+export function formatFraction(value: number): string {
+  const whole = Math.floor(value)
+  const decimal = value - whole
+
+  // Round to nearest 0.25 to handle floating point imprecision
+  const roundedDecimal = Math.round(decimal * 4) / 4
+
+  let fractionPart = ''
+  if (roundedDecimal === 0.25) fractionPart = '¼'
+  else if (roundedDecimal === 0.5) fractionPart = '½'
+  else if (roundedDecimal === 0.75) fractionPart = '¾'
+
+  if (whole === 0 && fractionPart) return fractionPart
+  if (fractionPart) return `${whole}${fractionPart}`
+  return whole.toString()
+}
