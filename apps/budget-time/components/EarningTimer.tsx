@@ -1,7 +1,6 @@
 'use client'
 
 import { getEarningIcon } from '../lib/budget-icons'
-import { TimeDisplay } from './TimeDisplay'
 
 interface EarningType {
   id: number
@@ -23,55 +22,36 @@ interface EarningTimerProps {
 
 export function EarningTimer({
   earningType,
-  isRunning,
-  elapsedSeconds,
   onStart,
   onStop,
   disabled = false,
 }: EarningTimerProps) {
   const Icon = getEarningIcon(earningType.slug, earningType.icon)
+
   return (
-    <div
-      className={`card bg-success/10 border-2 ${
-        isRunning ? 'timer-running border-success' : 'border-transparent'
-      }`}
-    >
-      <div className="card-body p-4">
-        <div className="flex items-center gap-2">
-          <Icon size={isRunning ? 20 : 28} className="text-success" />
-          <h3 className={`font-medium text-success ${isRunning ? 'text-sm' : 'text-xl'}`}>
-            {earningType.displayName}
-          </h3>
-        </div>
-        {isRunning && (
-          <TimeDisplay seconds={elapsedSeconds} className="text-3xl text-success" />
-        )}
+    <div className="rounded-lg border-2 border-transparent bg-success/10 px-3 py-2">
+      {/* Row 1: Icon + Label */}
+      <div className="flex items-center gap-1.5 mb-1">
+        <Icon size={20} className="text-base-content/80" />
+        <span className="text-lg font-medium text-base-content/80">
+          {earningType.displayName}
+        </span>
+      </div>
 
-        <div className="mt-2">
-          {isRunning ? (
-            <button
-              type="button"
-              className="btn btn-success btn-sm w-full"
-              onClick={onStop}
-              disabled={disabled}
-            >
-              Done
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-success btn-sm w-full"
-              onClick={() => onStart(earningType.id)}
-              disabled={disabled}
-            >
-              Start
-            </button>
-          )}
-        </div>
+      {/* Row 2: Ratio + Button */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-2xl font-mono text-base-content/80">
+          {earningType.ratioNumerator}:{earningType.ratioDenominator}
+        </span>
 
-        <p className="text-xs text-base-content/50 mt-1">
-          {earningType.ratioNumerator} min = {earningType.ratioDenominator} min
-        </p>
+        <button
+          type="button"
+          className="btn btn-success btn-sm"
+          onClick={() => onStart(earningType.id)}
+          disabled={disabled}
+        >
+          Start
+        </button>
       </div>
     </div>
   )
