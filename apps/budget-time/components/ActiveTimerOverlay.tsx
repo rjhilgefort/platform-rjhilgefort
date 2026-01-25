@@ -8,6 +8,7 @@ interface ActiveTimerOverlayProps {
   budgetTypeDisplayName: string
   budgetTypeIcon?: string | null
   remainingSeconds: number
+  startingSeconds: number
   isEarningToExtra: boolean
   isUsingExtraTime?: boolean
   extraRemainingSeconds?: number
@@ -21,6 +22,7 @@ export function ActiveTimerOverlay({
   budgetTypeDisplayName,
   budgetTypeIcon,
   remainingSeconds,
+  startingSeconds,
   isEarningToExtra,
   isUsingExtraTime = false,
   extraRemainingSeconds = 0,
@@ -34,6 +36,25 @@ export function ActiveTimerOverlay({
   const isExpired = remainingSeconds <= 0
   const extraIsWarning = extraRemainingSeconds <= 300 && extraRemainingSeconds > 0
   const extraIsNegative = extraRemainingSeconds < 0
+
+  // Determine color class
+  const colorClass = isEarningToExtra
+    ? 'text-success'
+    : isExpired
+      ? 'text-error'
+      : isWarning
+        ? 'text-warning'
+        : 'text-primary'
+
+  const progressColorClass = isEarningToExtra
+    ? 'bg-success'
+    : isExpired
+      ? 'bg-error'
+      : isWarning
+        ? 'bg-warning'
+        : 'bg-primary'
+
+  const percentRemaining = startingSeconds > 0 ? Math.max(0, remainingSeconds / startingSeconds) * 100 : 0
 
   // When using Extra time, show a different layout
   if (isUsingExtraTime) {
@@ -77,42 +98,40 @@ export function ActiveTimerOverlay({
 
   return (
     <div
-      className={`h-full flex flex-col items-center justify-between py-4 bg-base-100 ${
+      className={`h-full flex flex-col justify-between py-4 bg-base-100 ${
         isEarningToExtra ? 'bg-success/10' : ''
       }`}
     >
-      <div className="flex flex-col items-center gap-3">
-        <Icon
-          size={220}
-          className={`${
-            isEarningToExtra
-              ? 'text-success'
-              : isExpired
-                ? 'text-error'
-                : 'text-primary'
-          } animate-pulse`}
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col items-center justify-center gap-8">
+        {/* Icon + Label centered */}
+        <div className="flex items-center gap-3">
+          <Icon size={64} className="text-base-content" />
+          <p className="text-6xl text-base-content font-semibold">
+            {budgetTypeDisplayName}
+          </p>
+        </div>
+
+        {/* Large time display */}
+        <TimeDisplay
+          seconds={remainingSeconds}
+          className={`text-8xl ${colorClass}`}
+          secondsRatio={0.7}
         />
-        <p className="text-3xl text-base-content/70 font-medium">
-          {budgetTypeDisplayName}
-        </p>
+
+        {/* Progress bar */}
+        <div className="w-full h-16 bg-base-300 rounded-full overflow-hidden">
+          <div
+            className={`h-full ${progressColorClass} rounded-full transition-all duration-500 ease-out`}
+            style={{ width: `${percentRemaining}%` }}
+          />
+        </div>
       </div>
 
-      <TimeDisplay
-        seconds={remainingSeconds}
-        className={`text-8xl ${
-          isEarningToExtra
-            ? 'text-success'
-            : isExpired
-              ? 'text-error'
-              : isWarning
-                ? 'text-warning'
-                : 'text-base-content'
-        }`}
-      />
-
+      {/* Stop button */}
       <button
         type="button"
-        className="btn btn-error w-full h-20 text-2xl"
+        className="btn btn-error w-full h-16 text-2xl mt-4"
         onClick={onStop}
         disabled={disabled}
       >

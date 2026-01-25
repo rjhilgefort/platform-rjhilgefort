@@ -248,6 +248,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                 budgetTypeDisplayName={activeBudgetTimer.budgetTypeDisplayName}
                 budgetTypeIcon={activeBudgetTimer.budgetTypeIcon}
                 remainingSeconds={activeTimerCountdown}
+                startingSeconds={activeTimerBaseSeconds}
                 isEarningToExtra={false}
                 isUsingExtraTime={isUsingExtraTime}
                 extraRemainingSeconds={cachedExtraSeconds - overflowSeconds}
@@ -258,22 +259,25 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
             </div>
           )}
 
-          {/* Earning timer layout - enlarged Extra + divider + enlarged earning timer */}
+          {/* Earning timer layout - icon+label inline, time below */}
           {activeEarningTimer && activeEarningType && (() => {
             const extraBudgetType = status.typeBalances.find((tb) => tb.isEarningPool)
             const ExtraIcon = getBudgetIcon('extra', extraBudgetType?.budgetTypeIcon)
             const EarningIcon = getEarningIcon(activeEarningType.slug, activeEarningType.icon)
             return (
-              <div className="absolute inset-0 flex flex-col">
-                {/* Enlarged Extra timer */}
-                <div className="flex-1 flex flex-col items-center justify-center bg-success/10 rounded-lg p-4">
-                  <ExtraIcon size={120} className="text-success animate-pulse" />
-                  <p className="text-2xl text-success font-medium mt-1">Extra</p>
+              <div className="absolute inset-0 flex flex-col py-4">
+                {/* Extra section */}
+                <div className="flex flex-col items-center justify-center gap-1 bg-success/10 rounded-lg py-4">
+                  <div className="flex items-center gap-3">
+                    <ExtraIcon size={48} className="text-base-content/80" />
+                    <p className="text-4xl text-base-content/80 font-semibold">Extra</p>
+                  </div>
                   <TimeDisplay
                     seconds={extraBalance + pendingEarnedSeconds}
                     className="text-7xl text-success"
+                    secondsRatio={0.7}
                   />
-                  <p className="text-base text-success/70 mt-1">
+                  <p className="text-xl text-success/70">
                     +{formatTime(pendingEarnedSeconds)} earned
                   </p>
                 </div>
@@ -281,28 +285,33 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                 {/* Divider */}
                 <div className="divider text-xs text-base-content/50 my-1">Earn Time → Extra</div>
 
-                {/* Enlarged earning timer */}
-                <div className="flex-1 flex flex-col items-center justify-center bg-success/10 rounded-lg p-4">
-                  <EarningIcon size={120} className="text-success animate-pulse" />
-                  <p className="text-2xl text-success font-medium mt-1">
-                    {activeEarningType.displayName}
-                  </p>
+                {/* Earning activity section */}
+                <div className="flex flex-col items-center justify-center gap-1 bg-success/10 rounded-lg py-4">
+                  <div className="flex items-center gap-3">
+                    <EarningIcon size={48} className="text-base-content/80" />
+                    <p className="text-4xl text-base-content/80 font-semibold">
+                      {activeEarningType.displayName}
+                    </p>
+                  </div>
                   <TimeDisplay
                     seconds={earningElapsed}
                     className="text-7xl text-success"
+                    secondsRatio={0.7}
                   />
-                  <p className="text-base text-base-content/50 mt-1">
+                  <p className="text-xl text-base-content/50">
                     {activeEarningType.ratioNumerator} min = {activeEarningType.ratioDenominator} min extra
                   </p>
-                  <button
-                    type="button"
-                    className="btn btn-success btn-lg w-full mt-3"
-                    onClick={stopTimer}
-                    disabled={loading}
-                  >
-                    Done
-                  </button>
                 </div>
+
+                {/* Done button - outside the boxes */}
+                <button
+                  type="button"
+                  className="btn btn-success w-full h-16 text-2xl mt-4"
+                  onClick={stopTimer}
+                  disabled={loading}
+                >
+                  Done
+                </button>
               </div>
             )
           })()}

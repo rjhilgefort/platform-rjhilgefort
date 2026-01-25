@@ -59,7 +59,7 @@ export function CountdownTimer({
         <>
           <TimeDisplay
             seconds={displaySeconds}
-            className={`text-lg ${timeColor}`}
+            className={`text-xl ${timeColor}`}
           />
           {isExpired && extraBalance > 0 && !isEarningPool && (
             <span className="text-xs text-info whitespace-nowrap">
