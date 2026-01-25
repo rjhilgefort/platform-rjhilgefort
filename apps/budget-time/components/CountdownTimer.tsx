@@ -2,6 +2,7 @@
 
 import { formatTime } from '../lib/timer-logic'
 import { getBudgetIcon } from '../lib/budget-icons'
+import { TimerCard } from './TimerCard'
 import { TimeDisplay } from './TimeDisplay'
 
 interface CountdownTimerProps {
@@ -40,47 +41,35 @@ export function CountdownTimer({
   const isWarning = displaySeconds <= 300 && displaySeconds > 0
   const isExpired = displaySeconds <= 0
 
-  return (
-    <div
-      className={`rounded-lg border-2 px-3 py-2 ${
-        isEarning
-          ? 'timer-running border-success bg-success/20'
-          : isRunning
-            ? 'timer-running border-primary bg-base-200'
-            : 'border-transparent bg-base-200'
-      }`}
-    >
-      {/* Row 1: Icon + Label */}
-      <div className="flex items-center gap-1.5 mb-1">
-        <Icon size={20} className={isEarning ? 'text-success' : 'text-base-content/80'} />
-        <span className={`text-lg font-medium ${isEarning ? 'text-success' : 'text-base-content/80'}`}>
-          {label}
-        </span>
-      </div>
+  const timeColor = isEarning
+    ? 'text-success'
+    : isExpired
+      ? 'text-error'
+      : isWarning
+        ? 'text-warning'
+        : 'text-base-content/80'
 
-      {/* Row 2: Time + Button */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-baseline gap-1.5">
+  return (
+    <TimerCard
+      icon={Icon}
+      label={label}
+      variant={isEarning ? 'success' : 'warning'}
+      borderColor={isRunning && !isEarning ? 'primary' : undefined}
+      bottomLeft={
+        <>
           <TimeDisplay
             seconds={displaySeconds}
-            className={`${hasHours ? 'text-xl' : 'text-2xl'} ${
-              isEarning
-                ? 'text-success'
-                : isExpired
-                  ? 'text-error'
-                  : isWarning
-                    ? 'text-warning'
-                    : 'text-base-content/80'
-            }`}
+            className={`text-lg ${timeColor}`}
           />
           {isExpired && extraBalance > 0 && !isEarningPool && (
             <span className="text-xs text-info whitespace-nowrap">
               ({formatTime(extraBalance)})
             </span>
           )}
-        </div>
-
-        {isRunning ? (
+        </>
+      }
+      button={
+        isRunning ? (
           <button
             type="button"
             className="btn btn-error btn-sm"
@@ -98,8 +87,8 @@ export function CountdownTimer({
           >
             {isExpired ? 'No Time' : 'Start'}
           </button>
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   )
 }

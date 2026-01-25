@@ -16,7 +16,7 @@ export function TimeDisplay({ seconds, className = '', secondsRatio = 0.6 }: Tim
   const parts = formatTimeParts(seconds)
 
   return (
-    <span className={`font-mono font-bold ${className}`}>
+    <span className={`font-mono ${className}`}>
       {parts.main}
       <span style={{ fontSize: `${secondsRatio * 100}%` }}>:{parts.secs}</span>
     </span>
