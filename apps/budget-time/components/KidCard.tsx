@@ -5,6 +5,7 @@ import { CountdownTimer } from './CountdownTimer'
 import { EarningTimer } from './EarningTimer'
 import { BonusModal } from './BonusModal'
 import { ActiveTimerOverlay } from './ActiveTimerOverlay'
+import { PinPad } from './PinPad'
 import { useCountdown, useElapsed } from '../hooks/useCountdown'
 import { formatTime } from '../lib/timer-logic'
 import { Fraction } from './Fraction'
@@ -67,6 +68,8 @@ interface KidCardProps {
 export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCardProps) {
   const [showBonus, setShowBonus] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [pendingEarningTypeId, setPendingEarningTypeId] = useState<number | null>(null)
+  const [pinError, setPinError] = useState('')
 
   const hasActiveTimer = status.activeTimer !== null
   const isEarningTimer = status.activeTimer?.earningTypeId != null
@@ -173,6 +176,32 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
     onRefresh()
   }
 
+  const handleEarningPinSubmit = async (pin: string): Promise<boolean> => {
+    if (pendingEarningTypeId === null) return false
+
+    const response = await fetch('/api/auth/validate-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin }),
+    })
+    const data = await response.json()
+
+    if (data.valid) {
+      setPinError('')
+      setPendingEarningTypeId(null)
+      await startTimer(null, pendingEarningTypeId)
+      return true
+    } else {
+      setPinError('Invalid PIN')
+      return false
+    }
+  }
+
+  const handleEarningPinCancel = () => {
+    setPendingEarningTypeId(null)
+    setPinError('')
+  }
+
   return (
     <div className="card bg-base-100 shadow-xl h-full flex flex-col">
       <div className="card-body flex-1 flex flex-col">
@@ -232,7 +261,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
                     earningType={et}
                     isRunning={isThisEarningRunning}
                     elapsedSeconds={isThisEarningRunning ? earningElapsed : 0}
-                    onStart={(earningTypeId) => startTimer(null, earningTypeId)}
+                    onStart={(earningTypeId) => setPendingEarningTypeId(earningTypeId)}
                     onStop={stopTimer}
                     disabled={loading || (hasActiveTimer && !isThisEarningRunning)}
                   />
@@ -327,6 +356,22 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
         onClose={() => setShowBonus(false)}
         onSuccess={onRefresh}
       />
+
+      {/* PIN pad for starting earning timer */}
+      {pendingEarningTypeId !== null && (
+        <dialog className="modal modal-open">
+          <div className="modal-box w-80">
+            <PinPad
+              title={`Start ${earningTypes.find((et) => et.id === pendingEarningTypeId)?.displayName ?? 'Earning'}`}
+              onSubmit={handleEarningPinSubmit}
+              onCancel={handleEarningPinCancel}
+              cancelLabel="Cancel"
+              error={pinError}
+            />
+          </div>
+          <div className="modal-backdrop" onClick={handleEarningPinCancel} />
+        </dialog>
+      )}
     </div>
   )
 }

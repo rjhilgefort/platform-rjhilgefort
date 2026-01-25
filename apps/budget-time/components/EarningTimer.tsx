@@ -35,7 +35,7 @@ export function EarningTimer({
       label={earningType.displayName}
       variant="success"
       bottomLeft={
-        <span className="text-xl font-mono text-base-content/80">
+        <span className="text-xl text-base-content/80">
           1:<Fraction value={earningType.ratioDenominator} />
         </span>
       }

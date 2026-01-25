@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import { TbArrowLeft } from 'react-icons/tb'
 import { IconPickerModal } from '../../components/IconPickerModal'
 import { PinPad } from '../../components/PinPad'
 import { getIconComponent } from '../../lib/icon-registry'
@@ -73,6 +74,12 @@ export default function ConfigPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Set<string>>(new Set())
   const [savedInputs, setSavedInputs] = useState<Set<string>>(new Set())
   const saveTimeouts = useRef<Record<string, NodeJS.Timeout>>({})
+
+  // Simulate earning state
+  const [simulateKidId, setSimulateKidId] = useState<number | null>(null)
+  const [simulateEarningTypeId, setSimulateEarningTypeId] = useState<number | null>(null)
+  const [simulateMinutes, setSimulateMinutes] = useState('')
+  const [simulateLoading, setSimulateLoading] = useState(false)
 
   // Sort budget types: Extra (earning pool) last, then alphabetically by name
   const sortedBudgetTypes = [...budgetTypes].sort((a, b) => {
@@ -410,6 +417,50 @@ export default function ConfigPage() {
     }
   }
 
+  const handleSimulateEarning = async () => {
+    if (!simulateKidId || !simulateEarningTypeId || !simulateMinutes) return
+
+    setSimulateLoading(true)
+    setError('')
+
+    const response = await fetch('/api/earning/simulate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kidId: simulateKidId,
+        pin,
+        earningTypeId: simulateEarningTypeId,
+        activityMinutes: Number(simulateMinutes),
+      }),
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      // Update balances from response
+      const newInputs: Record<number, string> = {}
+      for (const tb of data.balance.typeBalances as TypeBalance[]) {
+        newInputs[tb.budgetTypeId] = Math.floor(tb.remainingSeconds / 60).toString()
+      }
+      setBalanceInputs((prev) => ({
+        ...prev,
+        [simulateKidId]: newInputs,
+      }))
+      const kid = kids.find((k) => k.id === simulateKidId)
+      showToast(`${kid?.name} earned ${data.earned.earnedMinutes} min from ${data.earned.activityMinutes} min activity`)
+      // Reset form
+      setSimulateMinutes('')
+    } else {
+      const data = await response.json()
+      setError(data.error || 'Failed to simulate earning')
+      if (data.error === 'Invalid PIN') {
+        setPinVerified(false)
+        setPin('')
+      }
+    }
+
+    setSimulateLoading(false)
+  }
+
   const handleIconSelect = async (iconName: string) => {
     if (!iconPickerTarget) return
 
@@ -583,11 +634,16 @@ export default function ConfigPage() {
   return (
     <div className="min-h-screen bg-base-200 p-4">
       <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <Link href="/" className="btn btn-ghost btn-sm">
+        <div className="flex items-center mb-6">
+          <Link href="/" className="btn btn-outline gap-1">
+            <TbArrowLeft size={20} />
             Back
           </Link>
+          <h1 className="text-2xl font-bold flex-1 text-center">Settings</h1>
+          <div className="btn btn-outline invisible gap-1">
+            <TbArrowLeft size={20} />
+            Back
+          </div>
         </div>
 
         {error && (
@@ -724,6 +780,91 @@ export default function ConfigPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Simulate Earning Section */}
+        <div className="card bg-base-100 shadow-xl mt-6">
+          <div className="card-body">
+            <div>
+              <h2 className="card-title">Simulate Earning</h2>
+              <p className="text-sm text-base-content/60">
+                Manually add earned time (for when you forgot to start a timer)
+              </p>
+            </div>
+            <div className="grid md:grid-cols-4 gap-4 mt-4 items-end">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Kid</span>
+                </label>
+                <select
+                  className="select select-bordered"
+                  value={simulateKidId ?? ''}
+                  onChange={(e) => setSimulateKidId(e.target.value ? Number(e.target.value) : null)}
+                >
+                  <option value="">Select kid...</option>
+                  {kids.map((k) => (
+                    <option key={k.id} value={k.id}>
+                      {k.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Earning Type</span>
+                </label>
+                <select
+                  className="select select-bordered"
+                  value={simulateEarningTypeId ?? ''}
+                  onChange={(e) => setSimulateEarningTypeId(e.target.value ? Number(e.target.value) : null)}
+                >
+                  <option value="">Select type...</option>
+                  {earningTypes.map((et) => (
+                    <option key={et.id} value={et.id}>
+                      {et.displayName} (1:{et.ratioDenominator})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Activity Minutes</span>
+                </label>
+                <input
+                  type="number"
+                  className="input input-bordered"
+                  placeholder="30"
+                  min="1"
+                  step="1"
+                  value={simulateMinutes}
+                  onChange={(e) => setSimulateMinutes(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-base-content/70 whitespace-nowrap">
+                  {(() => {
+                    if (!simulateEarningTypeId || !simulateMinutes) return ''
+                    const et = earningTypes.find((t) => t.id === simulateEarningTypeId)
+                    if (!et) return ''
+                    const earned = Math.floor((Number(simulateMinutes) * et.ratioDenominator) / et.ratioNumerator)
+                    return `→ ${earned} min`
+                  })()}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-success flex-1"
+                  onClick={handleSimulateEarning}
+                  disabled={!simulateKidId || !simulateEarningTypeId || !simulateMinutes || simulateLoading}
+                >
+                  {simulateLoading ? (
+                    <span className="loading loading-spinner loading-sm" />
+                  ) : (
+                    'Add Earned Time'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* General Settings Divider */}
@@ -896,7 +1037,7 @@ export default function ConfigPage() {
                       >
                         −
                       </button>
-                      <span className={`w-10 text-center font-mono transition-colors duration-1000 ${savedInputs.has(`et-denom-${et.id}`) ? 'text-success' : ''}`}>
+                      <span className={`w-10 text-center transition-colors duration-1000 ${savedInputs.has(`et-denom-${et.id}`) ? 'text-success' : ''}`}>
                         {et.ratioDenominator}
                       </span>
                       <button
