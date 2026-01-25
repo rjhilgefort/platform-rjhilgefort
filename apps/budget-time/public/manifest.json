@@ -1,0 +1,23 @@
+{
+  "name": "Budget Time",
+  "short_name": "Budget Time",
+  "description": "Manage time budgets for Jesselin & Raelin",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#22c55e",
+  "background_color": "#fef3c7",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
