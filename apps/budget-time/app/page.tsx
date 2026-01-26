@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { KidCard } from '../components/KidCard'
 import { KidAccordion } from '../components/KidAccordion'
 import { TimeUpSound } from '../components/TimeUpSound'
+import { AppIcon } from '../components/AppIcon'
 
 interface TypeBalance {
   budgetTypeId: number
@@ -138,7 +139,10 @@ export default function HomePage() {
     <div className="min-h-screen bg-base-200 p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Budget Time</h1>
+          <div className="flex items-center gap-3">
+            <AppIcon size={40} />
+            <h1 className="text-3xl font-bold">Budget Time</h1>
+          </div>
           <Link href="/config" className="btn btn-outline btn-sm">
             Settings
           </Link>

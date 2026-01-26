@@ -1,0 +1,47 @@
+interface AppIconProps {
+  size?: number
+  className?: string
+}
+
+export function AppIcon({ size = 48, className = '' }: AppIconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 64 64"
+      fill="none"
+      width={size}
+      height={size}
+      className={className}
+    >
+      {/* Full green background */}
+      <rect width="64" height="64" rx="12" fill="#16a34a" />
+      {/* Hourglass shape */}
+      <path
+        d="M20 14h24v4c0 6-5 10-12 14c7 4 12 8 12 14v4H20v-4c0-6 5-10 12-14c-7-4-12-8-12-14v-4z"
+        fill="white"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      {/* Sand in bottom */}
+      <path
+        d="M24 46v2h16v-2c0-4-3-6-8-9c-5 3-8 5-8 9z"
+        fill="#fbbf24"
+      />
+      {/* Sand in top */}
+      <path d="M28 20c0 2 2 3 4 4c2-1 4-2 4-4v-2h-8v2z" fill="#fbbf24" />
+      {/* Coin accent (bottom right) */}
+      <circle cx="50" cy="50" r="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+      <text
+        x="50"
+        y="54"
+        textAnchor="middle"
+        fontSize="12"
+        fontWeight="bold"
+        fill="#92400e"
+      >
+        $
+      </text>
+    </svg>
+  )
+}

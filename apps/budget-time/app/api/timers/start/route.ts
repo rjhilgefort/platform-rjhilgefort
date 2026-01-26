@@ -80,6 +80,15 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+
+    // Check if Extra is negative - prevent starting other budget timers until paid back
+    const extraBalance = balance.typeBalances.find((tb) => tb.isEarningPool)
+    if (extraBalance && extraBalance.remainingSeconds < 0) {
+      return NextResponse.json(
+        { error: 'Extra balance must be paid back before starting other timers' },
+        { status: 400 }
+      )
+    }
   }
 
   // Create active timer

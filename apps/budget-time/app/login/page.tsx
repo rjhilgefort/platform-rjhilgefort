@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { PinPad } from '../../components/PinPad'
+import { AppIcon } from '../../components/AppIcon'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,10 +26,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-base-200 p-4">
       <div className="card bg-base-100 shadow-xl w-full max-w-sm">
         <div className="card-body items-center">
-          <PinPad
-            title="Budget Time"
-            onSubmit={handleSubmit}
-          />
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <AppIcon size={64} />
+            <h1 className="text-2xl font-bold">Budget Time</h1>
+          </div>
+          <PinPad onSubmit={handleSubmit} />
         </div>
       </div>
     </div>

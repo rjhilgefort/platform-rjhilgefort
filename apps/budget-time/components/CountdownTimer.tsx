@@ -39,7 +39,8 @@ export function CountdownTimer({
   const displaySeconds = remainingSeconds + pendingEarnedSeconds
   const isWarning = displaySeconds <= 300 && displaySeconds > 0
   const isExpired = displaySeconds <= 0
-  const canStart = !isExpired || isEarningPool
+  const isExtraNegative = !isEarningPool && extraBalance < 0
+  const canStart = (!isExpired || isEarningPool) && !isExtraNegative
 
   const timeColor = isEarning
     ? 'text-success'
@@ -85,7 +86,7 @@ export function CountdownTimer({
             onClick={onStart}
             disabled={disabled || !canStart}
           >
-            {canStart ? 'Start' : 'No Time'}
+            {canStart ? 'Start' : isExtraNegative ? 'Pay Back' : 'No Time'}
           </button>
         )
       }

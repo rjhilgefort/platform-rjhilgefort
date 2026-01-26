@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Background circle -->
-  <circle cx="32" cy="32" r="30" fill="#22c55e"/>
+  <!-- Full green background for PWA icons -->
+  <rect width="64" height="64" fill="#16a34a"/>
 
   <!-- Hourglass shape -->
   <path d="M20 14h24v4c0 6-5 10-12 14c7 4 12 8 12 14v4H20v-4c0-6 5-10 12-14c-7-4-12-8-12-14v-4z" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>
