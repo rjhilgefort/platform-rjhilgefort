@@ -9,7 +9,8 @@ import { useEffect, useState } from 'react'
 export function useCountdown(
   startedAt: string | null,
   baseSeconds: number,
-  isRunning: boolean
+  isRunning: boolean,
+  allowNegative = false
 ): number {
   const [, setTick] = useState(0)
 
@@ -28,7 +29,8 @@ export function useCountdown(
   }
 
   const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
-  return Math.max(0, baseSeconds - elapsed)
+  const remaining = baseSeconds - elapsed
+  return allowNegative ? remaining : Math.max(0, remaining)
 }
 
 /**

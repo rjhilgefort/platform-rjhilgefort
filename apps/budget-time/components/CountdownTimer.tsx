@@ -40,6 +40,7 @@ export function CountdownTimer({
   const hasHours = Math.abs(displaySeconds) >= 3600
   const isWarning = displaySeconds <= 300 && displaySeconds > 0
   const isExpired = displaySeconds <= 0
+  const canStart = !isExpired || isEarningPool
 
   const timeColor = isEarning
     ? 'text-success'
@@ -83,9 +84,9 @@ export function CountdownTimer({
             type="button"
             className={`btn btn-sm px-6 ${isEarning ? 'btn-success' : 'btn-primary'}`}
             onClick={onStart}
-            disabled={disabled || isExpired}
+            disabled={disabled || !canStart}
           >
-            {isExpired ? 'No Time' : 'Start'}
+            {canStart ? 'Start' : 'No Time'}
           </button>
         )
       }

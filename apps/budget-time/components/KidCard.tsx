@@ -121,7 +121,8 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
   const activeTimerCountdown = useCountdown(
     activeBudgetTimer?.startedAt ?? null,
     activeTimerBaseSeconds,
-    activeBudgetTimer !== null
+    activeBudgetTimer !== null,
+    activeTimerBalance?.isEarningPool ?? false
   )
 
   // Track overflow into Extra time (when original budget depleted)

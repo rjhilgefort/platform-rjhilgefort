@@ -71,7 +71,8 @@ export async function POST(request: Request) {
   const balance = await getOrCreateTodayBalance(kidId)
 
   // For consumption timers (no earningTypeId), check if there's time remaining
-  if (!earningTypeId) {
+  // Exception: Extra (isEarningPool) can start even at 0 or negative
+  if (!earningTypeId && !budgetType.isEarningPool) {
     const typeBalance = balance.typeBalances.find((tb) => tb.budgetTypeId === budgetTypeId)
     if (!typeBalance || typeBalance.remainingSeconds <= 0) {
       return NextResponse.json(
