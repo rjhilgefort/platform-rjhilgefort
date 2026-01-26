@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.4.3
+
+### Patch Changes
+
+- 721ccb7: Use fullscreen display mode for PWA
+
 ## 0.4.2
 
 ### Patch Changes
