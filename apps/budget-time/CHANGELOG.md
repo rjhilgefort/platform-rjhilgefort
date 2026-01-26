@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.4.4
+
+### Patch Changes
+
+- 2cd4af5: Allow Extra timer to run into negative balance and start at zero/negative
+
 ## 0.4.3
 
 ### Patch Changes
