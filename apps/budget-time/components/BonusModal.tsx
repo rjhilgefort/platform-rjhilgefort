@@ -26,67 +26,79 @@ export function BonusModal({
   onClose,
   onSuccess,
 }: BonusModalProps) {
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [pinError, setPinError] = useState('')
   const [selectedBudgetTypeId, setSelectedBudgetTypeId] = useState<number>(
     budgetTypes[0]?.id ?? 0
   )
-  const [pendingMinutes, setPendingMinutes] = useState<number | null>(null)
-  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [feedback, setFeedback] = useState<{ minutes: number; type: string } | null>(null)
 
   const presets = [5, 10, 15, 30]
 
   const handlePinSubmit = async (pin: string): Promise<boolean> => {
-    if (pendingMinutes === null) return false
+    const response = await fetch('/api/auth/validate-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin }),
+    })
+    const data = await response.json()
+
+    if (data.valid) {
+      setIsUnlocked(true)
+      setPinError('')
+      return true
+    } else {
+      setPinError('Invalid PIN')
+      return false
+    }
+  }
+
+  const handleAdjustTime = async (minutes: number) => {
+    setLoading(true)
+    setFeedback(null)
 
     const response = await fetch('/api/bonus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         kidId,
-        pin,
-        minutes: pendingMinutes,
+        minutes,
         budgetTypeId: selectedBudgetTypeId,
       }),
     })
 
+    setLoading(false)
+
     if (response.ok) {
-      setPendingMinutes(null)
-      setError('')
+      const selectedType = budgetTypes.find((bt) => bt.id === selectedBudgetTypeId)
+      setFeedback({ minutes, type: selectedType?.displayName ?? '' })
       onSuccess()
-      onClose()
-      return true
-    } else {
-      const data = await response.json()
-      setError(data.error || 'Failed to add bonus')
-      return false
+      // Clear feedback after 2 seconds
+      setTimeout(() => setFeedback(null), 2000)
     }
   }
 
   const handleClose = () => {
-    setPendingMinutes(null)
-    setError('')
+    setIsUnlocked(false)
+    setPinError('')
+    setFeedback(null)
     onClose()
-  }
-
-  const handleBack = () => {
-    setPendingMinutes(null)
-    setError('')
   }
 
   if (!isOpen) return null
 
-  const selectedBudgetType = budgetTypes.find((bt) => bt.id === selectedBudgetTypeId)
-
-  // Show PIN pad if minutes selected
-  if (pendingMinutes !== null) {
+  // Show PIN pad first if not unlocked
+  if (!isUnlocked) {
     return (
       <dialog className="modal modal-open">
         <div className="modal-box w-80">
           <PinPad
-            title={`+${pendingMinutes} min ${selectedBudgetType?.displayName ?? ''}`}
+            title={`Adjust Time for ${kidName}`}
             onSubmit={handlePinSubmit}
-            onCancel={handleBack}
-            cancelLabel="Back"
-            error={error}
+            onCancel={handleClose}
+            cancelLabel="Cancel"
+            error={pinError}
           />
         </div>
         <div className="modal-backdrop" onClick={handleClose} />
@@ -94,10 +106,11 @@ export function BonusModal({
     )
   }
 
+  // Unlocked - show add/subtract UI
   return (
     <dialog className="modal modal-open">
       <div className="modal-box">
-        <h3 className="font-bold text-lg mb-4">Bonus Time for {kidName}</h3>
+        <h3 className="font-bold text-lg mb-4">Adjust Time for {kidName}</h3>
 
         {/* Budget Type Selection */}
         <div className="flex gap-2 mb-4 flex-wrap">
@@ -109,33 +122,59 @@ export function BonusModal({
                 selectedBudgetTypeId === bt.id ? 'btn-primary' : 'btn-ghost'
               }`}
               onClick={() => setSelectedBudgetTypeId(bt.id)}
+              disabled={loading}
             >
               {bt.displayName}
             </button>
           ))}
         </div>
 
-        {/* Preset Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        {/* Add Time Buttons */}
+        <div className="grid grid-cols-4 gap-2 mb-2">
           {presets.map((minutes) => (
             <button
               key={minutes}
               type="button"
               className="btn btn-success"
-              onClick={() => setPendingMinutes(minutes)}
+              onClick={() => handleAdjustTime(minutes)}
+              disabled={loading}
             >
-              +{minutes} min
+              +{minutes}
+            </button>
+          ))}
+        </div>
+
+        {/* Subtract Time Buttons */}
+        <div className="grid grid-cols-4 gap-2">
+          {presets.map((minutes) => (
+            <button
+              key={minutes}
+              type="button"
+              className="btn btn-error"
+              onClick={() => handleAdjustTime(-minutes)}
+              disabled={loading}
+            >
+              -{minutes}
             </button>
           ))}
         </div>
 
         <div className="modal-action">
           <button type="button" className="btn" onClick={handleClose}>
-            Cancel
+            Done
           </button>
         </div>
       </div>
       <div className="modal-backdrop" onClick={handleClose} />
+
+      {/* Toast notification */}
+      {feedback && (
+        <div className="toast toast-top toast-end z-50">
+          <div className={`alert ${feedback.minutes > 0 ? 'alert-success' : 'alert-warning'}`}>
+            {feedback.minutes > 0 ? '+' : ''}{feedback.minutes} min {feedback.type}
+          </div>
+        </div>
+      )}
     </dialog>
   )
 }

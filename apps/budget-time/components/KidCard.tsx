@@ -212,11 +212,11 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded
             <h2 className="card-title text-2xl">{status.kidName}</h2>
             <button
               type="button"
-              className="btn btn-ghost text-3xl font-bold leading-none"
+              className="btn btn-ghost text-2xl font-bold leading-none"
               onClick={() => setShowBonus(true)}
-              title="Add bonus time"
+              title="Adjust time"
             >
-              +
+              +/-
             </button>
           </div>
         )}
@@ -224,11 +224,11 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded
           <div className="flex justify-end mb-2">
             <button
               type="button"
-              className="btn btn-ghost text-2xl font-bold leading-none"
+              className="btn btn-ghost text-xl font-bold leading-none"
               onClick={() => setShowBonus(true)}
-              title="Add bonus time"
+              title="Adjust time"
             >
-              +
+              +/-
             </button>
           </div>
         )}

@@ -2,30 +2,23 @@ import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../db/client'
 import { kids, timerHistory, budgetTypes } from '../../../db/schema'
-import { validateParentPin } from '../../../lib/auth'
 import { updateBalance, getOrCreateTodayBalance } from '../../../lib/balance'
 
 export async function POST(request: Request) {
-  const { kidId, pin, minutes, budgetTypeId } = await request.json()
+  const { kidId, minutes, budgetTypeId } = await request.json()
 
-  if (!kidId || !pin || !minutes || !budgetTypeId) {
+  if (!kidId || minutes === undefined || !budgetTypeId) {
     return NextResponse.json(
-      { error: 'kidId, pin, minutes, and budgetTypeId required' },
+      { error: 'kidId, minutes, and budgetTypeId required' },
       { status: 400 }
     )
   }
 
-  if (typeof minutes !== 'number' || minutes <= 0) {
+  if (typeof minutes !== 'number' || minutes === 0) {
     return NextResponse.json(
-      { error: 'minutes must be a positive number' },
+      { error: 'minutes must be a non-zero number' },
       { status: 400 }
     )
-  }
-
-  // Validate parent PIN
-  const isValid = await validateParentPin(pin)
-  if (!isValid) {
-    return NextResponse.json({ error: 'Invalid PIN' }, { status: 401 })
   }
 
   // Verify kid exists
@@ -52,7 +45,7 @@ export async function POST(request: Request) {
   // Log to history
   await db.insert(timerHistory).values({
     kidId,
-    eventType: 'bonus_added',
+    eventType: minutes > 0 ? 'bonus_added' : 'bonus_subtracted',
     budgetTypeId,
     earningTypeId: null,
     seconds,
@@ -61,7 +54,7 @@ export async function POST(request: Request) {
   const balance = await getOrCreateTodayBalance(kidId)
 
   return NextResponse.json({
-    added: { minutes, budgetTypeId, budgetTypeDisplayName: budgetType.displayName },
+    adjusted: { minutes, budgetTypeId, budgetTypeDisplayName: budgetType.displayName },
     balance: {
       typeBalances: balance.typeBalances,
     },
