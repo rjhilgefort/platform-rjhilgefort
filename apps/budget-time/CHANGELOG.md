@@ -1,5 +1,12 @@
 # @repo/budget-time
 
+## 0.4.5
+
+### Patch Changes
+
+- dc85d8f: Improve bonus modal: PIN first, add/subtract time, +/- icon, toast notifications
+- 0b9184f: Add mobile accordion view for kids to reduce scrolling
+
 ## 0.4.4
 
 ### Patch Changes
