@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "npx tsx db/seed.ts"
+    "db:seed": "npx tsx db/seed.ts",
+    "deploy": "npm run version && git push && git checkout deploy/production && git merge - && git push && git checkout -"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
