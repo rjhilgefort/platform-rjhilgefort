@@ -63,9 +63,10 @@ interface KidCardProps {
   budgetTypes: BudgetType[]
   earningTypes: EarningType[]
   onRefresh: () => void
+  embedded?: boolean
 }
 
-export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCardProps) {
+export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded = false }: KidCardProps) {
   const [showBonus, setShowBonus] = useState(false)
   const [loading, setLoading] = useState(false)
   const [pendingEarningTypeId, setPendingEarningTypeId] = useState<number | null>(null)
@@ -204,25 +205,39 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh }: KidCar
   }
 
   return (
-    <div className="card bg-base-100 shadow-xl h-full flex flex-col">
-      <div className="card-body flex-1 flex flex-col">
-        <div className="flex justify-between items-center">
-          <h2 className="card-title text-2xl">{status.kidName}</h2>
-          <button
-            type="button"
-            className="btn btn-ghost text-3xl font-bold leading-none"
-            onClick={() => setShowBonus(true)}
-            title="Add bonus time"
-          >
-            +
-          </button>
-        </div>
+    <div className={embedded ? '' : 'card bg-base-100 shadow-xl h-full flex flex-col'}>
+      <div className={embedded ? '' : 'card-body flex-1 flex flex-col'}>
+        {!embedded && (
+          <div className="flex justify-between items-center">
+            <h2 className="card-title text-2xl">{status.kidName}</h2>
+            <button
+              type="button"
+              className="btn btn-ghost text-3xl font-bold leading-none"
+              onClick={() => setShowBonus(true)}
+              title="Add bonus time"
+            >
+              +
+            </button>
+          </div>
+        )}
+        {embedded && (
+          <div className="flex justify-end mb-2">
+            <button
+              type="button"
+              className="btn btn-ghost text-2xl font-bold leading-none"
+              onClick={() => setShowBonus(true)}
+              title="Add bonus time"
+            >
+              +
+            </button>
+          </div>
+        )}
 
         <div className="relative flex-1">
           {/* Normal grid - always rendered to preserve height, invisible when timer active */}
           <div className={activeBudgetTimer || isEarningTimer ? 'invisible' : ''}>
             {/* Budget Type Timers */}
-            <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="grid grid-cols-2 gap-3">
               {sortedTypeBalances.map((tb) => {
                 const isThisTimerRunning =
                   status.activeTimer?.budgetTypeId === tb.budgetTypeId && !isEarningTimer

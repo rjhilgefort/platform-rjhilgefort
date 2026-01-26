@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { KidCard } from '../components/KidCard'
+import { KidAccordion } from '../components/KidAccordion'
 import { TimeUpSound } from '../components/TimeUpSound'
 
 interface TypeBalance {
@@ -140,7 +141,18 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Mobile: Accordion view */}
+        <div className="md:hidden">
+          <KidAccordion
+            statuses={statuses}
+            budgetTypes={budgetTypes}
+            earningTypes={earningTypes}
+            onRefresh={fetchStatus}
+          />
+        </div>
+
+        {/* Desktop: Grid view */}
+        <div className="hidden md:grid md:grid-cols-2 gap-6">
           {statuses.map((status) => (
             <KidCard
               key={status.kidId}
