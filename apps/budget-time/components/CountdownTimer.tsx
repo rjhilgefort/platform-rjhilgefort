@@ -37,7 +37,6 @@ export function CountdownTimer({
 }: CountdownTimerProps) {
   const Icon = getBudgetIcon(budgetTypeSlug, icon)
   const displaySeconds = remainingSeconds + pendingEarnedSeconds
-  const hasHours = Math.abs(displaySeconds) >= 3600
   const isWarning = displaySeconds <= 300 && displaySeconds > 0
   const isExpired = displaySeconds <= 0
   const canStart = !isExpired || isEarningPool

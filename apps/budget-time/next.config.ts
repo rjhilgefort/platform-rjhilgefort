@@ -9,7 +9,12 @@ const exportedConfig =
   process.env.NODE_ENV === 'production'
     ? (async () => {
         const withPWAInit = (await import('@ducanh2912/next-pwa')).default
-        const withPWA = withPWAInit({ dest: 'public' })
+        const withPWA = withPWAInit({
+          dest: 'public',
+          workboxOptions: {
+            maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+          },
+        })
         return withPWA(nextConfig)
       })()
     : nextConfig

@@ -69,7 +69,7 @@ const main = async () => {
   console.log('Seeding app_settings table...')
   await db
     .insert(appSettings)
-    .values({ negativeBalancePenalty: -0.25 })
+    .values({ key: 'negativeBalancePenalty', value: '-0.25' })
     .onConflictDoNothing()
 
   console.log('Seeding complete!')

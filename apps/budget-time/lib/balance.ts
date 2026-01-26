@@ -10,7 +10,6 @@ import {
   DailyBalance,
   DailyTypeBalance,
   BudgetType,
-  AppSettings,
 } from '../db/schema'
 import { getBudgetDate, getPreviousBudgetDate } from './day-boundary'
 
@@ -277,31 +276,39 @@ export async function getEarningPoolBudgetType(): Promise<BudgetType | undefined
 }
 
 /**
- * Get app settings (creates default row if none exists)
+ * Get an app setting by key, with optional default
  */
-export async function getAppSettings(): Promise<AppSettings> {
-  const settings = await db.query.appSettings.findFirst()
-  if (settings) return settings
+export async function getAppSetting(key: string, defaultValue: string): Promise<string> {
+  const setting = await db.query.appSettings.findFirst({
+    where: eq(appSettings.key, key),
+  })
+  if (setting) return setting.value
 
-  // Create default settings if none exist
-  const [created] = await db
+  // Create with default if not exists
+  await db
     .insert(appSettings)
-    .values({ negativeBalancePenalty: -0.25 })
-    .returning()
-  return created!
+    .values({ key, value: defaultValue })
+    .onConflictDoNothing()
+  return defaultValue
 }
 
 /**
- * Update app settings
+ * Set an app setting
  */
-export async function updateAppSettings(
-  updates: Partial<Omit<AppSettings, 'id'>>
-): Promise<AppSettings> {
-  const settings = await getAppSettings()
-  const [updated] = await db
-    .update(appSettings)
-    .set(updates)
-    .where(eq(appSettings.id, settings.id))
-    .returning()
-  return updated!
+export async function setAppSetting(key: string, value: string): Promise<void> {
+  await db
+    .insert(appSettings)
+    .values({ key, value })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: { value },
+    })
+}
+
+/**
+ * Get negative balance penalty setting
+ */
+export async function getNegativeBalancePenalty(): Promise<number> {
+  const value = await getAppSetting('negativeBalancePenalty', '-0.25')
+  return parseFloat(value)
 }

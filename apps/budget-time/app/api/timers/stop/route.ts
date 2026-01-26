@@ -6,7 +6,7 @@ import {
   updateBalance,
   getOrCreateTodayBalance,
   getEarningPoolBudgetType,
-  getAppSettings,
+  getNegativeBalancePenalty,
 } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateEarnings } from '../../../../lib/timer-logic'
 
@@ -58,8 +58,7 @@ export async function POST(request: Request) {
 
     let penalty = 0
     if (extraBalance < 0) {
-      const settings = await getAppSettings()
-      penalty = settings.negativeBalancePenalty
+      penalty = await getNegativeBalancePenalty()
     }
 
     const earnedSeconds = calculateEarnings(elapsedSeconds, earningType, penalty)

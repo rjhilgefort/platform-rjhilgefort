@@ -112,7 +112,7 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
     } else {
       timerCacheRef.current = null
     }
-  }, [activeBudgetTimer?.startedAt, calculatedBaseSeconds, extraBalance])
+  }, [activeBudgetTimer, calculatedBaseSeconds, extraBalance])
 
   // Use cached values if available, otherwise use calculated
   const timerCache = timerCacheRef.current

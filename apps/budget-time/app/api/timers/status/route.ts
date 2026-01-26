@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../../db/client'
 import { activeTimers, budgetTypes, earningTypes } from '../../../../db/schema'
-import { getOrCreateTodayBalance, getAllBudgetTypes, getAppSettings } from '../../../../lib/balance'
+import { getOrCreateTodayBalance, getAllBudgetTypes, getNegativeBalancePenalty } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateRemainingTime } from '../../../../lib/timer-logic'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +15,7 @@ export async function GET() {
   const allEarningTypes = await db.query.earningTypes.findMany({
     orderBy: (et, { asc }) => asc(et.displayName),
   })
-  const settings = await getAppSettings()
+  const negativeBalancePenalty = await getNegativeBalancePenalty()
   const now = new Date()
 
   const statuses = await Promise.all(
@@ -71,7 +71,7 @@ export async function GET() {
     statuses,
     budgetTypes: allBudgetTypes,
     earningTypes: allEarningTypes,
-    negativeBalancePenalty: settings.negativeBalancePenalty,
+    negativeBalancePenalty,
     serverTime: now.toISOString(),
   })
 }

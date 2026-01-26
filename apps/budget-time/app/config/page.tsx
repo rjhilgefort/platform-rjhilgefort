@@ -129,8 +129,9 @@ export default function ConfigPage() {
 
   // Cleanup auto-save timeouts on unmount
   useEffect(() => {
+    const timeouts = saveTimeouts.current
     return () => {
-      Object.values(saveTimeouts.current).forEach(clearTimeout)
+      Object.values(timeouts).forEach(clearTimeout)
     }
   }, [])
 
@@ -915,23 +916,23 @@ export default function ConfigPage() {
                 type="button"
                 className="btn btn-sm btn-square bg-base-200 border-base-300"
                 onClick={() => {
-                  const newValue = Math.min(0, negativeBalancePenalty + 0.25)
+                  const newValue = negativeBalancePenalty - 0.25
                   updateNegativeBalancePenalty(newValue)
                 }}
-                disabled={negativeBalancePenalty >= 0}
               >
-                +
+                −
               </button>
               <span className="w-16 text-center font-mono text-lg">{negativeBalancePenalty}</span>
               <button
                 type="button"
                 className="btn btn-sm btn-square bg-base-200 border-base-300"
                 onClick={() => {
-                  const newValue = negativeBalancePenalty - 0.25
+                  const newValue = Math.min(0, negativeBalancePenalty + 0.25)
                   updateNegativeBalancePenalty(newValue)
                 }}
+                disabled={negativeBalancePenalty >= 0}
               >
-                −
+                +
               </button>
               <span className="text-sm text-base-content/50 ml-2">
                 (e.g. 1:2 ratio becomes 1:{Math.max(0, 2 + negativeBalancePenalty).toFixed(2)})

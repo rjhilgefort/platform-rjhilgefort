@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": ["FAMILY_PIN", "PARENT_PIN", "COOKIE_SECURE"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

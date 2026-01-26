@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../db/client'
-import { budgetTypes, earningTypes, kidBudgetDefaults, appSettings } from '../../../db/schema'
-import { getAppSettings } from '../../../lib/balance'
+import { budgetTypes, earningTypes, kidBudgetDefaults } from '../../../db/schema'
+import { getNegativeBalancePenalty, setAppSetting } from '../../../lib/balance'
 import { validateParentPin } from '../../../lib/auth'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +18,7 @@ export async function GET() {
     orderBy: (et, { asc }) => asc(et.displayName),
   })
   const allKidBudgetDefaults = await db.query.kidBudgetDefaults.findMany()
-  const settings = await getAppSettings()
+  const negativeBalancePenalty = await getNegativeBalancePenalty()
 
   // Build kid objects with budget defaults
   const kidsWithDefaults = allKids.map((kid) => {
@@ -43,7 +43,7 @@ export async function GET() {
     kids: kidsWithDefaults,
     budgetTypes: allBudgetTypes,
     earningTypes: allEarningTypes,
-    negativeBalancePenalty: settings.negativeBalancePenalty,
+    negativeBalancePenalty,
   })
 }
 
@@ -244,14 +244,8 @@ export async function PUT(request: Request) {
         )
       }
 
-      const settings = await getAppSettings()
-      const [updated] = await db
-        .update(appSettings)
-        .set({ negativeBalancePenalty })
-        .where(eq(appSettings.id, settings.id))
-        .returning()
-
-      return NextResponse.json({ negativeBalancePenalty: updated?.negativeBalancePenalty })
+      await setAppSetting('negativeBalancePenalty', negativeBalancePenalty.toString())
+      return NextResponse.json({ negativeBalancePenalty })
     }
 
     default:
