@@ -7,9 +7,13 @@ import { updateBalance, getOrCreateTodayBalance, getEarningPoolBudgetType } from
 import { calculateEarnings } from '../../../../lib/timer-logic'
 
 export async function POST(request: Request) {
-  const { kidId, pin, earningTypeId, activityMinutes } = await request.json()
+  const body = await request.json()
+  const kidId = Number(body.kidId)
+  const pin = body.pin
+  const earningTypeId = Number(body.earningTypeId)
+  const activityMinutes = Number(body.activityMinutes)
 
-  if (!kidId || !pin || !earningTypeId || typeof activityMinutes !== 'number') {
+  if (!kidId || !pin || !earningTypeId || !activityMinutes) {
     return NextResponse.json(
       { error: 'kidId, pin, earningTypeId, and activityMinutes required' },
       { status: 400 }
@@ -53,17 +57,22 @@ export async function POST(request: Request) {
   const activitySeconds = activityMinutes * 60
   const earnedSeconds = calculateEarnings(activitySeconds, earningType)
 
-  // Add earned time to the Extra balance
-  await updateBalance(kidId, earningPool.id, earnedSeconds)
+  try {
+    // Add earned time to the Extra balance
+    await updateBalance(kidId, earningPool.id, earnedSeconds)
 
-  // Log to history
-  await db.insert(timerHistory).values({
-    kidId,
-    eventType: 'simulated_earned',
-    budgetTypeId: earningPool.id,
-    earningTypeId,
-    seconds: earnedSeconds,
-  })
+    // Log to history
+    await db.insert(timerHistory).values({
+      kidId,
+      eventType: 'simulated_earned',
+      budgetTypeId: earningPool.id,
+      earningTypeId,
+      seconds: earnedSeconds,
+    })
+  } catch (err) {
+    console.error('Failed to update balance:', err)
+    return NextResponse.json({ error: 'Failed to save earned time' }, { status: 500 })
+  }
 
   const balance = await getOrCreateTodayBalance(kidId)
   const earnedMinutes = Math.floor(earnedSeconds / 60)
