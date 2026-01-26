@@ -11,7 +11,8 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "turbo run build --filter=docs^... && changeset publish",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "deploy": "npm run version && git push && git checkout deploy/production && git merge - && git push && git checkout -"
   },
   "devDependencies": {
     "@changesets/cli": "^2.28.0",
