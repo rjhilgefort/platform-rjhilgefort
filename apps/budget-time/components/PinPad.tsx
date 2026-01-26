@@ -119,7 +119,7 @@ export function PinPad({
                 </button>
               )
             ) : (
-              <div key={i} />
+              <div key={`empty-${i}`} />
             )
         )}
       </div>
