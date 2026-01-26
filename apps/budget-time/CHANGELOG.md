@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.4.6
+
+### Patch Changes
+
+- 553103e: Sort budget types and earning types alphabetically by display name
+
 ## 0.4.5
 
 ### Patch Changes
