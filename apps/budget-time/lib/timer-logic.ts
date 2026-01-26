@@ -69,14 +69,19 @@ export function calculateRemainingTime(
 
 /**
  * Calculate earned budget time from earning activity using earning type ratio
+ * Penalty reduces the effective denominator (e.g. -0.25 penalty: 1:2 becomes 1:1.75)
+ * If penalty exceeds denominator (effective <= 0), earns nothing
  */
 export function calculateEarnings(
   elapsedSeconds: number,
-  earningType: EarningType
+  earningType: EarningType,
+  penalty: number = 0
 ): number {
   // ratio: numerator:denominator means numerator min activity = denominator min budget
   // e.g. 1:2 means 1 min chores = 2 min budget time
-  return Math.floor((elapsedSeconds * earningType.ratioDenominator) / earningType.ratioNumerator)
+  const effectiveDenominator = earningType.ratioDenominator + penalty
+  if (effectiveDenominator <= 0) return 0
+  return Math.floor((elapsedSeconds * effectiveDenominator) / earningType.ratioNumerator)
 }
 
 /**

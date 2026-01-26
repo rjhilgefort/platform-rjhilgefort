@@ -81,6 +81,9 @@ export default function ConfigPage() {
   const [simulateMinutes, setSimulateMinutes] = useState('')
   const [simulateLoading, setSimulateLoading] = useState(false)
 
+  // App settings state
+  const [negativeBalancePenalty, setNegativeBalancePenalty] = useState(-0.25)
+
   // Sort budget types: Extra (earning pool) last, then alphabetically by name
   const sortedBudgetTypes = [...budgetTypes].sort((a, b) => {
     if (a.isEarningPool !== b.isEarningPool) return a.isEarningPool ? 1 : -1
@@ -138,6 +141,7 @@ export default function ConfigPage() {
       setKids(data.kids)
       setBudgetTypes(data.budgetTypes)
       setEarningTypes(data.earningTypes)
+      setNegativeBalancePenalty(data.negativeBalancePenalty)
     }
     setLoading(false)
   }
@@ -410,6 +414,32 @@ export default function ConfigPage() {
     } else {
       const data = await response.json()
       setError(data.error || 'Failed to delete')
+      if (data.error === 'Invalid PIN') {
+        setPinVerified(false)
+        setPin('')
+      }
+    }
+  }
+
+  const updateNegativeBalancePenalty = async (value: number) => {
+    setError('')
+
+    const response = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin,
+        action: 'updateNegativeBalancePenalty',
+        negativeBalancePenalty: value,
+      }),
+    })
+
+    if (response.ok) {
+      setNegativeBalancePenalty(value)
+      showToast('Penalty updated')
+    } else {
+      const data = await response.json()
+      setError(data.error || 'Failed to update penalty')
       if (data.error === 'Invalid PIN') {
         setPinVerified(false)
         setPin('')
@@ -869,6 +899,46 @@ export default function ConfigPage() {
 
         {/* General Settings Divider */}
         <div className="divider text-base-content/50 mt-8 mb-4">General Settings</div>
+
+        {/* Negative Balance Penalty */}
+        <div className="card bg-base-100 shadow-xl mb-4">
+          <div className="card-body">
+            <div>
+              <h2 className="card-title">Loan Payback Penalty</h2>
+              <p className="text-sm text-base-content/60">
+                When Extra balance is negative, reduce earning rates by this amount
+              </p>
+            </div>
+            <div className="flex items-center gap-4 mt-4">
+              <span className="text-sm text-base-content/70">Penalty:</span>
+              <button
+                type="button"
+                className="btn btn-sm btn-square bg-base-200 border-base-300"
+                onClick={() => {
+                  const newValue = Math.min(0, negativeBalancePenalty + 0.25)
+                  updateNegativeBalancePenalty(newValue)
+                }}
+                disabled={negativeBalancePenalty >= 0}
+              >
+                +
+              </button>
+              <span className="w-16 text-center font-mono text-lg">{negativeBalancePenalty}</span>
+              <button
+                type="button"
+                className="btn btn-sm btn-square bg-base-200 border-base-300"
+                onClick={() => {
+                  const newValue = negativeBalancePenalty - 0.25
+                  updateNegativeBalancePenalty(newValue)
+                }}
+              >
+                −
+              </button>
+              <span className="text-sm text-base-content/50 ml-2">
+                (e.g. 1:2 ratio becomes 1:{Math.max(0, 2 + negativeBalancePenalty).toFixed(2)})
+              </span>
+            </div>
+          </div>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-4">
         {/* Budget Types Section */}

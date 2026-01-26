@@ -6,6 +6,7 @@ import {
   updateBalance,
   getOrCreateTodayBalance,
   getEarningPoolBudgetType,
+  getAppSettings,
 } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateEarnings } from '../../../../lib/timer-logic'
 
@@ -50,7 +51,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Earning type not found' }, { status: 404 })
     }
 
-    const earnedSeconds = calculateEarnings(elapsedSeconds, earningType)
+    // Check if kid has negative Extra balance (apply penalty if so)
+    const currentBalance = await getOrCreateTodayBalance(kidId)
+    const extraTypeBalance = currentBalance.typeBalances.find((tb) => tb.isEarningPool)
+    const extraBalance = extraTypeBalance?.remainingSeconds ?? 0
+
+    let penalty = 0
+    if (extraBalance < 0) {
+      const settings = await getAppSettings()
+      penalty = settings.negativeBalancePenalty
+    }
+
+    const earnedSeconds = calculateEarnings(elapsedSeconds, earningType, penalty)
     await updateBalance(kidId, timer.budgetTypeId, earnedSeconds)
 
     // Log to history

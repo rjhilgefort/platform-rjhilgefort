@@ -8,6 +8,7 @@ import { ActiveTimerOverlay } from './ActiveTimerOverlay'
 import { PinPad } from './PinPad'
 import { useCountdown, useElapsed } from '../hooks/useCountdown'
 import { formatTime } from '../lib/timer-logic'
+import { TbAlertTriangle } from 'react-icons/tb'
 import { Fraction } from './Fraction'
 import { getBudgetIcon, getEarningIcon } from '../lib/budget-icons'
 import { TimeDisplay } from './TimeDisplay'
@@ -62,11 +63,12 @@ interface KidCardProps {
   status: KidStatus
   budgetTypes: BudgetType[]
   earningTypes: EarningType[]
+  negativeBalancePenalty: number
   onRefresh: () => void
   embedded?: boolean
 }
 
-export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded = false }: KidCardProps) {
+export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePenalty, onRefresh, embedded = false }: KidCardProps) {
   const [showBonus, setShowBonus] = useState(false)
   const [loading, setLoading] = useState(false)
   const [pendingEarningTypeId, setPendingEarningTypeId] = useState<number | null>(null)
@@ -268,7 +270,11 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded
             </div>
 
             {/* Earn Time Section */}
-            <div className="divider text-xs text-base-content/50">Earn Time → Extra</div>
+            <div className="divider text-xs text-base-content/50">
+              {extraBalance < 0
+                ? <span className="text-warning flex items-center gap-1"><TbAlertTriangle size={14} /> Earning reduced until Extra paid back</span>
+                : 'Earn Time → Extra'}
+            </div>
 
             {/* Earning Timers */}
             <div className="grid grid-cols-2 gap-3">
@@ -284,6 +290,8 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded
                     onStart={(earningTypeId) => setPendingEarningTypeId(earningTypeId)}
                     onStop={stopTimer}
                     disabled={loading || (hasActiveTimer && !isThisEarningRunning)}
+                    extraBalance={extraBalance}
+                    negativeBalancePenalty={negativeBalancePenalty}
                   />
                 )
               })}

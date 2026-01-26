@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../db/client'
-import { budgetTypes, earningTypes, kidBudgetDefaults } from '../../../db/schema'
+import { budgetTypes, earningTypes, kidBudgetDefaults, appSettings } from '../../../db/schema'
+import { getAppSettings } from '../../../lib/balance'
 import { validateParentPin } from '../../../lib/auth'
 
 export const dynamic = 'force-dynamic'
@@ -17,6 +18,7 @@ export async function GET() {
     orderBy: (et, { asc }) => asc(et.displayName),
   })
   const allKidBudgetDefaults = await db.query.kidBudgetDefaults.findMany()
+  const settings = await getAppSettings()
 
   // Build kid objects with budget defaults
   const kidsWithDefaults = allKids.map((kid) => {
@@ -41,6 +43,7 @@ export async function GET() {
     kids: kidsWithDefaults,
     budgetTypes: allBudgetTypes,
     earningTypes: allEarningTypes,
+    negativeBalancePenalty: settings.negativeBalancePenalty,
   })
 }
 
@@ -224,6 +227,31 @@ export async function PUT(request: Request) {
 
       await db.delete(earningTypes).where(eq(earningTypes.id, earningTypeId))
       return NextResponse.json({ success: true })
+    }
+
+    case 'updateNegativeBalancePenalty': {
+      const { negativeBalancePenalty } = body
+      if (typeof negativeBalancePenalty !== 'number') {
+        return NextResponse.json(
+          { error: 'negativeBalancePenalty required and must be a number' },
+          { status: 400 }
+        )
+      }
+      if (negativeBalancePenalty > 0) {
+        return NextResponse.json(
+          { error: 'Penalty must be negative or zero' },
+          { status: 400 }
+        )
+      }
+
+      const settings = await getAppSettings()
+      const [updated] = await db
+        .update(appSettings)
+        .set({ negativeBalancePenalty })
+        .where(eq(appSettings.id, settings.id))
+        .returning()
+
+      return NextResponse.json({ negativeBalancePenalty: updated?.negativeBalancePenalty })
     }
 
     default:

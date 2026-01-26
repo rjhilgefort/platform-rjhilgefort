@@ -120,6 +120,12 @@ export const timerHistory = pgTable('timer_history', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
 
+// Global app settings (single row table)
+export const appSettings = pgTable('app_settings', {
+  id: serial('id').primaryKey(),
+  negativeBalancePenalty: real('negative_balance_penalty').notNull().default(-0.25),
+})
+
 export type BudgetType = typeof budgetTypes.$inferSelect
 export type NewBudgetType = typeof budgetTypes.$inferInsert
 export type EarningType = typeof earningTypes.$inferSelect
@@ -136,3 +142,5 @@ export type ActiveTimer = typeof activeTimers.$inferSelect
 export type NewActiveTimer = typeof activeTimers.$inferInsert
 export type TimerHistoryEntry = typeof timerHistory.$inferSelect
 export type NewTimerHistoryEntry = typeof timerHistory.$inferInsert
+export type AppSettings = typeof appSettings.$inferSelect
+export type NewAppSettings = typeof appSettings.$inferInsert

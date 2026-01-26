@@ -57,6 +57,7 @@ interface StatusResponse {
   statuses: KidStatus[]
   budgetTypes: BudgetType[]
   earningTypes: EarningType[]
+  negativeBalancePenalty: number
   serverTime: string
 }
 
@@ -64,6 +65,7 @@ export default function HomePage() {
   const [statuses, setStatuses] = useState<KidStatus[]>([])
   const [budgetTypes, setBudgetTypes] = useState<BudgetType[]>([])
   const [earningTypes, setEarningTypes] = useState<EarningType[]>([])
+  const [negativeBalancePenalty, setNegativeBalancePenalty] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const prevTimesRef = useRef<Record<number, Record<number, number>>>({})
@@ -75,6 +77,7 @@ export default function HomePage() {
       setStatuses(data.statuses)
       setBudgetTypes(data.budgetTypes)
       setEarningTypes(data.earningTypes)
+      setNegativeBalancePenalty(data.negativeBalancePenalty)
       setError('')
     } else {
       setError('Failed to load status')
@@ -147,6 +150,7 @@ export default function HomePage() {
             statuses={statuses}
             budgetTypes={budgetTypes}
             earningTypes={earningTypes}
+            negativeBalancePenalty={negativeBalancePenalty}
             onRefresh={fetchStatus}
           />
         </div>
@@ -159,6 +163,7 @@ export default function HomePage() {
               status={status}
               budgetTypes={budgetTypes}
               earningTypes={earningTypes}
+              negativeBalancePenalty={negativeBalancePenalty}
               onRefresh={fetchStatus}
             />
           ))}

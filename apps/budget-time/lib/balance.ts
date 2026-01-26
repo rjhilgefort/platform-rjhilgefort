@@ -6,9 +6,11 @@ import {
   dailyTypeBalances,
   budgetTypes,
   kidBudgetDefaults,
+  appSettings,
   DailyBalance,
   DailyTypeBalance,
   BudgetType,
+  AppSettings,
 } from '../db/schema'
 import { getBudgetDate, getPreviousBudgetDate } from './day-boundary'
 
@@ -272,4 +274,34 @@ export async function getEarningPoolBudgetType(): Promise<BudgetType | undefined
   return db.query.budgetTypes.findFirst({
     where: eq(budgetTypes.isEarningPool, true),
   })
+}
+
+/**
+ * Get app settings (creates default row if none exists)
+ */
+export async function getAppSettings(): Promise<AppSettings> {
+  const settings = await db.query.appSettings.findFirst()
+  if (settings) return settings
+
+  // Create default settings if none exist
+  const [created] = await db
+    .insert(appSettings)
+    .values({ negativeBalancePenalty: -0.25 })
+    .returning()
+  return created!
+}
+
+/**
+ * Update app settings
+ */
+export async function updateAppSettings(
+  updates: Partial<Omit<AppSettings, 'id'>>
+): Promise<AppSettings> {
+  const settings = await getAppSettings()
+  const [updated] = await db
+    .update(appSettings)
+    .set(updates)
+    .where(eq(appSettings.id, settings.id))
+    .returning()
+  return updated!
 }

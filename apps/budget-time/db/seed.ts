@@ -1,7 +1,7 @@
 import { config } from 'dotenv'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
-import { budgetTypes, earningTypes, kids, kidBudgetDefaults } from './schema'
+import { budgetTypes, earningTypes, kids, kidBudgetDefaults, appSettings } from './schema'
 
 config({ path: '.env.local' })
 
@@ -65,6 +65,12 @@ const main = async () => {
       .values(defaultsToInsert)
       .onConflictDoNothing()
   }
+
+  console.log('Seeding app_settings table...')
+  await db
+    .insert(appSettings)
+    .values({ negativeBalancePenalty: -0.25 })
+    .onConflictDoNothing()
 
   console.log('Seeding complete!')
   await pool.end()

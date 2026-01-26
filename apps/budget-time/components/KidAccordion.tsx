@@ -54,6 +54,7 @@ interface KidAccordionProps {
   statuses: KidStatus[]
   budgetTypes: BudgetType[]
   earningTypes: EarningType[]
+  negativeBalancePenalty: number
   onRefresh: () => void
 }
 
@@ -61,6 +62,7 @@ export function KidAccordion({
   statuses,
   budgetTypes,
   earningTypes,
+  negativeBalancePenalty,
   onRefresh,
 }: KidAccordionProps) {
   // Auto-expand kid with active timer, otherwise first kid
@@ -96,6 +98,7 @@ export function KidAccordion({
                   status={status}
                   budgetTypes={budgetTypes}
                   earningTypes={earningTypes}
+                  negativeBalancePenalty={negativeBalancePenalty}
                   onRefresh={onRefresh}
                   embedded
                 />
