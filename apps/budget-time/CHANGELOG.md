@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.4.1
+
+### Patch Changes
+
+- d88df07: Fix duplicate React key warning in PinPad component
+
 ## 0.4.0
 
 ### Minor Changes
