@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.5.0
+
+### Minor Changes
+
+- 332b7a7: feat: add loan payback system - reduce earning rates when Extra balance is negative
+
 ## 0.4.6
 
 ### Patch Changes
