@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.4.2
+
+### Patch Changes
+
+- afeebb3: fix: simulate earning API type coercion and error handling
+
 ## 0.4.1
 
 ### Patch Changes
