@@ -76,7 +76,11 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded
   const isEarningTimer = status.activeTimer?.earningTypeId != null
   const activeBudgetTimer = hasActiveTimer && !isEarningTimer ? status.activeTimer : null
   const activeEarningTimer = hasActiveTimer && isEarningTimer ? status.activeTimer : null
-  const sortedTypeBalances = [...status.typeBalances].sort((a, b) => Number(a.isEarningPool) - Number(b.isEarningPool))
+  const sortedTypeBalances = [...status.typeBalances].sort((a, b) => {
+    if (a.isEarningPool !== b.isEarningPool) return Number(a.isEarningPool) - Number(b.isEarningPool)
+    return a.budgetTypeDisplayName.localeCompare(b.budgetTypeDisplayName)
+  })
+  const sortedEarningTypes = [...earningTypes].sort((a, b) => a.displayName.localeCompare(b.displayName))
   const extraTypeBalance = status.typeBalances.find((tb) => tb.isEarningPool)
   const extraBalance = extraTypeBalance?.remainingSeconds ?? 0
 
@@ -268,7 +272,7 @@ export function KidCard({ status, budgetTypes, earningTypes, onRefresh, embedded
 
             {/* Earning Timers */}
             <div className="grid grid-cols-2 gap-3">
-              {earningTypes.map((et) => {
+              {sortedEarningTypes.map((et) => {
                 const isThisEarningRunning =
                   status.activeTimer?.earningTypeId === et.id
                 return (
