@@ -83,6 +83,8 @@ export default function ConfigPage() {
 
   // App settings state
   const [negativeBalancePenalty, setNegativeBalancePenalty] = useState(-0.25)
+  const [timezone, setTimezone] = useState('America/Denver')
+  const [resetHour, setResetHour] = useState(4)
 
   // Sort budget types: Extra (earning pool) last, then alphabetically by name
   const sortedBudgetTypes = [...budgetTypes].sort((a, b) => {
@@ -143,6 +145,8 @@ export default function ConfigPage() {
       setBudgetTypes(data.budgetTypes)
       setEarningTypes(data.earningTypes)
       setNegativeBalancePenalty(data.negativeBalancePenalty)
+      setTimezone(data.timezone)
+      setResetHour(data.resetHour)
     }
     setLoading(false)
   }
@@ -441,6 +445,58 @@ export default function ConfigPage() {
     } else {
       const data = await response.json()
       setError(data.error || 'Failed to update penalty')
+      if (data.error === 'Invalid PIN') {
+        setPinVerified(false)
+        setPin('')
+      }
+    }
+  }
+
+  const updateTimezone = async (value: string) => {
+    setError('')
+
+    const response = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin,
+        action: 'updateTimezone',
+        timezone: value,
+      }),
+    })
+
+    if (response.ok) {
+      setTimezone(value)
+      showToast('Timezone updated')
+    } else {
+      const data = await response.json()
+      setError(data.error || 'Failed to update timezone')
+      if (data.error === 'Invalid PIN') {
+        setPinVerified(false)
+        setPin('')
+      }
+    }
+  }
+
+  const updateResetHour = async (value: number) => {
+    setError('')
+
+    const response = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin,
+        action: 'updateResetHour',
+        resetHour: value,
+      }),
+    })
+
+    if (response.ok) {
+      setResetHour(value)
+      showToast('Reset hour updated')
+    } else {
+      const data = await response.json()
+      setError(data.error || 'Failed to update reset hour')
       if (data.error === 'Invalid PIN') {
         setPinVerified(false)
         setPin('')
@@ -751,7 +807,7 @@ export default function ConfigPage() {
                 {/* Daily Defaults Section */}
                 <div className="divider text-sm">Daily Defaults</div>
                 <p className="text-xs text-base-content/50 -mt-2 mb-2">
-                  Added at midnight each day. Unused time carries over.
+                  Added at {resetHour === 0 ? '12' : resetHour > 12 ? resetHour - 12 : resetHour} {resetHour < 12 ? 'AM' : 'PM'} each day. Unused time carries over.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -901,42 +957,81 @@ export default function ConfigPage() {
         {/* General Settings Divider */}
         <div className="divider text-base-content/50 mt-8 mb-4">General Settings</div>
 
-        {/* Negative Balance Penalty */}
-        <div className="card bg-base-100 shadow-xl mb-4">
-          <div className="card-body">
-            <div>
-              <h2 className="card-title">Loan Payback Penalty</h2>
-              <p className="text-sm text-base-content/60">
-                When Extra balance is negative, reduce earning rates by this amount
-              </p>
+        <div className="grid lg:grid-cols-2 gap-4 mb-4">
+          {/* Negative Balance Penalty */}
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <div>
+                <h2 className="card-title">Loan Payback Penalty</h2>
+                <p className="text-sm text-base-content/60">
+                  When Extra balance is negative, reduce earning rates by this amount
+                </p>
+              </div>
+              <div className="flex items-center gap-4 mt-4 flex-wrap">
+                <span className="text-sm text-base-content/70">Penalty:</span>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-square bg-base-200 border-base-300"
+                  onClick={() => {
+                    const newValue = negativeBalancePenalty - 0.25
+                    updateNegativeBalancePenalty(newValue)
+                  }}
+                >
+                  −
+                </button>
+                <span className="w-16 text-center font-mono text-lg">{negativeBalancePenalty}</span>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-square bg-base-200 border-base-300"
+                  onClick={() => {
+                    const newValue = Math.min(0, negativeBalancePenalty + 0.25)
+                    updateNegativeBalancePenalty(newValue)
+                  }}
+                  disabled={negativeBalancePenalty >= 0}
+                >
+                  +
+                </button>
+                <span className="text-sm text-base-content/50">
+                  (e.g. 1:2 → 1:{Math.max(0, 2 + negativeBalancePenalty).toFixed(2)})
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-4 mt-4">
-              <span className="text-sm text-base-content/70">Penalty:</span>
-              <button
-                type="button"
-                className="btn btn-sm btn-square bg-base-200 border-base-300"
-                onClick={() => {
-                  const newValue = negativeBalancePenalty - 0.25
-                  updateNegativeBalancePenalty(newValue)
-                }}
-              >
-                −
-              </button>
-              <span className="w-16 text-center font-mono text-lg">{negativeBalancePenalty}</span>
-              <button
-                type="button"
-                className="btn btn-sm btn-square bg-base-200 border-base-300"
-                onClick={() => {
-                  const newValue = Math.min(0, negativeBalancePenalty + 0.25)
-                  updateNegativeBalancePenalty(newValue)
-                }}
-                disabled={negativeBalancePenalty >= 0}
-              >
-                +
-              </button>
-              <span className="text-sm text-base-content/50 ml-2">
-                (e.g. 1:2 ratio becomes 1:{Math.max(0, 2 + negativeBalancePenalty).toFixed(2)})
-              </span>
+          </div>
+
+          {/* Timezone & Reset Hour Setting */}
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <div>
+                <h2 className="card-title">Day Reset</h2>
+                <p className="text-sm text-base-content/60">
+                  Daily budgets reset at {resetHour === 0 ? '12' : resetHour > 12 ? resetHour - 12 : resetHour} {resetHour < 12 ? 'AM' : 'PM'}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <select
+                  className="select select-bordered select-sm flex-1 min-w-24"
+                  value={timezone}
+                  onChange={(e) => updateTimezone(e.target.value)}
+                >
+                  <option value="America/New_York">Eastern</option>
+                  <option value="America/Chicago">Central</option>
+                  <option value="America/Denver">Mountain</option>
+                  <option value="America/Los_Angeles">Pacific</option>
+                  <option value="America/Anchorage">Alaska</option>
+                  <option value="Pacific/Honolulu">Hawaii</option>
+                </select>
+                <select
+                  className="select select-bordered select-sm flex-1 min-w-24"
+                  value={resetHour}
+                  onChange={(e) => updateResetHour(Number(e.target.value))}
+                >
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <option key={i} value={i}>
+                      {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>

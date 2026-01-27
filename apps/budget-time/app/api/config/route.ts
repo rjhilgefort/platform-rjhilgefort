@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../db/client'
 import { budgetTypes, earningTypes, kidBudgetDefaults } from '../../../db/schema'
-import { getNegativeBalancePenalty, setAppSetting } from '../../../lib/balance'
+import { getNegativeBalancePenalty, getTimezone, getResetHour, setAppSetting } from '../../../lib/balance'
 import { validateParentPin } from '../../../lib/auth'
 
 export const dynamic = 'force-dynamic'
@@ -19,6 +19,8 @@ export async function GET() {
   })
   const allKidBudgetDefaults = await db.query.kidBudgetDefaults.findMany()
   const negativeBalancePenalty = await getNegativeBalancePenalty()
+  const timezone = await getTimezone()
+  const resetHour = await getResetHour()
 
   // Build kid objects with budget defaults
   const kidsWithDefaults = allKids.map((kid) => {
@@ -44,6 +46,8 @@ export async function GET() {
     budgetTypes: allBudgetTypes,
     earningTypes: allEarningTypes,
     negativeBalancePenalty,
+    timezone,
+    resetHour,
   })
 }
 
@@ -246,6 +250,32 @@ export async function PUT(request: Request) {
 
       await setAppSetting('negativeBalancePenalty', negativeBalancePenalty.toString())
       return NextResponse.json({ negativeBalancePenalty })
+    }
+
+    case 'updateTimezone': {
+      const { timezone } = body
+      if (typeof timezone !== 'string' || !timezone) {
+        return NextResponse.json(
+          { error: 'timezone required and must be a string' },
+          { status: 400 }
+        )
+      }
+
+      await setAppSetting('timezone', timezone)
+      return NextResponse.json({ timezone })
+    }
+
+    case 'updateResetHour': {
+      const { resetHour } = body
+      if (typeof resetHour !== 'number' || resetHour < 0 || resetHour > 23) {
+        return NextResponse.json(
+          { error: 'resetHour must be a number between 0 and 23' },
+          { status: 400 }
+        )
+      }
+
+      await setAppSetting('resetHour', resetHour.toString())
+      return NextResponse.json({ resetHour })
     }
 
     default:

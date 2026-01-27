@@ -20,6 +20,7 @@
     "@next/third-parties": "^15.2.1",
     "@repo/ui": "*",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "drizzle-orm": "^0.38.3",
     "effect": "^3.13.7",
     "next": "^15.2.0",

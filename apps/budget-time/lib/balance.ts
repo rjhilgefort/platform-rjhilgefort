@@ -45,7 +45,9 @@ export async function getAllBudgetTypes(): Promise<BudgetType[]> {
  * Handles carryover from previous day for all budget types
  */
 export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyBalance> {
-  const today = getBudgetDate()
+  const timezone = await getTimezone()
+  const resetHour = await getResetHour()
+  const today = getBudgetDate(timezone, resetHour)
 
   // Check if today's balance exists
   const existing = await db.query.dailyBalances.findFirst({
@@ -99,7 +101,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
   const defaults = await getKidBudgetDefaults(kidId)
 
   // Get yesterday's balance for carryover
-  const yesterday = getPreviousBudgetDate()
+  const yesterday = getPreviousBudgetDate(timezone, resetHour)
   const yesterdayBalance = await db.query.dailyBalances.findFirst({
     where: and(eq(dailyBalances.kidId, kidId), eq(dailyBalances.date, yesterday)),
   })
@@ -311,4 +313,19 @@ export async function setAppSetting(key: string, value: string): Promise<void> {
 export async function getNegativeBalancePenalty(): Promise<number> {
   const value = await getAppSetting('negativeBalancePenalty', '-0.25')
   return parseFloat(value)
+}
+
+/**
+ * Get timezone setting
+ */
+export async function getTimezone(): Promise<string> {
+  return getAppSetting('timezone', 'America/Denver')
+}
+
+/**
+ * Get reset hour setting (0-23, default 4 = 4 AM)
+ */
+export async function getResetHour(): Promise<number> {
+  const value = await getAppSetting('resetHour', '4')
+  return parseInt(value, 10)
 }
