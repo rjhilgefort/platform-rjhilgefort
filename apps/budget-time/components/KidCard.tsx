@@ -66,10 +66,14 @@ interface KidCardProps {
   negativeBalancePenalty: number
   onRefresh: () => void
   embedded?: boolean
+  showBonus?: boolean
+  onBonusClose?: () => void
 }
 
-export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePenalty, onRefresh, embedded = false }: KidCardProps) {
-  const [showBonus, setShowBonus] = useState(false)
+export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePenalty, onRefresh, embedded = false, showBonus: externalShowBonus, onBonusClose }: KidCardProps) {
+  const [internalShowBonus, setInternalShowBonus] = useState(false)
+  const showBonus = embedded ? (externalShowBonus ?? false) : internalShowBonus
+  const setShowBonus = embedded ? (v: boolean) => { if (!v && onBonusClose) onBonusClose() } : setInternalShowBonus
   const [loading, setLoading] = useState(false)
   const [pendingEarningTypeId, setPendingEarningTypeId] = useState<number | null>(null)
   const [pinError, setPinError] = useState('')
@@ -219,18 +223,6 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
             <button
               type="button"
               className="btn btn-ghost text-2xl font-bold leading-none"
-              onClick={() => setShowBonus(true)}
-              title="Adjust time"
-            >
-              +/-
-            </button>
-          </div>
-        )}
-        {embedded && (
-          <div className="flex justify-end mb-2">
-            <button
-              type="button"
-              className="btn btn-ghost text-xl font-bold leading-none"
               onClick={() => setShowBonus(true)}
               title="Adjust time"
             >

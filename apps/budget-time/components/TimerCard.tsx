@@ -42,17 +42,17 @@ export function TimerCard({
   }[effectiveBorderColor]
 
   return (
-    <div className={`rounded-lg border-2 px-3 py-2 ${bgClass} ${borderClass}`}>
+    <div className={`flex flex-col h-full rounded-lg border-2 px-3 py-2 ${bgClass} ${borderClass}`}>
       {/* Row 1: Icon + Label */}
-      <div className="flex items-center gap-1.5 mb-1">
-        <Icon size={20} className="text-base-content/80" />
-        <span className="text-lg font-bold text-base-content/80">{label}</span>
+      <div className="mb-1 text-lg font-bold text-base-content/80">
+        <Icon size={20} className="inline align-text-bottom mr-1" />
+        {label}
       </div>
 
-      {/* Row 2: Bottom content + Button */}
-      <div className="flex items-center justify-between gap-2">
+      {/* Row 2: Time + Button - stacks vertically on mobile, side-by-side on sm+ */}
+      <div className="mt-auto sm:mt-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-baseline gap-1.5">{bottomLeft}</div>
-        {button}
+        <div className="w-full sm:w-auto [&>button]:w-full [&>button]:sm:w-auto">{button}</div>
       </div>
     </div>
   )

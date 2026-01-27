@@ -68,9 +68,16 @@ export function KidAccordion({
   // Auto-expand kid with active timer, otherwise first kid
   const activeKidId = statuses.find((s) => s.activeTimer)?.kidId ?? statuses[0]?.kidId
   const [expandedKidId, setExpandedKidId] = useState<number | null>(activeKidId ?? null)
+  const [bonusKidId, setBonusKidId] = useState<number | null>(null)
 
   const handleToggle = (kidId: number) => {
     setExpandedKidId(expandedKidId === kidId ? null : kidId)
+  }
+
+  const handleBonusClick = (e: React.MouseEvent, kidId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setBonusKidId(kidId)
   }
 
   return (
@@ -86,11 +93,19 @@ export function KidAccordion({
               checked={isExpanded}
               onChange={() => handleToggle(status.kidId)}
             />
-            <div className="collapse-title text-2xl font-semibold flex items-center gap-3">
+            <div className="collapse-title text-2xl font-semibold flex items-center gap-2 pr-12">
               {status.kidName}
               {hasActiveTimer && (
                 <span className="badge badge-primary badge-sm animate-pulse">Active</span>
               )}
+              <button
+                type="button"
+                className="ml-auto btn btn-ghost btn-sm text-xl font-bold leading-none px-2"
+                onClick={(e) => handleBonusClick(e, status.kidId)}
+                title="Adjust time"
+              >
+                +/-
+              </button>
             </div>
             <div className="collapse-content">
               {isExpanded && (
@@ -101,6 +116,8 @@ export function KidAccordion({
                   negativeBalancePenalty={negativeBalancePenalty}
                   onRefresh={onRefresh}
                   embedded
+                  showBonus={bonusKidId === status.kidId}
+                  onBonusClose={() => setBonusKidId(null)}
                 />
               )}
             </div>
