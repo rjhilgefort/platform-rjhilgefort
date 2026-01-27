@@ -1,5 +1,44 @@
 # @repo/budget-time
 
+## 0.6.0
+
+### Minor Changes
+
+- ed71d7b: Replace mobile accordion with tabs for kid selection
+
+  - Kids selectable via tabs at top of page
+  - Active timer badge on tabs
+  - Always visible kid switcher regardless of scroll position
+
+- eae6e02: Kid profile pictures
+
+  - Add profile_picture column to kids table
+  - Upload/crop modal with pan/zoom on config page
+  - Server-side HEIC to JPEG conversion
+  - Display avatar on main page (desktop + mobile)
+
+- e02a396: Add configurable timezone and day reset hour
+
+  - add timezone setting (defaults to America/Denver)
+  - add configurable reset hour (0-23, defaults to 4 AM)
+  - day boundary calculations now timezone-aware via date-fns-tz
+  - reorganized General Settings into 2-column grid layout
+
+### Patch Changes
+
+- 78ebc0a: Mobile layout improvements
+
+  - TimerCard: stack time/button vertically on mobile, align to card bottom
+  - Move +/- button to accordion header (right side, before chevron)
+  - Icon now inline with title text (wraps under icon)
+
+- 3f346f2: UI improvements and negative balance protection
+
+  - fix PWA icon to use solid green background
+  - add app icon and branding to login screen
+  - add app icon to main page header
+  - prevent starting budget timers when Extra balance is negative
+
 ## 0.5.1
 
 ### Patch Changes
