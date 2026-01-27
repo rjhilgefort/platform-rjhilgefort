@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { KidCard } from '../components/KidCard'
-import { KidAccordion } from '../components/KidAccordion'
+import { KidTabs } from '../components/KidTabs'
 import { TimeUpSound } from '../components/TimeUpSound'
 import { AppIcon } from '../components/AppIcon'
 
@@ -148,9 +148,9 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Mobile: Accordion view */}
+        {/* Mobile: Tabs view */}
         <div className="md:hidden">
-          <KidAccordion
+          <KidTabs
             statuses={statuses}
             budgetTypes={budgetTypes}
             earningTypes={earningTypes}
