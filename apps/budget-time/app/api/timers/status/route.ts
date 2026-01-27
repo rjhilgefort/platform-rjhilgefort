@@ -61,6 +61,7 @@ export async function GET() {
       return {
         kidId: kid.id,
         kidName: kid.name,
+        profilePicture: kid.profilePicture,
         typeBalances: liveTypeBalances,
         activeTimer,
       }

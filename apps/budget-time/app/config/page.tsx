@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { TbArrowLeft } from 'react-icons/tb'
 import { IconPickerModal } from '../../components/IconPickerModal'
+import { ProfilePictureCropModal } from '../../components/ProfilePictureCropModal'
 import { PinPad } from '../../components/PinPad'
 import { getIconComponent } from '../../lib/icon-registry'
 
@@ -17,6 +18,7 @@ interface BudgetDefault {
 interface KidConfig {
   id: number
   name: string
+  profilePicture: string | null
   budgetDefaults: BudgetDefault[]
 }
 
@@ -70,6 +72,11 @@ export default function ConfigPage() {
     id: number
     currentIcon: string | null
   } | null>(null)
+  const [profilePictureCrop, setProfilePictureCrop] = useState<{
+    kidId: number
+    file: File
+  } | null>(null)
+  const [profilePictureLoading, setProfilePictureLoading] = useState<number | null>(null)
   const [resetConfirm, setResetConfirm] = useState<Set<number>>(new Set())
   const [deleteConfirm, setDeleteConfirm] = useState<Set<string>>(new Set())
   const [savedInputs, setSavedInputs] = useState<Set<string>>(new Set())
@@ -91,6 +98,49 @@ export default function ConfigPage() {
     if (a.isEarningPool !== b.isEarningPool) return a.isEarningPool ? 1 : -1
     return a.displayName.localeCompare(b.displayName)
   })
+
+  const handleProfilePictureSelect = (kidId: number, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file')
+      return
+    }
+    setProfilePictureCrop({ kidId, file })
+  }
+
+  const handleProfilePictureSave = async (kidId: number, profilePicture: string | null) => {
+    setError('')
+    setProfilePictureCrop(null)
+    setProfilePictureLoading(kidId)
+
+    const response = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin,
+        action: 'updateKidProfilePicture',
+        kidId,
+        profilePicture,
+      }),
+    })
+
+    setProfilePictureLoading(null)
+
+    if (response.ok) {
+      setKids((prev) =>
+        prev.map((k) =>
+          k.id === kidId ? { ...k, profilePicture } : k
+        )
+      )
+      showToast(profilePicture ? 'Profile picture updated' : 'Profile picture removed')
+    } else {
+      const data = await response.json()
+      setError(data.error || 'Failed to update profile picture')
+      if (data.error === 'Invalid PIN') {
+        setPinVerified(false)
+        setPin('')
+      }
+    }
+  }
 
   const flashSaved = (key: string) => {
     setSavedInputs((prev) => new Set(prev).add(key))
@@ -744,7 +794,52 @@ export default function ConfigPage() {
           {kids.map((kid) => (
             <div key={kid.id} className="card bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title">{kid.name}</h2>
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="relative">
+                    {profilePictureLoading === kid.id ? (
+                      <div className="w-16 h-16 rounded-full bg-base-300 flex items-center justify-center">
+                        <span className="loading loading-spinner loading-md" />
+                      </div>
+                    ) : kid.profilePicture ? (
+                      <img
+                        src={kid.profilePicture}
+                        alt={kid.name}
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-base-300 flex items-center justify-center">
+                        <span className="text-2xl">{kid.name[0]}</span>
+                      </div>
+                    )}
+                    {profilePictureLoading !== kid.id && (
+                      <label className="absolute -bottom-1 -right-1 btn btn-xs btn-circle btn-primary cursor-pointer">
+                        <span className="text-xs">+</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleProfilePictureSelect(kid.id, file)
+                            e.target.value = ''
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="card-title">{kid.name}</h2>
+                    {kid.profilePicture && profilePictureLoading !== kid.id && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs text-error -ml-2"
+                        onClick={() => handleProfilePictureSave(kid.id, null)}
+                      >
+                        Remove photo
+                      </button>
+                    )}
+                  </div>
+                </div>
 
                 {/* Current Balance Section */}
                 <div className="bg-base-200 rounded-lg p-4 mt-2">
@@ -1298,6 +1393,17 @@ export default function ConfigPage() {
         onClose={() => setIconPickerTarget(null)}
         onSelect={handleIconSelect}
         currentIcon={iconPickerTarget?.currentIcon ?? null}
+      />
+
+      <ProfilePictureCropModal
+        isOpen={profilePictureCrop !== null}
+        imageFile={profilePictureCrop?.file ?? null}
+        onConfirm={(base64) => {
+          if (profilePictureCrop) {
+            handleProfilePictureSave(profilePictureCrop.kidId, base64)
+          }
+        }}
+        onCancel={() => setProfilePictureCrop(null)}
       />
     </div>
   )

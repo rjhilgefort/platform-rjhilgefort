@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../db/client'
-import { budgetTypes, earningTypes, kidBudgetDefaults } from '../../../db/schema'
+import { budgetTypes, earningTypes, kidBudgetDefaults, kids } from '../../../db/schema'
 import { getNegativeBalancePenalty, getTimezone, getResetHour, setAppSetting } from '../../../lib/balance'
 import { validateParentPin } from '../../../lib/auth'
 
@@ -37,6 +37,7 @@ export async function GET() {
     return {
       id: kid.id,
       name: kid.name,
+      profilePicture: kid.profilePicture,
       budgetDefaults,
     }
   })
@@ -276,6 +277,30 @@ export async function PUT(request: Request) {
 
       await setAppSetting('resetHour', resetHour.toString())
       return NextResponse.json({ resetHour })
+    }
+
+    case 'updateKidProfilePicture': {
+      const { kidId, profilePicture } = body
+      if (!kidId) {
+        return NextResponse.json({ error: 'kidId required' }, { status: 400 })
+      }
+
+      // Validate base64 image format if provided
+      if (profilePicture && typeof profilePicture === 'string') {
+        if (!profilePicture.startsWith('data:image/')) {
+          return NextResponse.json(
+            { error: 'Invalid image format - must be a data URL' },
+            { status: 400 }
+          )
+        }
+      }
+
+      await db
+        .update(kids)
+        .set({ profilePicture: profilePicture ?? null })
+        .where(eq(kids.id, kidId))
+
+      return NextResponse.json({ success: true })
     }
 
     default:

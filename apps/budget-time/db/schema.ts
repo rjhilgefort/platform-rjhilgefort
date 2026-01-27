@@ -43,6 +43,7 @@ export const earningTypes = pgTable('earning_types', {
 export const kids = pgTable('kids', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
+  profilePicture: text('profile_picture'),
 })
 
 // Per-kid daily budget defaults

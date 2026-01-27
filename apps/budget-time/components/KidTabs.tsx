@@ -35,6 +35,7 @@ interface EarningType {
 interface KidStatus {
   kidId: number
   kidName: string
+  profilePicture: string | null
   typeBalances: TypeBalance[]
   activeTimer: {
     budgetTypeId: number
@@ -100,7 +101,20 @@ export function KidTabs({
       {selectedStatus && (
         <div className="bg-base-100 rounded-lg shadow-xl p-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">{selectedStatus.kidName}</h2>
+            <div className="flex items-center gap-3">
+              {selectedStatus.profilePicture ? (
+                <img
+                  src={selectedStatus.profilePicture}
+                  alt={selectedStatus.kidName}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-base-300 flex items-center justify-center">
+                  <span className="text-2xl">{selectedStatus.kidName[0]}</span>
+                </div>
+              )}
+              <h2 className="text-2xl font-semibold">{selectedStatus.kidName}</h2>
+            </div>
             <button
               type="button"
               className="btn btn-ghost text-xl font-bold leading-none px-2"

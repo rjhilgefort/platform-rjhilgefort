@@ -39,6 +39,7 @@ interface EarningType {
 interface KidStatus {
   kidId: number
   kidName: string
+  profilePicture: string | null
   typeBalances: TypeBalance[]
   activeTimer: {
     budgetTypeId: number

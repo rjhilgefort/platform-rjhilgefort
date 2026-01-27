@@ -44,6 +44,7 @@ interface EarningType {
 interface KidStatus {
   kidId: number
   kidName: string
+  profilePicture: string | null
   typeBalances: TypeBalance[]
   activeTimer: {
     budgetTypeId: number
@@ -219,7 +220,20 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
       <div className={embedded ? '' : 'card-body flex-1 flex flex-col'}>
         {!embedded && (
           <div className="flex justify-between items-center">
-            <h2 className="card-title text-2xl">{status.kidName}</h2>
+            <div className="flex items-center gap-3">
+              {status.profilePicture ? (
+                <img
+                  src={status.profilePicture}
+                  alt={status.kidName}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-base-300 flex items-center justify-center">
+                  <span className="text-xl font-semibold">{status.kidName[0]}</span>
+                </div>
+              )}
+              <h2 className="card-title text-2xl">{status.kidName}</h2>
+            </div>
             <button
               type="button"
               className="btn btn-ghost text-2xl font-bold leading-none"
