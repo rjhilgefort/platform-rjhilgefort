@@ -1,6 +1,7 @@
 # TODO
+
+- [ ] let's show the available extra time if there is any when a chore timer is running so the kids know how much time they have after their timer runs out.
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?) implement in plan mode.
-- [ ] Allow configuring profile picture per kid (TBD: where to store/display)
 
 # Ideas
 
