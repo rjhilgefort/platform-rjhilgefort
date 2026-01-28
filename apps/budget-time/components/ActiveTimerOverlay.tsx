@@ -126,6 +126,16 @@ export function ActiveTimerOverlay({
             style={{ width: `${percentRemaining}%` }}
           />
         </div>
+
+        {/* Show available Extra time (for non-Extra budgets) */}
+        {budgetTypeSlug !== 'extra' && (
+          <div className={`flex items-center gap-2 ${extraRemainingSeconds > 0 ? 'text-success' : 'text-warning'}`}>
+            <ExtraIcon size={24} />
+            <span className="text-lg">
+              then <TimeDisplay seconds={extraRemainingSeconds} className="inline text-lg" /> Extra
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Stop button */}
