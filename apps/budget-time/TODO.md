@@ -1,7 +1,8 @@
 # TODO
 
-- [ ] let's show the available extra time if there is any when a chore timer is running so the kids know how much time they have after their timer runs out.
+- [ ] make sure we're not looking for the extra time timer via the slug like this `{budgetTypeSlug !== 'extra'`. Should always be using the db column.
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?) implement in plan mode.
+- [ ] timer history page. This Will allow us to audit the times that happened in the past. It can be one page but then have a filter so we can filter by kid if desired. Use plan mode for this and let's talk about it.
 
 # Ideas
 
