@@ -77,7 +77,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
           carryoverSeconds: 0,
         }
       })
-      await db.insert(dailyTypeBalances).values(newBalances)
+      await db.insert(dailyTypeBalances).values(newBalances).onConflictDoNothing()
     }
 
     // Re-fetch to get complete data
@@ -113,17 +113,33 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
     })
   }
 
-  // Create today's balance
-  const [newBalance] = await db
+  // Create today's balance (handle race condition with onConflictDoNothing)
+  const [insertedBalance] = await db
     .insert(dailyBalances)
     .values({
       kidId,
       date: today,
     })
+    .onConflictDoNothing()
     .returning()
+
+  // If insert returned nothing, another request created it - fetch it
+  const newBalance = insertedBalance ?? await db.query.dailyBalances.findFirst({
+    where: and(eq(dailyBalances.kidId, kidId), eq(dailyBalances.date, today)),
+  })
 
   if (!newBalance) {
     throw new Error('Failed to create balance')
+  }
+
+  // Check if type balances already exist (created by the other request)
+  const existingTypeBalances = await db.query.dailyTypeBalances.findMany({
+    where: eq(dailyTypeBalances.dailyBalanceId, newBalance.id),
+  })
+
+  if (existingTypeBalances.length > 0) {
+    // Another request already created the type balances, return them
+    return buildFullBalance(newBalance, existingTypeBalances, allBudgetTypes)
   }
 
   // Create type balances for each budget type
@@ -140,10 +156,20 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
     }
   })
 
-  await db.insert(dailyTypeBalances).values(typeBalanceValues)
+  await db.insert(dailyTypeBalances).values(typeBalanceValues).onConflictDoNothing()
 
   const createdTypeBalances = await db.query.dailyTypeBalances.findMany({
     where: eq(dailyTypeBalances.dailyBalanceId, newBalance.id),
+  })
+
+  // Log new day balance creation for debugging
+  console.log(`[balance] Created new daily balance for kid ${kidId} on ${today}:`, {
+    balanceId: newBalance.id,
+    typeBalances: createdTypeBalances.map((tb) => ({
+      budgetTypeId: tb.budgetTypeId,
+      remainingSeconds: tb.remainingSeconds,
+      carryoverSeconds: tb.carryoverSeconds,
+    })),
   })
 
   return buildFullBalance(newBalance, createdTypeBalances, allBudgetTypes)
