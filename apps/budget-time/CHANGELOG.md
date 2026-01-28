@@ -1,5 +1,15 @@
 # @repo/budget-time
 
+## 0.7.0
+
+### Minor Changes
+
+- aec00d5: add cron job for daily balance creation at reset hour
+
+### Patch Changes
+
+- 9bce314: show Extra time available during active consumption timers
+
 ## 0.6.0
 
 ### Minor Changes
