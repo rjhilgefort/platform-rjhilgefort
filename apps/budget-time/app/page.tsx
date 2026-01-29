@@ -144,9 +144,14 @@ export default function HomePage() {
             <AppIcon size={40} />
             <h1 className="text-3xl font-bold">Budget Time</h1>
           </div>
-          <Link href="/config" className="btn btn-outline btn-sm">
-            Settings
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/history" className="btn btn-outline btn-sm">
+              History
+            </Link>
+            <Link href="/config" className="btn btn-outline btn-sm">
+              Settings
+            </Link>
+          </div>
         </div>
 
         {/* Mobile: Tabs view */}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db } from '../../../../db/client'
-import { kids, earningTypes, timerHistory } from '../../../../db/schema'
+import { kids, earningTypes, timerEvents } from '../../../../db/schema'
 import { validateParentPin } from '../../../../lib/auth'
 import { updateBalance, getOrCreateTodayBalance, getEarningPoolBudgetType } from '../../../../lib/balance'
 import { calculateEarnings } from '../../../../lib/timer-logic'
@@ -62,11 +62,14 @@ export async function POST(request: Request) {
     await updateBalance(kidId, earningPool.id, earnedSeconds)
 
     // Log to history
-    await db.insert(timerHistory).values({
+    const now = new Date()
+    await db.insert(timerEvents).values({
       kidId,
       eventType: 'simulated_earned',
       budgetTypeId: earningPool.id,
       earningTypeId,
+      startedAt: now,
+      endedAt: now,
       seconds: earnedSeconds,
     })
   } catch (err) {

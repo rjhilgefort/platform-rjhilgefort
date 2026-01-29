@@ -1,4 +1,4 @@
-import { ActiveTimer, EarningType } from '../db/schema'
+import { TimerEvent, EarningType } from '../db/schema'
 import { TypeBalance, FullDailyBalance } from './balance'
 
 export interface TimerState {
@@ -30,7 +30,7 @@ export function calculateElapsedSeconds(startedAt: Date, now: Date = new Date())
  */
 export function calculateRemainingTime(
   balance: FullDailyBalance,
-  activeTimer: ActiveTimer | null,
+  activeTimer: TimerEvent | null,
   budgetTypeId: number,
   now: Date = new Date()
 ): number {
@@ -40,7 +40,7 @@ export function calculateRemainingTime(
   const baseRemaining = typeBalance.remainingSeconds
 
   // Only subtract if this is a consumption timer (no earningTypeId) for this budget type
-  if (activeTimer && activeTimer.budgetTypeId === budgetTypeId && !activeTimer.earningTypeId) {
+  if (activeTimer && activeTimer.startedAt && activeTimer.budgetTypeId === budgetTypeId && !activeTimer.earningTypeId) {
     const elapsed = calculateElapsedSeconds(activeTimer.startedAt, now)
     // Non-Extra budgets clamp at 0, Extra (isEarningPool) can go negative
     if (typeBalance.isEarningPool) {
@@ -53,6 +53,7 @@ export function calculateRemainingTime(
   if (
     typeBalance.isEarningPool &&
     activeTimer &&
+    activeTimer.startedAt &&
     !activeTimer.earningTypeId &&
     activeTimer.budgetTypeId !== budgetTypeId
   ) {

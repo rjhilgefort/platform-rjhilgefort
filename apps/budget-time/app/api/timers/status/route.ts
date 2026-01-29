@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { eq } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 import { db } from '../../../../db/client'
-import { activeTimers, budgetTypes, earningTypes } from '../../../../db/schema'
+import { budgetTypes, earningTypes } from '../../../../db/schema'
 import { getOrCreateTodayBalance, getAllBudgetTypes, getNegativeBalancePenalty } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateRemainingTime } from '../../../../lib/timer-logic'
 
@@ -21,12 +21,12 @@ export async function GET() {
   const statuses = await Promise.all(
     allKids.map(async (kid) => {
       const balance = await getOrCreateTodayBalance(kid.id)
-      const timer = await db.query.activeTimers.findFirst({
-        where: eq(activeTimers.kidId, kid.id),
+      const timer = await db.query.timerEvents.findFirst({
+        where: (te, { and }) => and(eq(te.kidId, kid.id), isNull(te.endedAt)),
       })
 
       let activeTimer = null
-      if (timer) {
+      if (timer && timer.startedAt) {
         const elapsedSeconds = calculateElapsedSeconds(timer.startedAt, now)
         const budgetType = await db.query.budgetTypes.findFirst({
           where: eq(budgetTypes.id, timer.budgetTypeId),
@@ -53,9 +53,11 @@ export async function GET() {
       }
 
       // Calculate live remaining time for each budget type
+      // Only pass timer if it has a valid startedAt
+      const validTimer = timer && timer.startedAt ? timer : null
       const liveTypeBalances = balance.typeBalances.map((tb) => ({
         ...tb,
-        remainingSeconds: calculateRemainingTime(balance, timer ?? null, tb.budgetTypeId, now),
+        remainingSeconds: calculateRemainingTime(balance, validTimer, tb.budgetTypeId, now),
       }))
 
       return {

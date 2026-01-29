@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { eq } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 import { db } from '../../../../db/client'
-import { activeTimers, kids, budgetTypes, earningTypes } from '../../../../db/schema'
+import { timerEvents, kids, budgetTypes, earningTypes } from '../../../../db/schema'
 import { getOrCreateTodayBalance } from '../../../../lib/balance'
 
 export async function POST(request: Request) {
@@ -55,9 +55,9 @@ export async function POST(request: Request) {
     }
   }
 
-  // Check for existing active timer
-  const existingTimer = await db.query.activeTimers.findFirst({
-    where: eq(activeTimers.kidId, kidId),
+  // Check for existing active timer (ended_at IS NULL means active)
+  const existingTimer = await db.query.timerEvents.findFirst({
+    where: (te, { and }) => and(eq(te.kidId, kidId), isNull(te.endedAt)),
   })
 
   if (existingTimer) {
@@ -91,14 +91,17 @@ export async function POST(request: Request) {
     }
   }
 
-  // Create active timer
+  // Create active timer (in_progress with ended_at = NULL)
   const result = await db
-    .insert(activeTimers)
+    .insert(timerEvents)
     .values({
       kidId,
+      eventType: 'in_progress',
       budgetTypeId,
       earningTypeId: earningTypeId ?? null,
       startedAt: new Date(),
+      endedAt: null,
+      seconds: 0,
     })
     .returning()
 
@@ -117,7 +120,7 @@ export async function POST(request: Request) {
       earningTypeId: timer.earningTypeId,
       earningTypeSlug: earningType?.slug ?? null,
       earningTypeDisplayName: earningType?.displayName ?? null,
-      startedAt: timer.startedAt.toISOString(),
+      startedAt: timer.startedAt?.toISOString() ?? new Date().toISOString(),
     },
     balance: {
       typeBalances: balance.typeBalances,

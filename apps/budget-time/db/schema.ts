@@ -91,35 +91,29 @@ export const dailyTypeBalances = pgTable(
   (t) => [unique().on(t.dailyBalanceId, t.budgetTypeId)]
 )
 
-export const activeTimers = pgTable(
-  'active_timers',
+// Unified timer events table - active timers have ended_at = NULL
+export const timerEvents = pgTable(
+  'timer_events',
   {
     id: serial('id').primaryKey(),
     kidId: integer('kid_id')
       .references(() => kids.id)
       .notNull(),
+    eventType: text('event_type').notNull(), // 'in_progress', 'earned', 'budget_used'
     budgetTypeId: integer('budget_type_id')
       .references(() => budgetTypes.id)
       .notNull(),
     earningTypeId: integer('earning_type_id').references(() => earningTypes.id),
-    startedAt: timestamp('started_at', { withTimezone: true }).notNull(),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    endedAt: timestamp('ended_at', { withTimezone: true }),
+    seconds: integer('seconds').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   },
-  (table) => [unique().on(table.kidId)]
+  (t) => [
+    // Enforce one active timer per kid (ended_at IS NULL means active)
+    uniqueIndex('unique_active_timer_per_kid').on(t.kidId).where(sql`${t.endedAt} IS NULL`),
+  ]
 )
-
-export const timerHistory = pgTable('timer_history', {
-  id: serial('id').primaryKey(),
-  kidId: integer('kid_id')
-    .references(() => kids.id)
-    .notNull(),
-  eventType: text('event_type').notNull(),
-  budgetTypeId: integer('budget_type_id')
-    .references(() => budgetTypes.id)
-    .notNull(),
-  earningTypeId: integer('earning_type_id').references(() => earningTypes.id),
-  seconds: integer('seconds').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-})
 
 // Global app settings (key-value store)
 export const appSettings = pgTable('app_settings', {
@@ -139,9 +133,7 @@ export type DailyBalance = typeof dailyBalances.$inferSelect
 export type NewDailyBalance = typeof dailyBalances.$inferInsert
 export type DailyTypeBalance = typeof dailyTypeBalances.$inferSelect
 export type NewDailyTypeBalance = typeof dailyTypeBalances.$inferInsert
-export type ActiveTimer = typeof activeTimers.$inferSelect
-export type NewActiveTimer = typeof activeTimers.$inferInsert
-export type TimerHistoryEntry = typeof timerHistory.$inferSelect
-export type NewTimerHistoryEntry = typeof timerHistory.$inferInsert
+export type TimerEvent = typeof timerEvents.$inferSelect
+export type NewTimerEvent = typeof timerEvents.$inferInsert
 export type AppSetting = typeof appSettings.$inferSelect
 export type NewAppSetting = typeof appSettings.$inferInsert
