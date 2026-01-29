@@ -1,8 +1,6 @@
 # TODO
 
-- [ ] I have an idea to do this thing and I want you to do this thing and here's another constraint of how to do this thing and then one more thing that I want you to do with us. I'm not quite sure about doing X or why, can you give me options on which one would be better or which is more popular. Make sure to do this in plan mode
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?) implement in plan mode.
-- [ ] timer history page. This Will allow us to audit the times that happened in the past. It can be one page but then have a filter so we can filter by kid if desired. Use plan mode for this and let's talk about it.
 
 # Ideas
 
@@ -31,3 +29,4 @@
 - [x] on a phone, we should have an accordion for the kids so you can click into each one without having to scroll so much.
 - [x] for the ad additional time plus button on the main page. I want to be prompted for a passcode first and then I want to be able to add or subtract time in that view. So in addition to adding time I want to be able to subtract time. I should be able to hit the buttons as many times as I want after I put the passcode in, but after I close that model, then I would need a passcode to get back in. Lastly, we need to pick a different icon. A +/- would be good.
 - [x] make sure we're not looking for the extra time timer via the slug like this `{budgetTypeSlug !== 'extra'`. Should always be using the db column.
+- [x] timer history page. This Will allow us to audit the times that happened in the past. It can be one page but then have a filter so we can filter by kid if desired. Use plan mode for this and let's talk about it.
