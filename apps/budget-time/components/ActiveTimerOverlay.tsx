@@ -7,6 +7,7 @@ interface ActiveTimerOverlayProps {
   budgetTypeSlug: string
   budgetTypeDisplayName: string
   budgetTypeIcon?: string | null
+  isEarningPool: boolean
   remainingSeconds: number
   startingSeconds: number
   isEarningToExtra: boolean
@@ -21,6 +22,7 @@ export function ActiveTimerOverlay({
   budgetTypeSlug,
   budgetTypeDisplayName,
   budgetTypeIcon,
+  isEarningPool,
   remainingSeconds,
   startingSeconds,
   isEarningToExtra,
@@ -128,7 +130,7 @@ export function ActiveTimerOverlay({
         </div>
 
         {/* Show available Extra time (for non-Extra budgets) */}
-        {budgetTypeSlug !== 'extra' && (
+        {!isEarningPool && (
           <div className={`flex items-center gap-2 ${extraRemainingSeconds > 0 ? 'text-success' : 'text-warning'}`}>
             <ExtraIcon size={24} />
             <span className="text-lg">

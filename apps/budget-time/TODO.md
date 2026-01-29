@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] I have an idea to do this thing and I want you to do this thing and here's another constraint of how to do this thing and then one more thing that I want you to do with us. I'm not quite sure about doing X or why, can you give me options on which one would be better or which is more popular. Make sure to do this in plan mode
 - [ ] make sure we're not looking for the extra time timer via the slug like this `{budgetTypeSlug !== 'extra'`. Should always be using the db column.
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?) implement in plan mode.
 - [ ] timer history page. This Will allow us to audit the times that happened in the past. It can be one page but then have a filter so we can filter by kid if desired. Use plan mode for this and let's talk about it.

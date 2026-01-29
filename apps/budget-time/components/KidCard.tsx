@@ -311,6 +311,7 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
                 budgetTypeSlug={activeBudgetTimer.budgetTypeSlug}
                 budgetTypeDisplayName={activeBudgetTimer.budgetTypeDisplayName}
                 budgetTypeIcon={activeBudgetTimer.budgetTypeIcon}
+                isEarningPool={activeTimerBalance?.isEarningPool ?? false}
                 remainingSeconds={activeTimerCountdown}
                 startingSeconds={activeTimerBaseSeconds}
                 isEarningToExtra={false}
