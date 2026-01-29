@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.7.1
+
+### Patch Changes
+
+- 98f1add: use isEarningPool db column instead of slug checks for Extra budget type
+
 ## 0.7.0
 
 ### Minor Changes
