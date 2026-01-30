@@ -1,5 +1,11 @@
 # @repo/budget-time
 
+## 0.8.2
+
+### Patch Changes
+
+- b0a13ea: fix: show loading spinner with icon/title until data loaded, prevent stale timer values on refresh
+
 ## 0.8.1
 
 ### Patch Changes
