@@ -64,10 +64,7 @@ interface StatusResponse {
 }
 
 export default function HomePage() {
-  const [statuses, setStatuses] = useState<KidStatus[]>([])
-  const [budgetTypes, setBudgetTypes] = useState<BudgetType[]>([])
-  const [earningTypes, setEarningTypes] = useState<EarningType[]>([])
-  const [negativeBalancePenalty, setNegativeBalancePenalty] = useState(0)
+  const [data, setData] = useState<StatusResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const prevTimesRef = useRef<Record<number, Record<number, number>>>({})
@@ -75,11 +72,8 @@ export default function HomePage() {
   const fetchStatus = useCallback(async () => {
     const response = await fetch('/api/timers/status')
     if (response.ok) {
-      const data: StatusResponse = await response.json()
-      setStatuses(data.statuses)
-      setBudgetTypes(data.budgetTypes)
-      setEarningTypes(data.earningTypes)
-      setNegativeBalancePenalty(data.negativeBalancePenalty)
+      const responseData: StatusResponse = await response.json()
+      setData(responseData)
       setError('')
     } else {
       setError('Failed to load status')
@@ -92,6 +86,11 @@ export default function HomePage() {
     const interval = setInterval(fetchStatus, 30000) // Sync every 30s, client handles countdown
     return () => clearInterval(interval)
   }, [fetchStatus])
+
+  const statuses = data?.statuses ?? []
+  const budgetTypes = data?.budgetTypes ?? []
+  const earningTypes = data?.earningTypes ?? []
+  const negativeBalancePenalty = data?.negativeBalancePenalty ?? 0
 
   // Track when any timer hits zero
   const shouldPlaySound = statuses.some((status) => {
@@ -115,7 +114,8 @@ export default function HomePage() {
     prevTimesRef.current = newPrev
   }, [statuses])
 
-  if (loading) {
+  // Show loading until we have data
+  if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-200">
         <span className="loading loading-spinner loading-lg" />
