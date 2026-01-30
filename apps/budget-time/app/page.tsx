@@ -117,7 +117,11 @@ export default function HomePage() {
   // Show loading until we have data
   if (loading || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 gap-4">
+        <div className="flex items-center gap-3">
+          <AppIcon size={40} />
+          <h1 className="text-3xl font-bold">Budget Time</h1>
+        </div>
         <span className="loading loading-spinner loading-lg" />
       </div>
     )
@@ -125,7 +129,11 @@ export default function HomePage() {
 
   if (statuses.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 gap-4">
+        <div className="flex items-center gap-3">
+          <AppIcon size={40} />
+          <h1 className="text-3xl font-bold">Budget Time</h1>
+        </div>
         <div className="text-center">
           <p className="text-lg mb-4">No kids configured</p>
           <Link href="/config" className="btn btn-primary">Go to Settings</Link>
@@ -136,7 +144,11 @@ export default function HomePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 gap-4">
+        <div className="flex items-center gap-3">
+          <AppIcon size={40} />
+          <h1 className="text-3xl font-bold">Budget Time</h1>
+        </div>
         <div className="alert alert-error">
           <span>{error}</span>
           <button type="button" className="btn btn-sm" onClick={fetchStatus}>
