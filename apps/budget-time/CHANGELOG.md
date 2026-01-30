@@ -1,5 +1,12 @@
 # @repo/budget-time
 
+## 0.8.1
+
+### Patch Changes
+
+- 4101989: fix: timer countdown updates when bonus time added during active timer
+- 8fa4424: fix: preserve negative Extra balance on daily reset
+
 ## 0.8.0
 
 ### Minor Changes
