@@ -123,6 +123,17 @@ export default function HomePage() {
     )
   }
 
+  if (statuses.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-200">
+        <div className="text-center">
+          <p className="text-lg mb-4">No kids configured</p>
+          <Link href="/config" className="btn btn-primary">Go to Settings</Link>
+        </div>
+      </div>
+    )
+  }
+
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-200">
