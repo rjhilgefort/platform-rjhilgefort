@@ -103,10 +103,9 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
     ? activeTimerBalance.remainingSeconds + (status.activeTimer?.elapsedSeconds ?? 0)
     : 0
 
-  // Update cache when timer starts or changes
+  // Cache original values when timer starts (used only during overflow to prevent flicker)
   useEffect(() => {
     if (activeBudgetTimer) {
-      // Only set cache if this is a new timer (different startedAt)
       if (timerCacheRef.current?.startedAt !== activeBudgetTimer.startedAt) {
         timerCacheRef.current = {
           startedAt: activeBudgetTimer.startedAt,
@@ -119,14 +118,18 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
     }
   }, [activeBudgetTimer, calculatedBaseSeconds, extraBalance])
 
-  // Use cached values if available, otherwise use calculated
+  // Use cached values only during overflow to prevent flicker
+  // Otherwise use fresh calculated values to reflect bonus additions
   const timerCache = timerCacheRef.current
+  const isInOverflow = activeBudgetTimer &&
+    !activeTimerBalance?.isEarningPool &&
+    (activeTimerBalance?.remainingSeconds ?? 0) === 0
   const activeTimerBaseSeconds =
-    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt
+    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt && isInOverflow
       ? timerCache.budgetSeconds
       : calculatedBaseSeconds
   const cachedExtraSeconds =
-    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt
+    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt && isInOverflow
       ? timerCache.extraSeconds
       : extraBalance
 
