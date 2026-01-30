@@ -146,7 +146,11 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
   const typeBalanceValues = allBudgetTypes.map((bt) => {
     const defaultMinutes = defaults.find((d) => d.budgetTypeId === bt.id)?.dailyBudgetMinutes ?? 60
     const yesterdayTb = yesterdayTypeBalances.find((ytb) => ytb.budgetTypeId === bt.id)
-    const carryover = bt.allowCarryover && yesterdayTb ? Math.max(0, yesterdayTb.remainingSeconds) : 0
+    // For earning pool (Extra), preserve negative balance as debt to pay back
+    // For regular budgets, only carry over positive remaining time
+    const carryover = bt.allowCarryover && yesterdayTb
+      ? (bt.isEarningPool ? yesterdayTb.remainingSeconds : Math.max(0, yesterdayTb.remainingSeconds))
+      : 0
 
     return {
       dailyBalanceId: newBalance.id,
