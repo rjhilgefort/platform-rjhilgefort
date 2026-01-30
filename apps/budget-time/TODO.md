@@ -1,6 +1,8 @@
 # TODO
 
 - [ ] Replace time inputs on settings page with sliders (TBD: what to do about the max value?) implement in plan mode.
+- [ ] Should timers auto-stop after 3 or 4 hours to prevent runaway timers?
+- [ ] Setup notifications
 
 # Ideas
 
