@@ -118,8 +118,8 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
     }
   }, [activeBudgetTimer, calculatedBaseSeconds, extraBalance])
 
-  // Use cached values only during overflow to prevent flicker
-  // Otherwise use fresh calculated values to reflect bonus additions
+  // Use cached budgetSeconds only during overflow to prevent flicker
+  // Always use fresh extraBalance - server has correct value, overflow is calculated client-side
   const timerCache = timerCacheRef.current
   const isInOverflow = activeBudgetTimer &&
     !activeTimerBalance?.isEarningPool &&
@@ -128,10 +128,7 @@ export function KidCard({ status, budgetTypes, earningTypes, negativeBalancePena
     timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt && isInOverflow
       ? timerCache.budgetSeconds
       : calculatedBaseSeconds
-  const cachedExtraSeconds =
-    timerCache && timerCache.startedAt === activeBudgetTimer?.startedAt && isInOverflow
-      ? timerCache.extraSeconds
-      : extraBalance
+  const cachedExtraSeconds = extraBalance
 
   const activeTimerCountdown = useCountdown(
     activeBudgetTimer?.startedAt ?? null,
