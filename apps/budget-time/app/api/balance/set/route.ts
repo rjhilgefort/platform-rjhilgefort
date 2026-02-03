@@ -4,6 +4,7 @@ import { db } from '../../../../db/client'
 import { kids, budgetTypes } from '../../../../db/schema'
 import { validateParentPin } from '../../../../lib/auth'
 import { setBalance, getOrCreateTodayBalance } from '../../../../lib/balance'
+import { eventBroadcaster } from '../../../../lib/events'
 
 export async function POST(request: Request) {
   const { kidId, pin, budgetTypeId, minutes } = await request.json()
@@ -40,6 +41,15 @@ export async function POST(request: Request) {
   await setBalance(kidId, budgetTypeId, seconds)
 
   const balance = await getOrCreateTodayBalance(kidId)
+  const typeBalance = balance.typeBalances.find((tb) => tb.budgetTypeId === budgetTypeId)
+
+  // Broadcast event
+  eventBroadcaster.emit({
+    type: 'balance_updated',
+    kidId,
+    budgetTypeId,
+    remainingSeconds: typeBalance?.remainingSeconds ?? seconds,
+  })
 
   return NextResponse.json({
     balance: {

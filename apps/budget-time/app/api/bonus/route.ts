@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '../../../db/client'
 import { kids, timerEvents, budgetTypes } from '../../../db/schema'
 import { updateBalance, getOrCreateTodayBalance } from '../../../lib/balance'
+import { eventBroadcaster } from '../../../lib/events'
 
 export async function POST(request: Request) {
   const { kidId, minutes, budgetTypeId } = await request.json()
@@ -55,6 +56,9 @@ export async function POST(request: Request) {
   })
 
   const balance = await getOrCreateTodayBalance(kidId)
+
+  // Broadcast event
+  eventBroadcaster.emit({ type: 'bonus_added', kidId, budgetTypeId, minutes })
 
   return NextResponse.json({
     adjusted: { minutes, budgetTypeId, budgetTypeDisplayName: budgetType.displayName },

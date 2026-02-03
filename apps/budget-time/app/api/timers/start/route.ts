@@ -3,6 +3,7 @@ import { eq, isNull } from 'drizzle-orm'
 import { db } from '../../../../db/client'
 import { timerEvents, kids, budgetTypes, earningTypes } from '../../../../db/schema'
 import { getOrCreateTodayBalance } from '../../../../lib/balance'
+import { eventBroadcaster } from '../../../../lib/events'
 
 export async function POST(request: Request) {
   const { kidId, budgetTypeId: requestedBudgetTypeId, earningTypeId } = await request.json()
@@ -109,6 +110,14 @@ export async function POST(request: Request) {
   if (!timer) {
     return NextResponse.json({ error: 'Failed to create timer' }, { status: 500 })
   }
+
+  // Broadcast event to connected clients
+  eventBroadcaster.emit({
+    type: 'timer_started',
+    kidId,
+    budgetTypeId: earningTypeId ? undefined : budgetTypeId,
+    earningTypeId: earningTypeId ?? undefined,
+  })
 
   return NextResponse.json({
     timer: {

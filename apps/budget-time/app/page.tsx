@@ -6,6 +6,7 @@ import { KidCard } from '../components/KidCard'
 import { KidTabs } from '../components/KidTabs'
 import { TimeUpSound } from '../components/TimeUpSound'
 import { AppIcon } from '../components/AppIcon'
+import { useServerEvents } from '../hooks/useServerEvents'
 
 interface TypeBalance {
   budgetTypeId: number
@@ -81,9 +82,17 @@ export default function HomePage() {
     setLoading(false)
   }, [])
 
+  // Subscribe to real-time updates via SSE
+  useServerEvents(useCallback((event) => {
+    // Refetch on any state-changing event
+    if (event.type !== 'connected' && event.type !== 'ping') {
+      fetchStatus()
+    }
+  }, [fetchStatus]))
+
   useEffect(() => {
     fetchStatus()
-    const interval = setInterval(fetchStatus, 30000) // Sync every 30s, client handles countdown
+    const interval = setInterval(fetchStatus, 30000) // Backup sync every 30s
     return () => clearInterval(interval)
   }, [fetchStatus])
 

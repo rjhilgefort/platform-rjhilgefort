@@ -4,6 +4,7 @@ import { db } from '../../../../db/client'
 import { kids, kidBudgetDefaults } from '../../../../db/schema'
 import { validateParentPin } from '../../../../lib/auth'
 import { setBalance, getOrCreateTodayBalance } from '../../../../lib/balance'
+import { eventBroadcaster } from '../../../../lib/events'
 
 export async function POST(request: Request) {
   const { kidId, pin } = await request.json()
@@ -45,6 +46,9 @@ export async function POST(request: Request) {
   }
 
   const balance = await getOrCreateTodayBalance(kidId)
+
+  // Broadcast event
+  eventBroadcaster.emit({ type: 'balances_reset', kidId })
 
   return NextResponse.json({
     balance: {

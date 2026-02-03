@@ -9,6 +9,7 @@ import {
   getNegativeBalancePenalty,
 } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateEarnings } from '../../../../lib/timer-logic'
+import { eventBroadcaster } from '../../../../lib/events'
 
 export async function POST(request: Request) {
   const { kidId } = await request.json()
@@ -81,6 +82,9 @@ export async function POST(request: Request) {
 
     // Get updated balance
     const balance = await getOrCreateTodayBalance(kidId)
+
+    // Broadcast event
+    eventBroadcaster.emit({ type: 'timer_stopped', kidId, elapsedSeconds: earnedSeconds })
 
     return NextResponse.json({
       stopped: {
@@ -174,6 +178,9 @@ export async function POST(request: Request) {
 
     // Get updated balance
     const balance = await getOrCreateTodayBalance(kidId)
+
+    // Broadcast event
+    eventBroadcaster.emit({ type: 'timer_stopped', kidId, elapsedSeconds })
 
     return NextResponse.json({
       stopped: {
