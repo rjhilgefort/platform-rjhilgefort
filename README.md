@@ -85,7 +85,10 @@ platform-rjhilgefort/
 │   ├── bergen-meadow/                   # Bergen Meadow update site
 │   ├── blank/                           # Blank template app
 │   ├── bright-future/                   # Bright Future preschool site
-│   └── dg-rating-converter/             # DG Rating Converter tool
+│   ├── budget-time/                     # Budget tracking PWA
+│   ├── dg-rating-converter/             # Disc golf rating converter tool
+│   ├── proof-n-pour/                    # Cincinnati bourbon tasting events
+│   └── srh-personal/                    # Stephanie's personal/portfolio site
 ├── packages/                            # Shared packages
 │   ├── eslint-config/                   # Shared ESLint configuration
 │   ├── portainer-stack-redeploy/        # Stack redeployment utilities
@@ -114,13 +117,16 @@ Shared packages are used across multiple apps:
 
 ## Development Ports / Live URLs
 
-| App                 | Port                   | Live URL                                   |
-| ------------------- | ---------------------- | ------------------------------------------ |
-| Blank               | http://localhost:3000/ |                                            |
-| Bright Future       | http://localhost:3001/ | https://brightfuture-preschool.com/contact |
-| Ally Personal       | http://localhost:3002/ | https://ally.hilgefort.me/                 |
-| Bergen Meadow       | http://localhost:3003/ | https://bergenmeadowupdate.com/            |
-| DG Rating Converter | http://localhost:3004/ | https://dgratingconverter.com/             |
+| App                                                      | Port                   | Live URL                           |
+| -------------------------------------------------------- | ---------------------- | ---------------------------------- |
+| [Blank](apps/blank/README.md)                            | http://localhost:3000/ |                                    |
+| [Bright Future](apps/bright-future/README.md)            | http://localhost:3001/ | https://brightfuture-preschool.com |
+| [Ally Personal](apps/ally-personal/README.md)            | http://localhost:3002/ | https://ally.hilgefort.me          |
+| [Bergen Meadow](apps/bergen-meadow/README.md)            | http://localhost:3003/ | https://bergenmeadowupdate.com     |
+| [DG Rating Converter](apps/dg-rating-converter/README.md)| http://localhost:3004/ | https://dgratingconverter.com      |
+| [Proof & Pour](apps/proof-n-pour/README.md)              | http://localhost:3005/ | https://proofnpour.com             |
+| [SRH Personal](apps/srh-personal/README.md)              | http://localhost:3006/ | https://stephanie.hilgefort.me     |
+| [Budget Time](apps/budget-time/README.md)                | http://localhost:3007/ | https://budgettime.hilgefort.me    |
 
 ## Available Scripts
 
