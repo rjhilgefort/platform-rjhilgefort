@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { TbArrowLeft } from 'react-icons/tb'
+import { ExpandingSlider } from '../../components/ExpandingSlider'
 import { IconPickerModal } from '../../components/IconPickerModal'
 import { ProfilePictureCropModal } from '../../components/ProfilePictureCropModal'
 import { PinPad } from '../../components/PinPad'
@@ -856,43 +857,35 @@ export default function ConfigPage() {
                       {resetConfirm.has(kid.id) ? 'Are you sure?' : 'Reset to Default'}
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     {sortedBudgetTypes.map((bt) => {
                       const BtIcon = getIconComponent(bt.icon ?? 'TbStarFilled')
                       return (
                       <div key={bt.id} className="form-control">
-                        <label className="label">
-                          <span className="label-text flex items-center gap-1">
-                            <BtIcon size={16} />
-                            {bt.displayName} (min)
-                          </span>
-                        </label>
-                        <input
-                          type="number"
-                          className={`input input-bordered input-sm transition-colors duration-1000 ${savedInputs.has(`balance-${kid.id}-${bt.id}`) ? 'bg-success/20' : ''}`}
-                          value={balanceInputs[kid.id]?.[bt.id] ?? ''}
-                          onChange={(e) => {
-                            const newValue = e.target.value
+                        <ExpandingSlider
+                          label={
+                            <span className="flex items-center gap-1">
+                              <BtIcon size={16} />
+                              {bt.displayName}
+                            </span>
+                          }
+                          value={parseInt(balanceInputs[kid.id]?.[bt.id] || '0')}
+                          onChange={(val) => {
                             setBalanceInputs((prev) => ({
                               ...prev,
                               [kid.id]: {
                                 ...prev[kid.id],
-                                [bt.id]: newValue,
+                                [bt.id]: val.toString(),
                               },
                             }))
-                            scheduleAutoSave(`balance-${kid.id}-${bt.id}`, () =>
-                              setCurrentBalance(kid.id, bt.id, parseInt(newValue) || 0)
-                            )
                           }}
-                          onBlur={() => {
-                            cancelAutoSave(`balance-${kid.id}-${bt.id}`)
-                            setCurrentBalance(
-                              kid.id,
-                              bt.id,
-                              parseInt(balanceInputs[kid.id]?.[bt.id] || '0')
-                            )
+                          onChangeEnd={(val) => {
+                            setCurrentBalance(kid.id, bt.id, val)
                             flashSaved(`balance-${kid.id}-${bt.id}`)
                           }}
+                          initialMax={120}
+                          unit="min"
+                          inputClassName={savedInputs.has(`balance-${kid.id}-${bt.id}`) ? 'bg-success/20' : ''}
                         />
                       </div>
                     )})}
@@ -905,7 +898,7 @@ export default function ConfigPage() {
                   Added at {resetHour === 0 ? '12' : resetHour > 12 ? resetHour - 12 : resetHour} {resetHour < 12 ? 'AM' : 'PM'} each day. Unused time carries over.
                 </p>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                   {[...kid.budgetDefaults].sort((a, b) => {
                     const aIsExtra = budgetTypes.find((bt) => bt.id === a.budgetTypeId)?.isEarningPool ?? false
                     const bIsExtra = budgetTypes.find((bt) => bt.id === b.budgetTypeId)?.isEarningPool ?? false
@@ -916,18 +909,15 @@ export default function ConfigPage() {
                     const BdIcon = getIconComponent(bdType?.icon ?? 'TbStarFilled')
                     return (
                     <div key={bd.budgetTypeId} className="form-control">
-                      <label className="label">
-                        <span className="label-text flex items-center gap-1">
-                          <BdIcon size={16} />
-                          Daily {bd.budgetTypeDisplayName} (min)
-                        </span>
-                      </label>
-                      <input
-                        type="number"
-                        className={`input input-bordered transition-colors duration-1000 ${savedInputs.has(`kid-default-${kid.id}-${bd.budgetTypeId}`) ? 'bg-success/20' : ''}`}
+                      <ExpandingSlider
+                        label={
+                          <span className="flex items-center gap-1">
+                            <BdIcon size={16} />
+                            Daily {bd.budgetTypeDisplayName}
+                          </span>
+                        }
                         value={bd.dailyBudgetMinutes}
-                        onChange={(e) => {
-                          const newValue = parseInt(e.target.value) || 0
+                        onChange={(val) => {
                           setKids((prev) =>
                             prev.map((k) =>
                               k.id === kid.id
@@ -935,26 +925,21 @@ export default function ConfigPage() {
                                     ...k,
                                     budgetDefaults: k.budgetDefaults.map((d) =>
                                       d.budgetTypeId === bd.budgetTypeId
-                                        ? { ...d, dailyBudgetMinutes: newValue }
+                                        ? { ...d, dailyBudgetMinutes: val }
                                         : d
                                     ),
                                   }
                                 : k
                             )
                           )
-                          scheduleAutoSave(`kid-default-${kid.id}-${bd.budgetTypeId}`, () =>
-                            updateKidBudgetDefault(kid.id, bd.budgetTypeId, newValue)
-                          )
                         }}
-                        onBlur={() => {
-                          cancelAutoSave(`kid-default-${kid.id}-${bd.budgetTypeId}`)
-                          updateKidBudgetDefault(
-                            kid.id,
-                            bd.budgetTypeId,
-                            bd.dailyBudgetMinutes
-                          )
+                        onChangeEnd={(val) => {
+                          updateKidBudgetDefault(kid.id, bd.budgetTypeId, val)
                           flashSaved(`kid-default-${kid.id}-${bd.budgetTypeId}`)
                         }}
+                        initialMax={120}
+                        unit="min"
+                        inputClassName={savedInputs.has(`kid-default-${kid.id}-${bd.budgetTypeId}`) ? 'bg-success/20' : ''}
                       />
                     </div>
                   )})}
@@ -1009,17 +994,12 @@ export default function ConfigPage() {
                 </select>
               </div>
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Activity Minutes</span>
-                </label>
-                <input
-                  type="number"
-                  className="input input-bordered"
-                  placeholder="30"
-                  min="1"
-                  step="1"
-                  value={simulateMinutes}
-                  onChange={(e) => setSimulateMinutes(e.target.value)}
+                <ExpandingSlider
+                  label="Activity Minutes"
+                  value={parseInt(simulateMinutes) || 0}
+                  onChange={(val) => setSimulateMinutes(val.toString())}
+                  initialMax={60}
+                  unit="min"
                 />
               </div>
               <div className="flex items-center gap-3">
