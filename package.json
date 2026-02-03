@@ -15,7 +15,7 @@
     "deploy": "npm run version && git push && git checkout deploy/production && git merge - && git push && git checkout -"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.28.0",
+    "@changesets/cli": "^2.29.8",
     "prettier": "^3.5.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tsx": "^4.19.3",
