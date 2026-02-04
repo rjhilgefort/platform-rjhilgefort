@@ -11,7 +11,7 @@ interface ExpandingSliderProps {
   step?: number
   expandThreshold?: number // 0-1, default 0.85 - expand when above this %
   contractThreshold?: number // 0-1, default 0.3 - contract when below this %
-  scaleFactor?: number // default 1.5 (grows/shrinks by 50%)
+  incrementRatio?: number // default 0.5 - add this fraction of initialMax each step
   unit?: string
   label?: ReactNode
   className?: string
@@ -28,7 +28,7 @@ export function ExpandingSlider({
   step = 1,
   expandThreshold = 0.85,
   contractThreshold = 0.3,
-  scaleFactor = 1.5,
+  incrementRatio = 0.5,
   unit = '',
   label,
   className = '',
@@ -39,6 +39,9 @@ export function ExpandingSlider({
   const [inputValue, setInputValue] = useState(value.toString())
   const sliderRef = useRef<HTMLInputElement>(null)
   const isDragging = useRef(false)
+  
+  // Calculate the step size for expansion/contraction
+  const increment = Math.round(initialMax * incrementRatio)
 
   // Sync input value with prop
   useEffect(() => {
@@ -51,20 +54,19 @@ export function ExpandingSlider({
   useEffect(() => {
     const percentOfMax = value / currentMax
     
-    // Expand when approaching top
+    // Expand when approaching top - add one increment
     if (percentOfMax >= expandThreshold && currentMax < 10000) {
-      const newMax = Math.round(currentMax * scaleFactor)
-      setCurrentMax(newMax)
+      setCurrentMax(currentMax + increment)
     }
-    // Contract when near bottom (but not below initialMax)
+    // Contract when near bottom - subtract one increment (but not below initialMax)
     else if (percentOfMax <= contractThreshold && currentMax > initialMax) {
-      const newMax = Math.max(initialMax, Math.round(currentMax / scaleFactor))
+      const newMax = Math.max(initialMax, currentMax - increment)
       // Only contract if value still fits comfortably
       if (value <= newMax * expandThreshold) {
         setCurrentMax(newMax)
       }
     }
-  }, [value, currentMax, initialMax, expandThreshold, contractThreshold, scaleFactor])
+  }, [value, currentMax, initialMax, expandThreshold, contractThreshold, increment])
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     isDragging.current = true
@@ -85,12 +87,13 @@ export function ExpandingSlider({
     const parsed = parseInt(raw, 10)
     if (!isNaN(parsed) && parsed >= min) {
       onChange(parsed)
-      // Expand if needed for direct input
+      // Expand if needed for direct input - round up to next increment
       if (parsed > currentMax) {
-        setCurrentMax(Math.ceil(parsed * scaleFactor))
+        const stepsNeeded = Math.ceil((parsed - currentMax) / increment)
+        setCurrentMax(currentMax + stepsNeeded * increment)
       }
     }
-  }, [onChange, min, currentMax, scaleFactor])
+  }, [onChange, min, currentMax, increment])
 
   const handleInputBlur = useCallback(() => {
     const parsed = parseInt(inputValue, 10)
