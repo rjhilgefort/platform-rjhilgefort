@@ -54,19 +54,19 @@ export function ExpandingSlider({
   useEffect(() => {
     const percentOfMax = value / currentMax
     
-    // Expand when approaching top - add one increment
-    if (percentOfMax >= expandThreshold && currentMax < 10000) {
+    // Expand only when hitting the ceiling (at or very near max)
+    if (percentOfMax >= 0.99 && currentMax < 10000) {
       setCurrentMax(currentMax + increment)
     }
-    // Contract when near bottom - subtract one increment (but not below initialMax)
+    // Contract when in the bottom portion - subtract one increment (but not below initialMax)
     else if (percentOfMax <= contractThreshold && currentMax > initialMax) {
       const newMax = Math.max(initialMax, currentMax - increment)
-      // Only contract if value still fits comfortably
-      if (value <= newMax * expandThreshold) {
+      // Only contract if value still fits with headroom
+      if (value <= newMax * 0.9) {
         setCurrentMax(newMax)
       }
     }
-  }, [value, currentMax, initialMax, expandThreshold, contractThreshold, increment])
+  }, [value, currentMax, initialMax, contractThreshold, increment])
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     isDragging.current = true
