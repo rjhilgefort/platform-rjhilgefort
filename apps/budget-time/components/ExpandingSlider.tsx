@@ -56,15 +56,21 @@ export function ExpandingSlider({
     }
   }, [value, currentMax, expansionThreshold, expansionFactor])
 
-  // Contract max when value is well below threshold (optional - keeps expanded)
-  // Uncomment if you want auto-contract behavior:
-  // useEffect(() => {
-  //   const contractThreshold = initialMax * expansionThreshold * 0.5
-  //   if (value < contractThreshold && currentMax > initialMax) {
-  //     setCurrentMax(initialMax)
-  //     setIsExpanded(false)
-  //   }
-  // }, [value, currentMax, initialMax, expansionThreshold])
+  // Contract max when slider is released at a low value
+  const maybeContract = useCallback((finalValue: number) => {
+    if (currentMax <= initialMax) return // Already at minimum
+    
+    // Find the smallest max that still fits the value with room to spare
+    let targetMax = initialMax
+    while (targetMax * expansionThreshold <= finalValue && targetMax < currentMax) {
+      targetMax = Math.round(targetMax * expansionFactor)
+    }
+    
+    if (targetMax < currentMax) {
+      setCurrentMax(targetMax)
+      setIsExpanded(targetMax > initialMax)
+    }
+  }, [currentMax, initialMax, expansionThreshold, expansionFactor])
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     isDragging.current = true
@@ -75,8 +81,9 @@ export function ExpandingSlider({
 
   const handleSliderEnd = useCallback(() => {
     isDragging.current = false
+    maybeContract(value)
     onChangeEnd?.(value)
-  }, [onChangeEnd, value])
+  }, [onChangeEnd, value, maybeContract])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value
@@ -98,12 +105,14 @@ export function ExpandingSlider({
     if (isNaN(parsed) || parsed < min) {
       setInputValue(min.toString())
       onChange(min)
+      maybeContract(min)
       onChangeEnd?.(min)
     } else {
       setInputValue(parsed.toString())
+      maybeContract(parsed)
       onChangeEnd?.(parsed)
     }
-  }, [inputValue, min, onChange, onChangeEnd])
+  }, [inputValue, min, onChange, onChangeEnd, maybeContract])
 
   // Calculate fill percentage for styling
   const fillPercent = ((value - min) / (currentMax - min)) * 100
