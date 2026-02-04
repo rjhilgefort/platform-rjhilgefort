@@ -9,8 +9,9 @@ interface ExpandingSliderProps {
   min?: number
   initialMax?: number
   step?: number
-  expansionThreshold?: number // 0-1, default 0.8
-  expansionFactor?: number // default 2 (doubles)
+  expandThreshold?: number // 0-1, default 0.85 - expand when above this %
+  contractThreshold?: number // 0-1, default 0.3 - contract when below this %
+  scaleFactor?: number // default 1.5 (grows/shrinks by 50%)
   unit?: string
   label?: ReactNode
   className?: string
@@ -25,8 +26,9 @@ export function ExpandingSlider({
   min = 0,
   initialMax = 60,
   step = 1,
-  expansionThreshold = 0.8,
-  expansionFactor = 2,
+  expandThreshold = 0.85,
+  contractThreshold = 0.3,
+  scaleFactor = 1.5,
   unit = '',
   label,
   className = '',
@@ -35,7 +37,6 @@ export function ExpandingSlider({
 }: ExpandingSliderProps) {
   const [currentMax, setCurrentMax] = useState(initialMax)
   const [inputValue, setInputValue] = useState(value.toString())
-  const [isExpanded, setIsExpanded] = useState(false)
   const sliderRef = useRef<HTMLInputElement>(null)
   const isDragging = useRef(false)
 
@@ -46,31 +47,24 @@ export function ExpandingSlider({
     }
   }, [value])
 
-  // Expand max when value approaches threshold
+  // Adjust range live as value changes (during drag or otherwise)
   useEffect(() => {
-    const thresholdValue = currentMax * expansionThreshold
-    if (value >= thresholdValue && currentMax < 10000) {
-      const newMax = Math.round(currentMax * expansionFactor)
+    const percentOfMax = value / currentMax
+    
+    // Expand when approaching top
+    if (percentOfMax >= expandThreshold && currentMax < 10000) {
+      const newMax = Math.round(currentMax * scaleFactor)
       setCurrentMax(newMax)
-      setIsExpanded(true)
     }
-  }, [value, currentMax, expansionThreshold, expansionFactor])
-
-  // Contract max when slider is released at a low value
-  const maybeContract = useCallback((finalValue: number) => {
-    if (currentMax <= initialMax) return // Already at minimum
-    
-    // Find the smallest max that still fits the value with room to spare
-    let targetMax = initialMax
-    while (targetMax * expansionThreshold <= finalValue && targetMax < currentMax) {
-      targetMax = Math.round(targetMax * expansionFactor)
+    // Contract when near bottom (but not below initialMax)
+    else if (percentOfMax <= contractThreshold && currentMax > initialMax) {
+      const newMax = Math.max(initialMax, Math.round(currentMax / scaleFactor))
+      // Only contract if value still fits comfortably
+      if (value <= newMax * expandThreshold) {
+        setCurrentMax(newMax)
+      }
     }
-    
-    if (targetMax < currentMax) {
-      setCurrentMax(targetMax)
-      setIsExpanded(targetMax > initialMax)
-    }
-  }, [currentMax, initialMax, expansionThreshold, expansionFactor])
+  }, [value, currentMax, initialMax, expandThreshold, contractThreshold, scaleFactor])
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     isDragging.current = true
@@ -81,9 +75,8 @@ export function ExpandingSlider({
 
   const handleSliderEnd = useCallback(() => {
     isDragging.current = false
-    maybeContract(value)
     onChangeEnd?.(value)
-  }, [onChangeEnd, value, maybeContract])
+  }, [onChangeEnd, value])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value
@@ -94,29 +87,26 @@ export function ExpandingSlider({
       onChange(parsed)
       // Expand if needed for direct input
       if (parsed > currentMax) {
-        setCurrentMax(Math.ceil(parsed * expansionFactor))
-        setIsExpanded(true)
+        setCurrentMax(Math.ceil(parsed * scaleFactor))
       }
     }
-  }, [onChange, min, currentMax, expansionFactor])
+  }, [onChange, min, currentMax, scaleFactor])
 
   const handleInputBlur = useCallback(() => {
     const parsed = parseInt(inputValue, 10)
     if (isNaN(parsed) || parsed < min) {
       setInputValue(min.toString())
       onChange(min)
-      maybeContract(min)
       onChangeEnd?.(min)
     } else {
       setInputValue(parsed.toString())
-      maybeContract(parsed)
       onChangeEnd?.(parsed)
     }
-  }, [inputValue, min, onChange, onChangeEnd, maybeContract])
+  }, [inputValue, min, onChange, onChangeEnd])
 
   // Calculate fill percentage for styling
   const fillPercent = ((value - min) / (currentMax - min)) * 100
-  const thresholdPercent = expansionThreshold * 100
+  const isExpanded = currentMax > initialMax
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
@@ -126,7 +116,7 @@ export function ExpandingSlider({
         </label>
       )}
       <div className="flex items-center gap-2">
-        {/* Slider with visual zones */}
+        {/* Slider */}
         <div className="relative flex-1">
           <input
             ref={sliderRef}
@@ -140,26 +130,11 @@ export function ExpandingSlider({
             onTouchEnd={handleSliderEnd}
             disabled={disabled}
             className="range range-sm range-primary w-full"
-            style={{
-              background: `linear-gradient(to right, 
-                oklch(var(--p)) 0%, 
-                oklch(var(--p)) ${Math.min(fillPercent, thresholdPercent)}%, 
-                ${fillPercent > thresholdPercent ? 'oklch(var(--a))' : 'oklch(var(--b3))'} ${Math.min(fillPercent, thresholdPercent)}%,
-                ${fillPercent > thresholdPercent ? `oklch(var(--a)) ${fillPercent}%, oklch(var(--b3)) ${fillPercent}%` : ''},
-                oklch(var(--b3)) 100%
-              )`,
-            }}
           />
-          {/* Zone indicator */}
+          {/* Show current max when expanded */}
           {isExpanded && (
-            <div 
-              className="absolute -bottom-3 left-0 right-0 flex justify-between text-[10px] text-base-content/40 pointer-events-none"
-            >
-              <span>0</span>
-              <span className="absolute" style={{ left: `${(initialMax / currentMax) * 100}%`, transform: 'translateX(-50%)' }}>
-                {initialMax}
-              </span>
-              <span>{currentMax}</span>
+            <div className="absolute -bottom-4 right-0 text-[10px] text-base-content/40 pointer-events-none">
+              max: {currentMax}
             </div>
           )}
         </div>
