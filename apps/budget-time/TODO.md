@@ -1,6 +1,5 @@
 # TODO
 
-- [x] Replace time inputs on settings page with sliders (soft-max expanding slider - auto-expands at 80% threshold)
 - [ ] Should timers auto-stop after 3 or 4 hours to prevent runaway timers?
 - [ ] Setup notifications
 
@@ -32,3 +31,4 @@
 - [x] for the ad additional time plus button on the main page. I want to be prompted for a passcode first and then I want to be able to add or subtract time in that view. So in addition to adding time I want to be able to subtract time. I should be able to hit the buttons as many times as I want after I put the passcode in, but after I close that model, then I would need a passcode to get back in. Lastly, we need to pick a different icon. A +/- would be good.
 - [x] make sure we're not looking for the extra time timer via the slug like this `{budgetTypeSlug !== 'extra'`. Should always be using the db column.
 - [x] timer history page. This Will allow us to audit the times that happened in the past. It can be one page but then have a filter so we can filter by kid if desired. Use plan mode for this and let's talk about it.
+- [x] Replace time inputs on settings page with sliders (soft-max expanding slider - auto-expands at 80% threshold)
