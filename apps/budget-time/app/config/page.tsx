@@ -885,6 +885,7 @@ export default function ConfigPage() {
                           }}
                           initialMax={120}
                           unit="min"
+                          allowNegative
                           inputClassName={savedInputs.has(`balance-${kid.id}-${bt.id}`) ? 'bg-success/20' : ''}
                         />
                       </div>
