@@ -1,5 +1,5 @@
 ---
-"budget-time": patch
+"@repo/budget-time": patch
 ---
 
 ExpandingSlider: support negative values and smoother expansion
