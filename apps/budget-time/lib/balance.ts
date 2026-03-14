@@ -1,5 +1,5 @@
 import { eq, and } from 'drizzle-orm'
-import { db } from '../db/client'
+import { db, type DbClient } from '../db/client'
 import {
   kids,
   dailyBalances,
@@ -34,8 +34,8 @@ export interface FullDailyBalance {
 /**
  * Get all budget types ordered by displayName
  */
-export async function getAllBudgetTypes(): Promise<BudgetType[]> {
-  return db.query.budgetTypes.findMany({
+export async function getAllBudgetTypes(dbClient: DbClient = db): Promise<BudgetType[]> {
+  return dbClient.query.budgetTypes.findMany({
     orderBy: (bt, { asc }) => asc(bt.displayName),
   })
 }
@@ -44,21 +44,21 @@ export async function getAllBudgetTypes(): Promise<BudgetType[]> {
  * Get or create today's balance for a kid
  * Handles carryover from previous day for all budget types
  */
-export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyBalance> {
-  const timezone = await getTimezone()
-  const resetHour = await getResetHour()
+export async function getOrCreateTodayBalance(kidId: number, dbClient: DbClient = db): Promise<FullDailyBalance> {
+  const timezone = await getTimezone(dbClient)
+  const resetHour = await getResetHour(dbClient)
   const today = getBudgetDate(timezone, resetHour)
 
   // Check if today's balance exists
-  const existing = await db.query.dailyBalances.findFirst({
+  const existing = await dbClient.query.dailyBalances.findFirst({
     where: and(eq(dailyBalances.kidId, kidId), eq(dailyBalances.date, today)),
   })
 
-  const allBudgetTypes = await getAllBudgetTypes()
+  const allBudgetTypes = await getAllBudgetTypes(dbClient)
 
   if (existing) {
     // Get all type balances for this daily balance
-    const typeBalancesData = await db.query.dailyTypeBalances.findMany({
+    const typeBalancesData = await dbClient.query.dailyTypeBalances.findMany({
       where: eq(dailyTypeBalances.dailyBalanceId, existing.id),
     })
 
@@ -67,7 +67,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
     const missingTypes = allBudgetTypes.filter((bt) => !existingTypeIds.has(bt.id))
 
     if (missingTypes.length > 0) {
-      const defaults = await getKidBudgetDefaults(kidId)
+      const defaults = await getKidBudgetDefaults(kidId, dbClient)
       const newBalances = missingTypes.map((bt) => {
         const defaultMinutes = defaults.find((d) => d.budgetTypeId === bt.id)?.dailyBudgetMinutes ?? 60
         return {
@@ -77,11 +77,11 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
           carryoverSeconds: 0,
         }
       })
-      await db.insert(dailyTypeBalances).values(newBalances).onConflictDoNothing()
+      await dbClient.insert(dailyTypeBalances).values(newBalances).onConflictDoNothing()
     }
 
     // Re-fetch to get complete data
-    const updatedTypeBalances = await db.query.dailyTypeBalances.findMany({
+    const updatedTypeBalances = await dbClient.query.dailyTypeBalances.findMany({
       where: eq(dailyTypeBalances.dailyBalanceId, existing.id),
     })
 
@@ -89,7 +89,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
   }
 
   // Verify kid exists
-  const kid = await db.query.kids.findFirst({
+  const kid = await dbClient.query.kids.findFirst({
     where: eq(kids.id, kidId),
   })
 
@@ -98,23 +98,23 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
   }
 
   // Get kid's budget defaults
-  const defaults = await getKidBudgetDefaults(kidId)
+  const defaults = await getKidBudgetDefaults(kidId, dbClient)
 
   // Get yesterday's balance for carryover
   const yesterday = getPreviousBudgetDate(timezone, resetHour)
-  const yesterdayBalance = await db.query.dailyBalances.findFirst({
+  const yesterdayBalance = await dbClient.query.dailyBalances.findFirst({
     where: and(eq(dailyBalances.kidId, kidId), eq(dailyBalances.date, yesterday)),
   })
 
   let yesterdayTypeBalances: DailyTypeBalance[] = []
   if (yesterdayBalance) {
-    yesterdayTypeBalances = await db.query.dailyTypeBalances.findMany({
+    yesterdayTypeBalances = await dbClient.query.dailyTypeBalances.findMany({
       where: eq(dailyTypeBalances.dailyBalanceId, yesterdayBalance.id),
     })
   }
 
   // Create today's balance (handle race condition with onConflictDoNothing)
-  const [insertedBalance] = await db
+  const [insertedBalance] = await dbClient
     .insert(dailyBalances)
     .values({
       kidId,
@@ -124,7 +124,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
     .returning()
 
   // If insert returned nothing, another request created it - fetch it
-  const newBalance = insertedBalance ?? await db.query.dailyBalances.findFirst({
+  const newBalance = insertedBalance ?? await dbClient.query.dailyBalances.findFirst({
     where: and(eq(dailyBalances.kidId, kidId), eq(dailyBalances.date, today)),
   })
 
@@ -133,7 +133,7 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
   }
 
   // Check if type balances already exist (created by the other request)
-  const existingTypeBalances = await db.query.dailyTypeBalances.findMany({
+  const existingTypeBalances = await dbClient.query.dailyTypeBalances.findMany({
     where: eq(dailyTypeBalances.dailyBalanceId, newBalance.id),
   })
 
@@ -160,9 +160,9 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
     }
   })
 
-  await db.insert(dailyTypeBalances).values(typeBalanceValues).onConflictDoNothing()
+  await dbClient.insert(dailyTypeBalances).values(typeBalanceValues).onConflictDoNothing()
 
-  const createdTypeBalances = await db.query.dailyTypeBalances.findMany({
+  const createdTypeBalances = await dbClient.query.dailyTypeBalances.findMany({
     where: eq(dailyTypeBalances.dailyBalanceId, newBalance.id),
   })
 
@@ -182,8 +182,8 @@ export async function getOrCreateTodayBalance(kidId: number): Promise<FullDailyB
 /**
  * Get a kid's budget defaults
  */
-async function getKidBudgetDefaults(kidId: number) {
-  return db.query.kidBudgetDefaults.findMany({
+async function getKidBudgetDefaults(kidId: number, dbClient: DbClient = db) {
+  return dbClient.query.kidBudgetDefaults.findMany({
     where: eq(kidBudgetDefaults.kidId, kidId),
   })
 }
@@ -215,6 +215,32 @@ function buildFullBalance(
     }),
   }
 }
+/**
+ * Update balance directly using known IDs (avoids re-fetching via getOrCreateTodayBalance)
+ */
+export async function updateBalanceDirect(
+  dailyBalanceId: number,
+  budgetTypeId: number,
+  deltaSeconds: number,
+  dbClient: DbClient = db
+): Promise<void> {
+  const typeBalanceRecord = await dbClient.query.dailyTypeBalances.findFirst({
+    where: and(
+      eq(dailyTypeBalances.dailyBalanceId, dailyBalanceId),
+      eq(dailyTypeBalances.budgetTypeId, budgetTypeId)
+    ),
+  })
+
+  if (!typeBalanceRecord) {
+    throw new Error(`Type balance record not found for dailyBalanceId=${dailyBalanceId}, budgetTypeId=${budgetTypeId}`)
+  }
+
+  await dbClient
+    .update(dailyTypeBalances)
+    .set({ remainingSeconds: typeBalanceRecord.remainingSeconds + deltaSeconds })
+    .where(eq(dailyTypeBalances.id, typeBalanceRecord.id))
+}
+
 
 /**
  * Update a kid's balance for a specific budget type
@@ -222,9 +248,10 @@ function buildFullBalance(
 export async function updateBalance(
   kidId: number,
   budgetTypeId: number,
-  deltaSeconds: number
+  deltaSeconds: number,
+  dbClient: DbClient = db
 ): Promise<FullDailyBalance> {
-  const balance = await getOrCreateTodayBalance(kidId)
+  const balance = await getOrCreateTodayBalance(kidId, dbClient)
 
   const typeBalance = balance.typeBalances.find((tb) => tb.budgetTypeId === budgetTypeId)
   if (!typeBalance) {
@@ -232,7 +259,7 @@ export async function updateBalance(
   }
 
   // Find the daily_type_balance record
-  const typeBalanceRecord = await db.query.dailyTypeBalances.findFirst({
+  const typeBalanceRecord = await dbClient.query.dailyTypeBalances.findFirst({
     where: and(
       eq(dailyTypeBalances.dailyBalanceId, balance.dailyBalanceId),
       eq(dailyTypeBalances.budgetTypeId, budgetTypeId)
@@ -243,12 +270,12 @@ export async function updateBalance(
     throw new Error('Type balance record not found')
   }
 
-  await db
+  await dbClient
     .update(dailyTypeBalances)
     .set({ remainingSeconds: typeBalanceRecord.remainingSeconds + deltaSeconds })
     .where(eq(dailyTypeBalances.id, typeBalanceRecord.id))
 
-  return getOrCreateTodayBalance(kidId)
+  return getOrCreateTodayBalance(kidId, dbClient)
 }
 
 /**
@@ -301,8 +328,8 @@ export async function getBudgetTypeById(id: number): Promise<BudgetType | undefi
 /**
  * Get the earning pool budget type (Extra)
  */
-export async function getEarningPoolBudgetType(): Promise<BudgetType | undefined> {
-  return db.query.budgetTypes.findFirst({
+export async function getEarningPoolBudgetType(dbClient: DbClient = db): Promise<BudgetType | undefined> {
+  return dbClient.query.budgetTypes.findFirst({
     where: eq(budgetTypes.isEarningPool, true),
   })
 }
@@ -310,14 +337,14 @@ export async function getEarningPoolBudgetType(): Promise<BudgetType | undefined
 /**
  * Get an app setting by key, with optional default
  */
-export async function getAppSetting(key: string, defaultValue: string): Promise<string> {
-  const setting = await db.query.appSettings.findFirst({
+export async function getAppSetting(key: string, defaultValue: string, dbClient: DbClient = db): Promise<string> {
+  const setting = await dbClient.query.appSettings.findFirst({
     where: eq(appSettings.key, key),
   })
   if (setting) return setting.value
 
   // Create with default if not exists
-  await db
+  await dbClient
     .insert(appSettings)
     .values({ key, value: defaultValue })
     .onConflictDoNothing()
@@ -340,22 +367,22 @@ export async function setAppSetting(key: string, value: string): Promise<void> {
 /**
  * Get negative balance penalty setting
  */
-export async function getNegativeBalancePenalty(): Promise<number> {
-  const value = await getAppSetting('negativeBalancePenalty', '-0.25')
+export async function getNegativeBalancePenalty(dbClient: DbClient = db): Promise<number> {
+  const value = await getAppSetting('negativeBalancePenalty', '-0.25', dbClient)
   return parseFloat(value)
 }
 
 /**
  * Get timezone setting
  */
-export async function getTimezone(): Promise<string> {
-  return getAppSetting('timezone', 'America/Denver')
+export async function getTimezone(dbClient: DbClient = db): Promise<string> {
+  return getAppSetting('timezone', 'America/Denver', dbClient)
 }
 
 /**
  * Get reset hour setting (0-23, default 4 = 4 AM)
  */
-export async function getResetHour(): Promise<number> {
-  const value = await getAppSetting('resetHour', '4')
+export async function getResetHour(dbClient: DbClient = db): Promise<number> {
+  const value = await getAppSetting('resetHour', '4', dbClient)
   return parseInt(value, 10)
 }

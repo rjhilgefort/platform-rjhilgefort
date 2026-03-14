@@ -1,24 +1,26 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../../db/client'
 import { kids, earningTypes, timerEvents } from '../../../../db/schema'
 import { validateParentPin } from '../../../../lib/auth'
 import { updateBalance, getOrCreateTodayBalance, getEarningPoolBudgetType } from '../../../../lib/balance'
 import { calculateEarnings } from '../../../../lib/timer-logic'
+import { apiHandler, parseBody } from '../../../../lib/api-utils'
 
-export async function POST(request: Request) {
+const SimulateEarningBody = Schema.Struct({
+  kidId: Schema.Number,
+  pin: Schema.String,
+  earningTypeId: Schema.Number,
+  activityMinutes: Schema.Number,
+})
+
+export const POST = apiHandler(async (request: Request) => {
   const body = await request.json()
-  const kidId = Number(body.kidId)
-  const pin = body.pin
-  const earningTypeId = Number(body.earningTypeId)
-  const activityMinutes = Number(body.activityMinutes)
+  const parsed = parseBody(SimulateEarningBody, body)
+  if (!parsed.success) return parsed.response
 
-  if (!kidId || !pin || !earningTypeId || !activityMinutes) {
-    return NextResponse.json(
-      { error: 'kidId, pin, earningTypeId, and activityMinutes required' },
-      { status: 400 }
-    )
-  }
+  const { kidId, pin, earningTypeId, activityMinutes } = parsed.data
 
   if (activityMinutes <= 0) {
     return NextResponse.json(
@@ -57,25 +59,20 @@ export async function POST(request: Request) {
   const activitySeconds = activityMinutes * 60
   const earnedSeconds = calculateEarnings(activitySeconds, earningType)
 
-  try {
-    // Add earned time to the Extra balance
-    await updateBalance(kidId, earningPool.id, earnedSeconds)
+  // Add earned time to the Extra balance
+  await updateBalance(kidId, earningPool.id, earnedSeconds)
 
-    // Log to history
-    const now = new Date()
-    await db.insert(timerEvents).values({
-      kidId,
-      eventType: 'simulated_earned',
-      budgetTypeId: earningPool.id,
-      earningTypeId,
-      startedAt: now,
-      endedAt: now,
-      seconds: earnedSeconds,
-    })
-  } catch (err) {
-    console.error('Failed to update balance:', err)
-    return NextResponse.json({ error: 'Failed to save earned time' }, { status: 500 })
-  }
+  // Log to history
+  const now = new Date()
+  await db.insert(timerEvents).values({
+    kidId,
+    eventType: 'simulated_earned',
+    budgetTypeId: earningPool.id,
+    earningTypeId,
+    startedAt: now,
+    endedAt: now,
+    seconds: earnedSeconds,
+  })
 
   const balance = await getOrCreateTodayBalance(kidId)
   const earnedMinutes = Math.floor(earnedSeconds / 60)
@@ -92,4 +89,4 @@ export async function POST(request: Request) {
       typeBalances: balance.typeBalances,
     },
   })
-}
+})

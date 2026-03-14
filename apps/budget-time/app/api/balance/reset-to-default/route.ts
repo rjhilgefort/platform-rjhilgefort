@@ -1,20 +1,24 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../../db/client'
 import { kids, kidBudgetDefaults } from '../../../../db/schema'
 import { validateParentPin } from '../../../../lib/auth'
 import { setBalance, getOrCreateTodayBalance } from '../../../../lib/balance'
 import { eventBroadcaster } from '../../../../lib/events'
+import { apiHandler, parseBody } from '../../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { kidId, pin } = await request.json()
+const ResetToDefaultBody = Schema.Struct({
+  kidId: Schema.Number,
+  pin: Schema.String,
+})
 
-  if (!kidId || !pin) {
-    return NextResponse.json(
-      { error: 'kidId and pin required' },
-      { status: 400 }
-    )
-  }
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(ResetToDefaultBody, body)
+  if (!parsed.success) return parsed.response
+
+  const { kidId, pin } = parsed.data
 
   const isValid = await validateParentPin(pin)
   if (!isValid) {
@@ -55,4 +59,4 @@ export async function POST(request: Request) {
       typeBalances: balance.typeBalances,
     },
   })
-}
+})

@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server'
+import * as Schema from 'effect/Schema'
 import { validateFamilyPin, setAuthCookie, clearAuthCookie } from '../../../lib/auth'
+import { apiHandler, apiHandlerNoArgs, parseBody } from '../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { pin } = await request.json()
+const AuthBody = Schema.Struct({
+  pin: Schema.String,
+})
 
-  if (!pin || typeof pin !== 'string') {
-    return NextResponse.json({ error: 'PIN required' }, { status: 400 })
-  }
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(AuthBody, body)
+  if (!parsed.success) return parsed.response
+
+  const { pin } = parsed.data
 
   const isValid = await validateFamilyPin(pin)
 
@@ -16,9 +22,9 @@ export async function POST(request: Request) {
 
   await setAuthCookie()
   return NextResponse.json({ success: true })
-}
+})
 
-export async function DELETE() {
+export const DELETE = apiHandlerNoArgs(async () => {
   await clearAuthCookie()
   return NextResponse.json({ success: true })
-}
+})
