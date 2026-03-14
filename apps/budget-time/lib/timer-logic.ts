@@ -21,7 +21,7 @@ export interface TimerState {
  * Calculate elapsed seconds from a timer's start time
  */
 export function calculateElapsedSeconds(startedAt: Date, now: Date = new Date()): number {
-  return Math.floor((now.getTime() - startedAt.getTime()) / 1000)
+  return Math.max(0, Math.floor((now.getTime() - startedAt.getTime()) / 1000))
 }
 
 /**

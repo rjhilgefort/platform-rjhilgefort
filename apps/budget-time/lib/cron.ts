@@ -4,6 +4,13 @@ import { getOrCreateTodayBalance, getResetHour, getTimezone } from './balance'
 
 let isScheduled = false
 
+const MAX_RETRIES = 3
+const BASE_DELAY_MS = 1000
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 /**
  * Create daily balances for all kids proactively
  */
@@ -16,11 +23,24 @@ async function createDailyBalancesForAllKids() {
   const allKids = await db.query.kids.findMany()
 
   for (const kid of allKids) {
-    try {
-      const balance = await getOrCreateTodayBalance(kid.id)
-      console.log(`[cron] Created/verified balance for kid ${kid.id} (${kid.name}): ${balance.date}`)
-    } catch (err) {
-      console.error(`[cron] Failed to create balance for kid ${kid.id}:`, err)
+    let success = false
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const balance = await getOrCreateTodayBalance(kid.id)
+        console.log(`[cron] Created/verified balance for kid ${kid.id} (${kid.name}): ${balance.date}`)
+        success = true
+        break
+      } catch (err) {
+        console.error(`[cron] Attempt ${attempt + 1}/${MAX_RETRIES} failed for kid ${kid.id}:`, err)
+        if (attempt < MAX_RETRIES - 1) {
+          const delay = BASE_DELAY_MS * Math.pow(2, attempt)
+          console.log(`[cron] Retrying in ${delay}ms...`)
+          await sleep(delay)
+        }
+      }
+    }
+    if (!success) {
+      console.error(`[cron] FAILED to create balance for kid ${kid.id} (${kid.name}) after ${MAX_RETRIES} attempts`)
     }
   }
 
@@ -51,4 +71,8 @@ export async function scheduleDailyBalanceCron() {
 
   isScheduled = true
   console.log(`[cron] Scheduled daily balance creation at ${resetHour}:00 (${timezone})`)
+
+  // Run immediately on startup to catch up on any missed cron runs
+  console.log('[cron] Running startup balance verification...')
+  await createDailyBalancesForAllKids()
 }

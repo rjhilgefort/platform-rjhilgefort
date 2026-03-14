@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { db } from '../../../db/client'
 import { getOrCreateTodayBalance, getAllBudgetTypes } from '../../../lib/balance'
+import { apiHandlerNoArgs } from '../../../lib/api-utils'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export const GET = apiHandlerNoArgs(async () => {
   const allKids = await db.query.kids.findMany({
     orderBy: (kids, { asc }) => asc(kids.id),
   })
@@ -22,4 +23,4 @@ export async function GET() {
   )
 
   return NextResponse.json({ balances, budgetTypes: allBudgetTypes })
-}
+})

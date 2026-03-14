@@ -4,10 +4,11 @@ import { db } from '../../../../db/client'
 import { budgetTypes, earningTypes } from '../../../../db/schema'
 import { getOrCreateTodayBalance, getAllBudgetTypes, getNegativeBalancePenalty } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateRemainingTime } from '../../../../lib/timer-logic'
+import { apiHandlerNoArgs } from '../../../../lib/api-utils'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export const GET = apiHandlerNoArgs(async () => {
   const allKids = await db.query.kids.findMany({
     orderBy: (kids, { asc }) => asc(kids.id),
   })
@@ -53,7 +54,6 @@ export async function GET() {
       }
 
       // Calculate live remaining time for each budget type
-      // Only pass timer if it has a valid startedAt
       const validTimer = timer && timer.startedAt ? timer : null
       const liveTypeBalances = balance.typeBalances.map((tb) => ({
         ...tb,
@@ -77,4 +77,4 @@ export async function GET() {
     negativeBalancePenalty,
     serverTime: now.toISOString(),
   })
-}
+})

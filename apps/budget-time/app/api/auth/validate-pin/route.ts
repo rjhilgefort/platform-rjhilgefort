@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server'
+import * as Schema from 'effect/Schema'
 import { validateParentPin } from '../../../../lib/auth'
+import { apiHandler, parseBody } from '../../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { pin } = await request.json()
+const ValidatePinBody = Schema.Struct({
+  pin: Schema.String,
+})
 
-  if (!pin || typeof pin !== 'string') {
-    return NextResponse.json({ valid: false }, { status: 400 })
-  }
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(ValidatePinBody, body)
+  if (!parsed.success) return parsed.response
+
+  const { pin } = parsed.data
 
   const isValid = await validateParentPin(pin)
   return NextResponse.json({ valid: isValid })
-}
+})

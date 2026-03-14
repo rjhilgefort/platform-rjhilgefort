@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../db/client'
 import { budgetTypes, earningTypes, kidBudgetDefaults, kids } from '../../../db/schema'
 import { getNegativeBalancePenalty, getTimezone, getResetHour, setAppSetting } from '../../../lib/balance'
 import { validateParentPin } from '../../../lib/auth'
+import { apiHandler, apiHandlerNoArgs, parseBody } from '../../../lib/api-utils'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export const GET = apiHandlerNoArgs(async () => {
   const allKids = await db.query.kids.findMany({
     orderBy: (kids, { asc }) => asc(kids.id),
   })
@@ -50,15 +52,21 @@ export async function GET() {
     timezone,
     resetHour,
   })
-}
+})
 
-export async function PUT(request: Request) {
+// The PUT route uses an action-based dispatch pattern.
+// We validate pin + action at the top level, then validate action-specific fields inline.
+const ConfigPutBase = Schema.Struct({
+  pin: Schema.String,
+  action: Schema.String,
+})
+
+export const PUT = apiHandler(async (request: Request) => {
   const body = await request.json()
-  const { pin, action } = body
+  const baseParsed = parseBody(ConfigPutBase, body)
+  if (!baseParsed.success) return baseParsed.response
 
-  if (!pin) {
-    return NextResponse.json({ error: 'pin required' }, { status: 400 })
-  }
+  const { pin, action } = baseParsed.data
 
   const isValid = await validateParentPin(pin)
   if (!isValid) {
@@ -67,13 +75,15 @@ export async function PUT(request: Request) {
 
   switch (action) {
     case 'updateKidBudgetDefault': {
-      const { kidId, budgetTypeId, dailyBudgetMinutes } = body
-      if (!kidId || !budgetTypeId || typeof dailyBudgetMinutes !== 'number') {
-        return NextResponse.json(
-          { error: 'kidId, budgetTypeId, and dailyBudgetMinutes required' },
-          { status: 400 }
-        )
-      }
+      const schema = Schema.Struct({
+        kidId: Schema.Number,
+        budgetTypeId: Schema.Number,
+        dailyBudgetMinutes: Schema.Number,
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { kidId, budgetTypeId, dailyBudgetMinutes } = parsed.data
 
       // Upsert kid budget default
       const existing = await db.query.kidBudgetDefaults.findFirst({
@@ -98,13 +108,16 @@ export async function PUT(request: Request) {
     }
 
     case 'createBudgetType': {
-      const { slug, displayName, allowCarryover, icon } = body
-      if (!slug || !displayName) {
-        return NextResponse.json(
-          { error: 'slug and displayName required' },
-          { status: 400 }
-        )
-      }
+      const schema = Schema.Struct({
+        slug: Schema.String,
+        displayName: Schema.String,
+        allowCarryover: Schema.optional(Schema.Boolean),
+        icon: Schema.optional(Schema.String),
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { slug, displayName, allowCarryover, icon } = parsed.data
 
       const [newBudgetType] = await db
         .insert(budgetTypes)
@@ -132,10 +145,16 @@ export async function PUT(request: Request) {
     }
 
     case 'updateBudgetType': {
-      const { budgetTypeId, displayName, allowCarryover, icon } = body
-      if (!budgetTypeId) {
-        return NextResponse.json({ error: 'budgetTypeId required' }, { status: 400 })
-      }
+      const schema = Schema.Struct({
+        budgetTypeId: Schema.Number,
+        displayName: Schema.optional(Schema.String),
+        allowCarryover: Schema.optional(Schema.Boolean),
+        icon: Schema.optional(Schema.String),
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { budgetTypeId, displayName, allowCarryover, icon } = parsed.data
 
       const updates: Record<string, boolean | string> = {}
       if (typeof displayName === 'string') updates.displayName = displayName
@@ -156,12 +175,14 @@ export async function PUT(request: Request) {
     }
 
     case 'deleteBudgetType': {
-      const { budgetTypeId } = body
-      if (!budgetTypeId) {
-        return NextResponse.json({ error: 'budgetTypeId required' }, { status: 400 })
-      }
+      const schema = Schema.Struct({
+        budgetTypeId: Schema.Number,
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
 
-      // Check if this is the protected earning pool budget type
+      const { budgetTypeId } = parsed.data
+
       const budgetTypeToDelete = await db.query.budgetTypes.findFirst({
         where: eq(budgetTypes.id, budgetTypeId),
       })
@@ -177,13 +198,17 @@ export async function PUT(request: Request) {
     }
 
     case 'createEarningType': {
-      const { slug, displayName, ratioNumerator, ratioDenominator, icon } = body
-      if (!slug || !displayName) {
-        return NextResponse.json(
-          { error: 'slug and displayName required' },
-          { status: 400 }
-        )
-      }
+      const schema = Schema.Struct({
+        slug: Schema.String,
+        displayName: Schema.String,
+        ratioNumerator: Schema.optional(Schema.Number),
+        ratioDenominator: Schema.optional(Schema.Number),
+        icon: Schema.optional(Schema.String),
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { slug, displayName, ratioNumerator, ratioDenominator, icon } = parsed.data
 
       const [newEarningType] = await db
         .insert(earningTypes)
@@ -200,10 +225,17 @@ export async function PUT(request: Request) {
     }
 
     case 'updateEarningType': {
-      const { earningTypeId, displayName, ratioNumerator, ratioDenominator, icon } = body
-      if (!earningTypeId) {
-        return NextResponse.json({ error: 'earningTypeId required' }, { status: 400 })
-      }
+      const schema = Schema.Struct({
+        earningTypeId: Schema.Number,
+        displayName: Schema.optional(Schema.String),
+        ratioNumerator: Schema.optional(Schema.Number),
+        ratioDenominator: Schema.optional(Schema.Number),
+        icon: Schema.optional(Schema.String),
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { earningTypeId, displayName, ratioNumerator, ratioDenominator, icon } = parsed.data
 
       const updates: Record<string, string | number> = {}
       if (typeof displayName === 'string') updates.displayName = displayName
@@ -225,23 +257,27 @@ export async function PUT(request: Request) {
     }
 
     case 'deleteEarningType': {
-      const { earningTypeId } = body
-      if (!earningTypeId) {
-        return NextResponse.json({ error: 'earningTypeId required' }, { status: 400 })
-      }
+      const schema = Schema.Struct({
+        earningTypeId: Schema.Number,
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { earningTypeId } = parsed.data
 
       await db.delete(earningTypes).where(eq(earningTypes.id, earningTypeId))
       return NextResponse.json({ success: true })
     }
 
     case 'updateNegativeBalancePenalty': {
-      const { negativeBalancePenalty } = body
-      if (typeof negativeBalancePenalty !== 'number') {
-        return NextResponse.json(
-          { error: 'negativeBalancePenalty required and must be a number' },
-          { status: 400 }
-        )
-      }
+      const schema = Schema.Struct({
+        negativeBalancePenalty: Schema.Number,
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { negativeBalancePenalty } = parsed.data
+
       if (negativeBalancePenalty > 0) {
         return NextResponse.json(
           { error: 'Penalty must be negative or zero' },
@@ -254,21 +290,28 @@ export async function PUT(request: Request) {
     }
 
     case 'updateTimezone': {
-      const { timezone } = body
-      if (typeof timezone !== 'string' || !timezone) {
-        return NextResponse.json(
-          { error: 'timezone required and must be a string' },
-          { status: 400 }
-        )
-      }
+      const schema = Schema.Struct({
+        timezone: Schema.String,
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { timezone } = parsed.data
 
       await setAppSetting('timezone', timezone)
       return NextResponse.json({ timezone })
     }
 
     case 'updateResetHour': {
-      const { resetHour } = body
-      if (typeof resetHour !== 'number' || resetHour < 0 || resetHour > 23) {
+      const schema = Schema.Struct({
+        resetHour: Schema.Number,
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { resetHour } = parsed.data
+
+      if (resetHour < 0 || resetHour > 23) {
         return NextResponse.json(
           { error: 'resetHour must be a number between 0 and 23' },
           { status: 400 }
@@ -280,19 +323,21 @@ export async function PUT(request: Request) {
     }
 
     case 'updateKidProfilePicture': {
-      const { kidId, profilePicture } = body
-      if (!kidId) {
-        return NextResponse.json({ error: 'kidId required' }, { status: 400 })
-      }
+      const schema = Schema.Struct({
+        kidId: Schema.Number,
+        profilePicture: Schema.optional(Schema.String),
+      })
+      const parsed = parseBody(schema, body)
+      if (!parsed.success) return parsed.response
+
+      const { kidId, profilePicture } = parsed.data
 
       // Validate base64 image format if provided
-      if (profilePicture && typeof profilePicture === 'string') {
-        if (!profilePicture.startsWith('data:image/')) {
-          return NextResponse.json(
-            { error: 'Invalid image format - must be a data URL' },
-            { status: 400 }
-          )
-        }
+      if (profilePicture && !profilePicture.startsWith('data:image/')) {
+        return NextResponse.json(
+          { error: 'Invalid image format - must be a data URL' },
+          { status: 400 }
+        )
       }
 
       await db
@@ -306,4 +351,4 @@ export async function PUT(request: Request) {
     default:
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   }
-}
+})

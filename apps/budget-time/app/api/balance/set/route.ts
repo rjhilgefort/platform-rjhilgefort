@@ -1,20 +1,26 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../../db/client'
 import { kids, budgetTypes } from '../../../../db/schema'
 import { validateParentPin } from '../../../../lib/auth'
 import { setBalance, getOrCreateTodayBalance } from '../../../../lib/balance'
 import { eventBroadcaster } from '../../../../lib/events'
+import { apiHandler, parseBody } from '../../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { kidId, pin, budgetTypeId, minutes } = await request.json()
+const SetBalanceBody = Schema.Struct({
+  kidId: Schema.Number,
+  pin: Schema.String,
+  budgetTypeId: Schema.Number,
+  minutes: Schema.Number,
+})
 
-  if (!kidId || !pin || !budgetTypeId || typeof minutes !== 'number') {
-    return NextResponse.json(
-      { error: 'kidId, pin, budgetTypeId, and minutes required' },
-      { status: 400 }
-    )
-  }
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(SetBalanceBody, body)
+  if (!parsed.success) return parsed.response
+
+  const { kidId, pin, budgetTypeId, minutes } = parsed.data
 
   const isValid = await validateParentPin(pin)
   if (!isValid) {
@@ -56,4 +62,4 @@ export async function POST(request: Request) {
       typeBalances: balance.typeBalances,
     },
   })
-}
+})

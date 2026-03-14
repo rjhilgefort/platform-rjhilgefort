@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { GoogleAnalytics } from '@next/third-parties/google'
 import { Outfit } from 'next/font/google'
 import './globals.css'
 
@@ -28,7 +27,6 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="bumblebee">
       <body className={outfit.className}>{children}</body>
-      <GoogleAnalytics gaId="TODO" />
     </html>
   )
 }
