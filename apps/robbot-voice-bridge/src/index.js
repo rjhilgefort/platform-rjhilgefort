@@ -47,7 +47,9 @@ const client = new Client({
 let voiceConnection = null;
 let audioPlayer = null;
 let logChannel = null;
-let isProcessing = false; // prevent overlapping pipeline runs
+let isProcessing = false;
+const conversationHistory = []; // rolling message history
+const MAX_HISTORY = 60; // keep last 20 messages (10 exchanges) // prevent overlapping pipeline runs
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
@@ -87,7 +89,7 @@ async function transcribe(wavBuffer) {
   return data.text?.trim() || "";
 }
 
-async function askOpenClaw(text) {
+async function askOpenClaw(text, history = []) {
   const res = await fetch(`${OPENCLAW_GATEWAY_URL}/v1/chat/completions`, {
     method: "POST",
     headers: {
@@ -96,7 +98,7 @@ async function askOpenClaw(text) {
     },
     body: JSON.stringify({
       model: OPENCLAW_AGENT_ID,
-      messages: [{ role: "user", content: text }],
+      messages: [...history, { role: "user", content: text }],
     }),
   });
   if (!res.ok) throw new Error(`OpenClaw ${res.status}: ${await res.text()}`);
@@ -176,13 +178,17 @@ async function handleSpeech(userId, pcmChunks) {
     }
     console.log(`[1/4] "${text}"`);
 
-    // 2. Ask OpenClaw
+    // 2. Ask OpenClaw (with conversation history)
     console.log("[2/4] Asking OpenClaw...");
-    const response = await askOpenClaw(text);
+    const response = await askOpenClaw(text, conversationHistory);
     if (!response) {
       console.log("[2/4] Empty response");
       return;
     }
+    // Update conversation history
+    conversationHistory.push({ role: "user", content: text });
+    conversationHistory.push({ role: "assistant", content: response });
+    while (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
     console.log(`[2/4] "${response.slice(0, 120)}..."`);
 
     // 3. Generate TTS

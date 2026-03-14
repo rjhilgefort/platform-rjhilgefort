@@ -1,40 +1,42 @@
 # RobBot Voice Bridge
 
-A lightweight Discord bot that bridges voice channels to RobBot (OpenClaw).
+Discord voice bridge that enables voice conversations with RobBot (OpenClaw).
 
-## How it works
+## Pipeline
 
-1. Bot joins a Discord voice channel
-2. Listens to your microphone, detects when you stop talking
-3. Transcribes speech via OpenAI Whisper
-4. Sends the text to RobBot via OpenClaw's HTTP API
-5. Logs both your speech and RobBot's reply in a text channel
-6. Plays RobBot's reply as TTS audio in the voice channel
+1. **Listen** — Captures speech from Discord voice channel
+2. **Transcribe** — OpenAI Whisper STT
+3. **Think** — Sends text to OpenClaw HTTP API, receives response
+4. **Speak** — OpenAI TTS generates audio, plays back in voice channel
+5. **Log** — Full transcript posted to `#🎙️voice` text channel
+
+## Requirements
+
+- Node.js 22+
+- ffmpeg (for audio processing)
+- Discord bot with Voice permissions + Privileged Gateway Intents
+- OpenAI API key (Whisper + TTS)
+- OpenClaw gateway with HTTP API enabled
 
 ## Setup
 
-1. Create a Discord application at https://discord.com/developers/applications
-2. Add a bot, copy the token
-3. Enable **Message Content Intent** and **Server Members Intent**
-4. Invite the bot with voice + message permissions
-5. Copy `.env.example` to `.env` and fill in values
-6. `npm install && npm start`
+```bash
+cp .env.example .env
+# Fill in your tokens
+npm install
+npm start
+```
 
-## Usage
+## Key Dependencies
 
-- `!join` — Bot joins your current voice channel
-- `!leave` — Bot leaves the voice channel
+- `@discordjs/voice` 0.19.1 — Discord voice connection
+- `@snazzah/davey` — DAVE E2EE protocol support (mandatory since March 2, 2026)
+- `sodium-native` — Encryption performance
+- `opusscript` — Opus audio decoding
 
-## Environment Variables
+## Commands
 
-| Variable | Description |
-|----------|-------------|
-| `DISCORD_BOT_TOKEN` | Bot token for the voice bridge |
-| `DISCORD_GUILD_ID` | Your Discord server ID |
-| `VOICE_LOG_CHANNEL_ID` | Text channel for conversation logs |
-| `OPENAI_API_KEY` | For Whisper STT + TTS |
-| `OPENCLAW_GATEWAY_URL` | RobBot gateway URL |
-| `OPENCLAW_GATEWAY_TOKEN` | Gateway auth token |
-| `OPENCLAW_AGENT_ID` | Agent to talk to (default: main) |
-| `TTS_VOICE` | OpenAI TTS voice (default: nova) |
-| `SILENCE_THRESHOLD_MS` | Silence before processing (default: 1500) |
+- `!join` — Join your voice channel
+- `!leave` — Leave voice channel
+- Auto-joins when someone enters a voice channel
+- Auto-leaves when everyone else leaves
