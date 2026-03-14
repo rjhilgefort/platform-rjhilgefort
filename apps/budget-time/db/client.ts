@@ -7,3 +7,8 @@ const pool = new Pool({
 })
 
 export const db = drizzle(pool, { schema })
+
+// Type that works for both the main db client and transaction objects
+type TxParam = Parameters<(typeof db)['transaction']>[0]
+type TxClient = Parameters<TxParam>[0]
+export type DbClient = typeof db | TxClient
