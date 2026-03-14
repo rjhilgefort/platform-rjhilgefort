@@ -215,6 +215,32 @@ function buildFullBalance(
     }),
   }
 }
+/**
+ * Update balance directly using known IDs (avoids re-fetching via getOrCreateTodayBalance)
+ */
+export async function updateBalanceDirect(
+  dailyBalanceId: number,
+  budgetTypeId: number,
+  deltaSeconds: number,
+  dbClient: DbClient = db
+): Promise<void> {
+  const typeBalanceRecord = await dbClient.query.dailyTypeBalances.findFirst({
+    where: and(
+      eq(dailyTypeBalances.dailyBalanceId, dailyBalanceId),
+      eq(dailyTypeBalances.budgetTypeId, budgetTypeId)
+    ),
+  })
+
+  if (!typeBalanceRecord) {
+    throw new Error(`Type balance record not found for dailyBalanceId=${dailyBalanceId}, budgetTypeId=${budgetTypeId}`)
+  }
+
+  await dbClient
+    .update(dailyTypeBalances)
+    .set({ remainingSeconds: typeBalanceRecord.remainingSeconds + deltaSeconds })
+    .where(eq(dailyTypeBalances.id, typeBalanceRecord.id))
+}
+
 
 /**
  * Update a kid's balance for a specific budget type

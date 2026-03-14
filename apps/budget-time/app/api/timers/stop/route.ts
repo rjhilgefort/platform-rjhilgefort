@@ -3,7 +3,7 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../../../db/client'
 import { timerEvents, budgetTypes, earningTypes } from '../../../../db/schema'
 import {
-  updateBalance,
+  updateBalanceDirect,
   getOrCreateTodayBalance,
   getEarningPoolBudgetType,
   getNegativeBalancePenalty,
@@ -60,6 +60,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Budget type not found' }, { status: 404 })
     }
 
+    // Fetch today's balance ONCE for all lookups
+    const currentBalance = await getOrCreateTodayBalance(kidId, tx)
+
     // Process based on timer type
     if (timer.earningTypeId) {
       // Earning timer: add earned time to target budget
@@ -72,7 +75,6 @@ export async function POST(request: Request) {
       }
 
       // Check if kid has negative Extra balance (apply penalty if so)
-      const currentBalance = await getOrCreateTodayBalance(kidId, tx)
       const extraTypeBalance = currentBalance.typeBalances.find((tb) => tb.isEarningPool)
       const extraBalance = extraTypeBalance?.remainingSeconds ?? 0
 
@@ -82,7 +84,7 @@ export async function POST(request: Request) {
       }
 
       const earnedSeconds = calculateEarnings(elapsedSeconds, earningType, penalty)
-      await updateBalance(kidId, timer.budgetTypeId, earnedSeconds, tx)
+      await updateBalanceDirect(currentBalance.dailyBalanceId, timer.budgetTypeId, earnedSeconds, tx)
 
       // Update timer to completed state
       await tx
@@ -94,7 +96,7 @@ export async function POST(request: Request) {
         })
         .where(eq(timerEvents.id, timer.id))
 
-      // Get updated balance
+      // Get updated balance for response
       const balance = await getOrCreateTodayBalance(kidId, tx)
 
       // Broadcast event
@@ -117,7 +119,6 @@ export async function POST(request: Request) {
       })
     } else {
       // Consumption timer: subtract elapsed time from budget
-      const currentBalance = await getOrCreateTodayBalance(kidId, tx)
       const currentTypeBalance = currentBalance.typeBalances.find(
         (tb) => tb.budgetTypeId === timer.budgetTypeId
       )
@@ -131,7 +132,7 @@ export async function POST(request: Request) {
 
       // Check if this IS the earning pool (Extra) - let it go negative directly
       if (budgetType.isEarningPool) {
-        await updateBalance(kidId, timer.budgetTypeId, -elapsedSeconds, tx)
+        await updateBalanceDirect(currentBalance.dailyBalanceId, timer.budgetTypeId, -elapsedSeconds, tx)
 
         await tx
           .update(timerEvents)
@@ -143,7 +144,7 @@ export async function POST(request: Request) {
           .where(eq(timerEvents.id, timer.id))
       } else if (elapsedSeconds <= remainingSeconds) {
         // No overflow - deduct normally
-        await updateBalance(kidId, timer.budgetTypeId, -elapsedSeconds, tx)
+        await updateBalanceDirect(currentBalance.dailyBalanceId, timer.budgetTypeId, -elapsedSeconds, tx)
 
         await tx
           .update(timerEvents)
@@ -157,7 +158,7 @@ export async function POST(request: Request) {
         // Overflow: deduct all remaining from original, overflow from Extra
         const overflow = elapsedSeconds - remainingSeconds
 
-        await updateBalance(kidId, timer.budgetTypeId, -remainingSeconds, tx)
+        await updateBalanceDirect(currentBalance.dailyBalanceId, timer.budgetTypeId, -remainingSeconds, tx)
 
         await tx
           .update(timerEvents)
@@ -169,7 +170,7 @@ export async function POST(request: Request) {
           .where(eq(timerEvents.id, timer.id))
 
         if (earningPool) {
-          await updateBalance(kidId, earningPool.id, -overflow, tx)
+          await updateBalanceDirect(currentBalance.dailyBalanceId, earningPool.id, -overflow, tx)
 
           await tx.insert(timerEvents).values({
             kidId,
@@ -183,7 +184,7 @@ export async function POST(request: Request) {
         }
       }
 
-      // Get updated balance
+      // Get updated balance for response
       const balance = await getOrCreateTodayBalance(kidId, tx)
 
       // Broadcast event
