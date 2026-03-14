@@ -1,21 +1,26 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../db/client'
 import { kids, timerEvents, budgetTypes } from '../../../db/schema'
 import { updateBalance, getOrCreateTodayBalance } from '../../../lib/balance'
 import { eventBroadcaster } from '../../../lib/events'
+import { apiHandler, parseBody } from '../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { kidId, minutes, budgetTypeId } = await request.json()
+const BonusBody = Schema.Struct({
+  kidId: Schema.Number,
+  minutes: Schema.Number,
+  budgetTypeId: Schema.Number,
+})
 
-  if (!kidId || minutes === undefined || !budgetTypeId) {
-    return NextResponse.json(
-      { error: 'kidId, minutes, and budgetTypeId required' },
-      { status: 400 }
-    )
-  }
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(BonusBody, body)
+  if (!parsed.success) return parsed.response
 
-  if (typeof minutes !== 'number' || minutes === 0) {
+  const { kidId, minutes, budgetTypeId } = parsed.data
+
+  if (minutes === 0) {
     return NextResponse.json(
       { error: 'minutes must be a non-zero number' },
       { status: 400 }
@@ -66,4 +71,4 @@ export async function POST(request: Request) {
       typeBalances: balance.typeBalances,
     },
   })
-}
+})

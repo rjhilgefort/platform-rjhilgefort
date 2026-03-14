@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { eq, sql } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../../db/client'
 import { timerEvents, budgetTypes, earningTypes } from '../../../../db/schema'
 import {
@@ -10,13 +11,18 @@ import {
 } from '../../../../lib/balance'
 import { calculateElapsedSeconds, calculateEarnings } from '../../../../lib/timer-logic'
 import { eventBroadcaster } from '../../../../lib/events'
+import { apiHandler, parseBody } from '../../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { kidId } = await request.json()
+const StopTimerBody = Schema.Struct({
+  kidId: Schema.Number,
+})
 
-  if (!kidId) {
-    return NextResponse.json({ error: 'kidId required' }, { status: 400 })
-  }
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(StopTimerBody, body)
+  if (!parsed.success) return parsed.response
+
+  const { kidId } = parsed.data
 
   return await db.transaction(async (tx) => {
     // Lock the active timer row with FOR UPDATE to prevent concurrent stops
@@ -206,4 +212,4 @@ export async function POST(request: Request) {
       })
     }
   })
-}
+})

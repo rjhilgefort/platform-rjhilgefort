@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 import { eq, desc, isNotNull, and, lt } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../db/client'
 import { timerEvents, budgetTypes, earningTypes } from '../../../db/schema'
 import { validateParentPin } from '../../../lib/auth'
+import { apiHandler, parseBody } from '../../../lib/api-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +25,7 @@ interface HistoryEntry {
   createdAt: string | null
 }
 
-export async function GET(request: Request) {
+export const GET = apiHandler(async (request: Request) => {
   const { searchParams } = new URL(request.url)
   const kidIdParam = searchParams.get('kidId')
   const limitParam = searchParams.get('limit')
@@ -53,7 +55,7 @@ export async function GET(request: Request) {
   const entries = await db.query.timerEvents.findMany({
     where: and(...conditions),
     orderBy: [desc(timerEvents.endedAt), desc(timerEvents.id)],
-    limit: limit + 1, // Fetch one extra to check for more
+    limit: limit + 1,
   })
 
   const hasMore = entries.length > limit
@@ -103,18 +105,20 @@ export async function GET(request: Request) {
       nextCursor,
     },
   })
-}
+})
 
-export async function PATCH(request: Request) {
+const EditHistoryBody = Schema.Struct({
+  id: Schema.Number,
+  endedAt: Schema.String,
+  pin: Schema.String,
+})
+
+export const PATCH = apiHandler(async (request: Request) => {
   const body = await request.json()
-  const { id, endedAt, pin } = body
+  const parsed = parseBody(EditHistoryBody, body)
+  if (!parsed.success) return parsed.response
 
-  if (!id || !endedAt || !pin) {
-    return NextResponse.json(
-      { error: 'id, endedAt, and pin are required' },
-      { status: 400 }
-    )
-  }
+  const { id, endedAt, pin } = parsed.data
 
   // Validate PIN
   const isValidPin = await validateParentPin(pin)
@@ -159,7 +163,6 @@ export async function PATCH(request: Request) {
       where: eq(earningTypes.id, entry.earningTypeId),
     })
     if (earningType) {
-      // earned_seconds = floor(elapsed * denominator / numerator)
       newSeconds = Math.floor(
         (elapsedSeconds * earningType.ratioDenominator) / earningType.ratioNumerator
       )
@@ -175,9 +178,5 @@ export async function PATCH(request: Request) {
     })
     .where(eq(timerEvents.id, id))
 
-  // Note: This does NOT update the balance - that would require recalculating
-  // all subsequent entries. For now, editing is for record-keeping only.
-  // A future enhancement could add balance recalculation.
-
   return NextResponse.json({ success: true, newSeconds })
-}
+})

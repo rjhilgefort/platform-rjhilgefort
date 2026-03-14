@@ -1,17 +1,29 @@
 import { NextResponse } from 'next/server'
 import { eq, sql } from 'drizzle-orm'
+import * as Schema from 'effect/Schema'
 import { db } from '../../../../db/client'
 import { timerEvents, kids, budgetTypes, earningTypes } from '../../../../db/schema'
 import { getOrCreateTodayBalance } from '../../../../lib/balance'
 import { eventBroadcaster } from '../../../../lib/events'
+import { apiHandler, parseBody } from '../../../../lib/api-utils'
 
-export async function POST(request: Request) {
-  const { kidId, budgetTypeId: requestedBudgetTypeId, earningTypeId } = await request.json()
+const StartTimerBody = Schema.Struct({
+  kidId: Schema.Number,
+  budgetTypeId: Schema.optional(Schema.Number),
+  earningTypeId: Schema.optional(Schema.Number),
+})
+
+export const POST = apiHandler(async (request: Request) => {
+  const body = await request.json()
+  const parsed = parseBody(StartTimerBody, body)
+  if (!parsed.success) return parsed.response
+
+  const { kidId, budgetTypeId: requestedBudgetTypeId, earningTypeId } = parsed.data
 
   // For earning timers, budgetTypeId is optional (will use Extra)
-  if (!kidId || (!earningTypeId && !requestedBudgetTypeId)) {
+  if (!earningTypeId && !requestedBudgetTypeId) {
     return NextResponse.json(
-      { error: 'kidId required, budgetTypeId required for consumption timers' },
+      { error: 'budgetTypeId required for consumption timers' },
       { status: 400 }
     )
   }
@@ -48,7 +60,7 @@ export async function POST(request: Request) {
       budgetTypeId = budgetType.id
     } else {
       budgetType = await tx.query.budgetTypes.findFirst({
-        where: eq(budgetTypes.id, budgetTypeId),
+        where: eq(budgetTypes.id, budgetTypeId!),
       })
       if (!budgetType) {
         return NextResponse.json({ error: 'Budget type not found' }, { status: 404 })
@@ -98,7 +110,7 @@ export async function POST(request: Request) {
       .values({
         kidId,
         eventType: 'in_progress',
-        budgetTypeId,
+        budgetTypeId: budgetTypeId!,
         earningTypeId: earningTypeId ?? null,
         startedAt: new Date(),
         endedAt: null,
@@ -136,4 +148,4 @@ export async function POST(request: Request) {
       },
     })
   })
-}
+})
