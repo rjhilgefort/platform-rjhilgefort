@@ -3,6 +3,14 @@ import * as Schema from 'effect/Schema'
 import { TreeFormatter } from 'effect/ParseResult'
 
 /**
+ * Schema helpers for fields that may be null, undefined, or a value.
+ * Use with Schema.optional() for struct fields the frontend may send as null.
+ */
+export const NullableNumber = Schema.Union(Schema.Number, Schema.Null, Schema.Undefined)
+export const NullableString = Schema.Union(Schema.String, Schema.Null, Schema.Undefined)
+export const NullableBoolean = Schema.Union(Schema.Boolean, Schema.Null, Schema.Undefined)
+
+/**
  * Parse and validate request JSON against an Effect Schema.
  * Returns { success: true, data } or { success: false, response: NextResponse }
  */

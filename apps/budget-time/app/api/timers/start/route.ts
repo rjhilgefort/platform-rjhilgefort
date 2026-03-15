@@ -5,12 +5,12 @@ import { db } from '../../../../db/client'
 import { timerEvents, kids, budgetTypes, earningTypes } from '../../../../db/schema'
 import { getOrCreateTodayBalance } from '../../../../lib/balance'
 import { eventBroadcaster } from '../../../../lib/events'
-import { apiHandler, parseBody } from '../../../../lib/api-utils'
+import { apiHandler, parseBody, NullableNumber } from '../../../../lib/api-utils'
 
 const StartTimerBody = Schema.Struct({
   kidId: Schema.Number,
-  budgetTypeId: Schema.optional(Schema.Number),
-  earningTypeId: Schema.optional(Schema.Number),
+  budgetTypeId: Schema.optional(NullableNumber),
+  earningTypeId: Schema.optional(NullableNumber),
 })
 
 export const POST = apiHandler(async (request: Request) => {
@@ -18,7 +18,9 @@ export const POST = apiHandler(async (request: Request) => {
   const parsed = parseBody(StartTimerBody, body)
   if (!parsed.success) return parsed.response
 
-  const { kidId, budgetTypeId: requestedBudgetTypeId, earningTypeId } = parsed.data
+  const { kidId } = parsed.data
+  const requestedBudgetTypeId = parsed.data.budgetTypeId ?? undefined
+  const earningTypeId = parsed.data.earningTypeId ?? undefined
 
   // For earning timers, budgetTypeId is optional (will use Extra)
   if (!earningTypeId && !requestedBudgetTypeId) {
