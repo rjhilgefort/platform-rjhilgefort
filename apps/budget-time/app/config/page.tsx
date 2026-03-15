@@ -1,8 +1,10 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
-import { TbArrowLeft } from 'react-icons/tb'
+import { TbArrowLeft, TbLogout } from 'react-icons/tb'
 import { ExpandingSlider } from '../../components/ExpandingSlider'
 import { IconPickerModal } from '../../components/IconPickerModal'
 import { ProfilePictureCropModal } from '../../components/ProfilePictureCropModal'
@@ -54,6 +56,12 @@ interface StatusData {
 }
 
 export default function ConfigPage() {
+  const router = useRouter()
+  const handleLogout = async () => {
+    await fetch('/api/auth', { method: 'DELETE' })
+    router.push('/login')
+  }
+
   const [kids, setKids] = useState<KidConfig[]>([])
   const [budgetTypes, setBudgetTypes] = useState<BudgetType[]>([])
   const [earningTypes, setEarningTypes] = useState<EarningType[]>([])
@@ -1368,6 +1376,18 @@ export default function ConfigPage() {
           ))}
         </div>
       )}
+
+      {/* Logout */}
+      <div className="mt-8 pt-4 border-t border-base-300 flex justify-center">
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm text-base-content/40 gap-1"
+          onClick={handleLogout}
+        >
+          <TbLogout className="w-4 h-4" />
+          Log Out
+        </button>
+      </div>
 
       <IconPickerModal
         isOpen={iconPickerTarget !== null}
