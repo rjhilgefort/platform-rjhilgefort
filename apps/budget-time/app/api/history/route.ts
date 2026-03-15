@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { eq, desc, isNotNull, and, lt } from 'drizzle-orm'
+import { eq, desc, isNotNull, and, lt, inArray } from 'drizzle-orm'
 import * as Schema from 'effect/Schema'
 import { db } from '../../../db/client'
-import { timerEvents, budgetTypes, earningTypes } from '../../../db/schema'
+import { timerEvents, budgetTypes, earningTypes, dailyBalances, dailyTypeBalances, kidBudgetDefaults } from '../../../db/schema'
 import { validateParentPin } from '../../../lib/auth'
 import { apiHandler, parseBody } from '../../../lib/api-utils'
 
@@ -97,8 +97,129 @@ export const GET = apiHandler(async (request: Request) => {
     })
   )
 
+  // Fetch daily balance data for allowances and end-of-day summaries
+  const uniqueDates = [...new Set(
+    resultEntries
+      .map((e) => e.endedAt)
+      .filter((d): d is Date => d !== null)
+      .map((d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+  )]
+
+  const dailyAllowances: Record<string, Array<{
+    kidId: number
+    kidName: string
+    budgetTypes: Array<{
+      budgetTypeId: number
+      displayName: string
+      icon: string | null
+      allowanceSeconds: number
+      carryoverSeconds: number
+    }>
+  }>> = {}
+
+  const endOfDaySummaries: Record<string, Array<{
+    kidId: number
+    kidName: string
+    budgetTypes: Array<{
+      budgetTypeId: number
+      displayName: string
+      icon: string | null
+      remainingSeconds: number
+    }>
+  }>> = {}
+
+  if (uniqueDates.length > 0) {
+    const balanceConditions = [inArray(dailyBalances.date, uniqueDates)]
+    if (kidIdParam) {
+      balanceConditions.push(eq(dailyBalances.kidId, parseInt(kidIdParam, 10)))
+    }
+
+    const [balanceData, defaults] = await Promise.all([
+      db
+        .select({
+          date: dailyBalances.date,
+          kidId: dailyBalances.kidId,
+          budgetTypeId: dailyTypeBalances.budgetTypeId,
+          remainingSeconds: dailyTypeBalances.remainingSeconds,
+          carryoverSeconds: dailyTypeBalances.carryoverSeconds,
+          budgetDisplayName: budgetTypes.displayName,
+          budgetIcon: budgetTypes.icon,
+        })
+        .from(dailyBalances)
+        .innerJoin(dailyTypeBalances, eq(dailyTypeBalances.dailyBalanceId, dailyBalances.id))
+        .innerJoin(budgetTypes, eq(budgetTypes.id, dailyTypeBalances.budgetTypeId))
+        .where(and(...balanceConditions)),
+      db
+        .select({
+          kidId: kidBudgetDefaults.kidId,
+          budgetTypeId: kidBudgetDefaults.budgetTypeId,
+          dailyBudgetMinutes: kidBudgetDefaults.dailyBudgetMinutes,
+        })
+        .from(kidBudgetDefaults),
+    ])
+
+    const defaultsMap = new Map<string, number>()
+    for (const d of defaults) {
+      defaultsMap.set(`${d.kidId}-${d.budgetTypeId}`, d.dailyBudgetMinutes)
+    }
+
+    for (const date of uniqueDates) {
+      const dateRows = balanceData.filter((r) => r.date === date)
+
+      const kidMap = new Map<number, typeof dateRows>()
+      for (const row of dateRows) {
+        const existing = kidMap.get(row.kidId)
+        if (existing) {
+          existing.push(row)
+        } else {
+          kidMap.set(row.kidId, [row])
+        }
+      }
+
+      const allowances: (typeof dailyAllowances)[string] = []
+      const summaries: (typeof endOfDaySummaries)[string] = []
+
+      for (const [kidId, rows] of kidMap) {
+        const kid = allKids.find((k) => k.id === kidId)
+        const kidName = kid?.name ?? 'Unknown'
+        rows.sort((a, b) => a.budgetTypeId - b.budgetTypeId)
+
+        allowances.push({
+          kidId,
+          kidName,
+          budgetTypes: rows.map((r) => {
+            const baseBudgetMinutes = defaultsMap.get(`${kidId}-${r.budgetTypeId}`) ?? 0
+            return {
+              budgetTypeId: r.budgetTypeId,
+              displayName: r.budgetDisplayName,
+              icon: r.budgetIcon,
+              allowanceSeconds: baseBudgetMinutes * 60 + r.carryoverSeconds,
+              carryoverSeconds: r.carryoverSeconds,
+            }
+          }),
+        })
+
+        summaries.push({
+          kidId,
+          kidName,
+          budgetTypes: rows.map((r) => ({
+            budgetTypeId: r.budgetTypeId,
+            displayName: r.budgetDisplayName,
+            icon: r.budgetIcon,
+            remainingSeconds: r.remainingSeconds,
+          })),
+        })
+      }
+
+      dailyAllowances[date] = allowances
+      endOfDaySummaries[date] = summaries
+    }
+  }
+
   return NextResponse.json({
     entries: enrichedEntries,
+    dailyAllowances,
+    endOfDaySummaries,
     kids: allKids.map((k) => ({ id: k.id, name: k.name })),
     pagination: {
       hasMore,

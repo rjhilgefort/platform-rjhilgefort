@@ -29,6 +29,33 @@ interface Kid {
   name: string
 }
 
+interface BudgetTypeAllowance {
+  budgetTypeId: number
+  displayName: string
+  icon: string | null
+  allowanceSeconds: number
+  carryoverSeconds: number
+}
+
+interface DailyAllowance {
+  kidId: number
+  kidName: string
+  budgetTypes: BudgetTypeAllowance[]
+}
+
+interface BudgetTypeRemaining {
+  budgetTypeId: number
+  displayName: string
+  icon: string | null
+  remainingSeconds: number
+}
+
+interface EndOfDaySummary {
+  kidId: number
+  kidName: string
+  budgetTypes: BudgetTypeRemaining[]
+}
+
 interface DayGroup {
   label: string
   date: string
@@ -102,6 +129,8 @@ export default function HistoryPage() {
   const [nextCursor, setNextCursor] = useState<number | null>(null)
   const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [dailyAllowances, setDailyAllowances] = useState<Record<string, DailyAllowance[]>>({})
+  const [endOfDaySummaries, setEndOfDaySummaries] = useState<Record<string, EndOfDaySummary[]>>({})
 
   // Edit state
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -134,6 +163,8 @@ export default function HistoryPage() {
       const data = await fetchHistory()
       setEntries(data.entries)
       setKids(data.kids)
+      setDailyAllowances(data.dailyAllowances ?? {})
+      setEndOfDaySummaries(data.endOfDaySummaries ?? {})
       setHasMore(data.pagination.hasMore)
       setNextCursor(data.pagination.nextCursor)
     } catch {
@@ -149,6 +180,8 @@ export default function HistoryPage() {
     try {
       const data = await fetchHistory(nextCursor)
       setEntries((prev) => [...prev, ...data.entries])
+      setDailyAllowances((prev) => ({ ...prev, ...(data.dailyAllowances ?? {}) }))
+      setEndOfDaySummaries((prev) => ({ ...prev, ...(data.endOfDaySummaries ?? {}) }))
       setHasMore(data.pagination.hasMore)
       setNextCursor(data.pagination.nextCursor)
     } catch {
@@ -320,6 +353,51 @@ export default function HistoryPage() {
 
                 {/* Day entries */}
                 <div className="space-y-2">
+                  {/* Daily Allowance cards */}
+                  {(dailyAllowances[group.date] ?? []).map((allowance) => (
+                    <div
+                      key={`allowance-${allowance.kidId}`}
+                      className="card bg-base-100 shadow-sm p-3"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-blue-400 shrink-0">
+                          <span className="text-lg">🔄</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{allowance.kidName}</span>
+                            <span className="text-base-content/50">·</span>
+                            <span className="text-blue-400 font-semibold">Daily Allowance</span>
+                          </div>
+                          <div className="text-xs text-base-content/60 mt-0.5 flex flex-wrap gap-x-3">
+                            {allowance.budgetTypes.map((bt) => {
+                              const BtIcon = bt.icon ? getIconComponent(bt.icon) : null
+                              return (
+                                <span key={bt.budgetTypeId} className="whitespace-nowrap">
+                                  {BtIcon && <BtIcon className="w-3 h-3 inline-block align-text-bottom" />}
+                                  {' '}{bt.displayName}: <span className="text-success font-medium">+{formatTime(bt.allowanceSeconds)}</span>
+                                </span>
+                              )
+                            })}
+                          </div>
+                          {allowance.budgetTypes.some((bt) => bt.carryoverSeconds > 0) && (
+                            <div className="text-[11px] text-base-content/50 italic mt-0.5">
+                              {'includes '}
+                              {allowance.budgetTypes
+                                .filter((bt) => bt.carryoverSeconds > 0)
+                                .map((bt, i) => (
+                                  <span key={bt.budgetTypeId}>
+                                    {i > 0 && ', '}
+                                    {formatTime(bt.carryoverSeconds)} carryover on {bt.displayName}
+                                  </span>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
                   {group.entries.map((entry) => {
                     const isEditing = editingId === entry.id
                     const isEarning = entry.eventType === 'earned'
@@ -434,6 +512,30 @@ export default function HistoryPage() {
                     )
                   })}
                 </div>
+
+                {/* End of Day summary */}
+                {(endOfDaySummaries[group.date] ?? []).length > 0 && (
+                  <div className="mt-2 rounded-[10px] px-3.5 py-2.5" style={{ background: '#ECECEC' }}>
+                    <div className="text-[11px] font-semibold text-base-content/50 mb-1">End of Day</div>
+                    {(endOfDaySummaries[group.date] ?? []).map((summary) => (
+                      <div key={summary.kidId} className="text-xs mb-0.5 flex flex-wrap items-center gap-x-3">
+                        <span className="font-bold">{summary.kidName}</span>
+                        {summary.budgetTypes.map((bt) => {
+                          const BtIcon = bt.icon ? getIconComponent(bt.icon) : null
+                          return (
+                            <span key={bt.budgetTypeId} className="whitespace-nowrap">
+                              {BtIcon && <BtIcon className="w-3 h-3 inline-block align-text-bottom" />}
+                              {' '}
+                              <span className={bt.remainingSeconds >= 0 ? 'text-success' : 'text-error'}>
+                                {formatTime(bt.remainingSeconds)}
+                              </span>
+                            </span>
+                          )
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
