@@ -5,7 +5,7 @@ import { db } from '../../../db/client'
 import { budgetTypes, earningTypes, kidBudgetDefaults, kids } from '../../../db/schema'
 import { getNegativeBalancePenalty, getTimezone, getResetHour, setAppSetting } from '../../../lib/balance'
 import { validateParentPin } from '../../../lib/auth'
-import { apiHandler, apiHandlerNoArgs, parseBody } from '../../../lib/api-utils'
+import { apiHandler, apiHandlerNoArgs, parseBody, NullableNumber, NullableString, NullableBoolean } from '../../../lib/api-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -111,8 +111,8 @@ export const PUT = apiHandler(async (request: Request) => {
       const schema = Schema.Struct({
         slug: Schema.String,
         displayName: Schema.String,
-        allowCarryover: Schema.optional(Schema.Boolean),
-        icon: Schema.optional(Schema.String),
+        allowCarryover: Schema.optional(NullableBoolean),
+        icon: Schema.optional(NullableString),
       })
       const parsed = parseBody(schema, body)
       if (!parsed.success) return parsed.response
@@ -147,9 +147,9 @@ export const PUT = apiHandler(async (request: Request) => {
     case 'updateBudgetType': {
       const schema = Schema.Struct({
         budgetTypeId: Schema.Number,
-        displayName: Schema.optional(Schema.String),
-        allowCarryover: Schema.optional(Schema.Boolean),
-        icon: Schema.optional(Schema.String),
+        displayName: Schema.optional(NullableString),
+        allowCarryover: Schema.optional(NullableBoolean),
+        icon: Schema.optional(NullableString),
       })
       const parsed = parseBody(schema, body)
       if (!parsed.success) return parsed.response
@@ -201,9 +201,9 @@ export const PUT = apiHandler(async (request: Request) => {
       const schema = Schema.Struct({
         slug: Schema.String,
         displayName: Schema.String,
-        ratioNumerator: Schema.optional(Schema.Number),
-        ratioDenominator: Schema.optional(Schema.Number),
-        icon: Schema.optional(Schema.String),
+        ratioNumerator: Schema.optional(NullableNumber),
+        ratioDenominator: Schema.optional(NullableNumber),
+        icon: Schema.optional(NullableString),
       })
       const parsed = parseBody(schema, body)
       if (!parsed.success) return parsed.response
@@ -227,10 +227,10 @@ export const PUT = apiHandler(async (request: Request) => {
     case 'updateEarningType': {
       const schema = Schema.Struct({
         earningTypeId: Schema.Number,
-        displayName: Schema.optional(Schema.String),
-        ratioNumerator: Schema.optional(Schema.Number),
-        ratioDenominator: Schema.optional(Schema.Number),
-        icon: Schema.optional(Schema.String),
+        displayName: Schema.optional(NullableString),
+        ratioNumerator: Schema.optional(NullableNumber),
+        ratioDenominator: Schema.optional(NullableNumber),
+        icon: Schema.optional(NullableString),
       })
       const parsed = parseBody(schema, body)
       if (!parsed.success) return parsed.response
@@ -325,7 +325,7 @@ export const PUT = apiHandler(async (request: Request) => {
     case 'updateKidProfilePicture': {
       const schema = Schema.Struct({
         kidId: Schema.Number,
-        profilePicture: Schema.optional(Schema.String),
+        profilePicture: Schema.optional(NullableString),
       })
       const parsed = parseBody(schema, body)
       if (!parsed.success) return parsed.response
