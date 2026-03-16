@@ -21,6 +21,9 @@ WORKDIR /app
 COPY --from=builder /app/out/json/ .
 RUN npm install
 
+# Ensure native bindings for musl/Alpine are present (npm optional dep bug)
+RUN npm rebuild @tailwindcss/oxide || true
+
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN npm run build
