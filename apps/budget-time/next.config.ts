@@ -20,3 +20,4 @@ const exportedConfig =
     : nextConfig
 
 export default exportedConfig
+
