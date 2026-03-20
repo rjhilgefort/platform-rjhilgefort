@@ -93,9 +93,11 @@ async function askOpenClaw(text) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENCLAW_GATEWAY_TOKEN}`,
+      "x-openclaw-agent-id": OPENCLAW_AGENT_ID,
+      "x-openclaw-session-key": `agent:${OPENCLAW_AGENT_ID}:discord:channel:${VOICE_LOG_CHANNEL_ID}`,
     },
     body: JSON.stringify({
-      model: OPENCLAW_AGENT_ID,
+      model: "openclaw",
       messages: [{ role: "user", content: text }],
     }),
   });
