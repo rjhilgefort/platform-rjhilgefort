@@ -1,12 +1,14 @@
 import { cdpCall } from './cdp.js';
 
-const RATE_LIMIT_DELAY_MS = 200;
+export const RATE_LIMIT_DELAY_MS = 200;
 
 /**
  * Call a Slack API method via CDP Runtime.evaluate (runs fetch inside the Slack tab).
  * Handles 429 rate limits with retry.
  */
-export async function slackAPI(ws, token, method, params = {}) {
+const MAX_RETRIES = 3;
+
+export async function slackAPI(ws, token, method, params = {}, _retries = 0) {
   const body = new URLSearchParams({ token, ...params }).toString();
   const expr = `
     fetch('https://app.slack.com/api/${method}', {
@@ -28,12 +30,15 @@ export async function slackAPI(ws, token, method, params = {}) {
     throw new Error(`No response from Slack API: ${method}`);
   }
 
-  // Handle rate limiting
+  // Handle rate limiting with retry cap
   if (value.error === 'ratelimited') {
-    const retryAfter = (value.headers?.['retry-after'] || 5) * 1000;
-    console.error(`Rate limited on ${method}, waiting ${retryAfter}ms...`);
-    await sleep(retryAfter);
-    return slackAPI(ws, token, method, params);
+    if (_retries >= MAX_RETRIES) {
+      throw new Error(`Rate limited on ${method} after ${MAX_RETRIES} retries`);
+    }
+    const waitMs = 5000;
+    console.error(`Rate limited on ${method}, waiting ${waitMs}ms (retry ${_retries + 1}/${MAX_RETRIES})...`);
+    await sleep(waitMs);
+    return slackAPI(ws, token, method, params, _retries + 1);
   }
 
   return value;

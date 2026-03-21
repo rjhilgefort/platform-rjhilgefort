@@ -2,12 +2,10 @@ import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { findSlackTab, connectCDP, closeCDP } from './cdp.js';
-import { slackAPI, slackAPIPaginate, sleep } from './slack-api.js';
+import { slackAPI, slackAPIPaginate, sleep, RATE_LIMIT_DELAY_MS } from './slack-api.js';
 import { readJSON, writeJSON } from './data.js';
 
 const ROB_USER_ID = 'U08AA03B0TV';
-const TEAM_ID = 'T032DFUNJ';
-const RATE_LIMIT_DELAY_MS = 200;
 
 // ---------------------------------------------------------------------------
 // Credentials
