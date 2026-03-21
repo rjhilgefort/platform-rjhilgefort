@@ -3,17 +3,20 @@
   "version": "0.11.6",
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3007 --turbopack",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
     "check-types": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
+    "db:seed": "npx tsx db/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "npx tsx db/seed.ts"
+    "dev": "next dev --port 3007 --turbopack",
+    "dev:down": "docker compose -f docker-compose.dev.yml down",
+    "dev:reset": "docker compose -f docker-compose.dev.yml down -v && docker compose -f docker-compose.dev.yml up -d && sleep 3 && npm run db:push && npm run db:seed",
+    "dev:up": "docker compose -f docker-compose.dev.yml up -d",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "start": "next start"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
