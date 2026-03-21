@@ -1,0 +1,113 @@
+name: Create/Update Deploy PR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for pending changesets
+        id: check
+        run: |
+          # Find changeset files (exclude config.json and README.md)
+          CHANGESETS=$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null)
+          if [ -z "$CHANGESETS" ]; then
+            echo "No pending changesets"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build PR body from changesets
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          BODY="## 🚀 Pending Deployment\n\n"
+          BODY+="The following changesets are on \`main\` and ready to deploy.\n\n"
+
+          # Parse each changeset file
+          for file in $(find .changeset -name '*.md' ! -name 'README.md' | sort); do
+            FILENAME=$(basename "$file")
+
+            # Extract package name(s) from frontmatter
+            PACKAGES=$(sed -n '/^---$/,/^---$/p' "$file" | grep -v '^---$' | sed 's/:.*//' | sed 's/^"//' | sed 's/"$//' | tr '\n' ', ' | sed 's/, $//')
+
+            # Extract bump type
+            BUMP=$(sed -n '/^---$/,/^---$/p' "$file" | grep -v '^---$' | head -1 | sed 's/.*: //')
+
+            # Extract description (everything after second ---)
+            DESC=$(sed '1,/^---$/d' "$file" | sed '1,/^---$/d' | sed '/^$/d')
+
+            BODY+="### 📦 ${PACKAGES} (\`${BUMP}\`)\n\n"
+            BODY+="${DESC}\n\n"
+          done
+
+          # Add diff stats vs deploy/production
+          git fetch origin deploy/production 2>/dev/null || true
+          if git rev-parse origin/deploy/production >/dev/null 2>&1; then
+            BODY+="---\n\n"
+            BODY+="### Diff vs production\n\n"
+
+            CHANGED=$(git diff --name-only origin/deploy/production..origin/main 2>/dev/null | grep -oE '^(apps|packages)/[^/]+' | sort -u)
+            if [ -n "$CHANGED" ]; then
+              BODY+="**Affected:**\n"
+              while IFS= read -r dir; do
+                BODY+="- \`${dir}\`\n"
+              done <<< "$CHANGED"
+              BODY+="\n"
+            fi
+
+            STATS=$(git diff --stat origin/deploy/production..origin/main 2>/dev/null | tail -1)
+            if [ -n "$STATS" ]; then
+              BODY+="\`\`\`\n${STATS}\n\`\`\`\n"
+            fi
+          fi
+
+          BODY+="\n---\n"
+          BODY+="_Merge this PR to deploy all pending changes to production._\n"
+          BODY+="_Auto-updated on every push to main._"
+
+          echo -e "$BODY" > /tmp/pr-body.md
+
+      - name: Create or update deploy PR
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --base deploy/production --head main --json number --jq '.[0].number' 2>/dev/null)
+
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            gh pr edit "$EXISTING_PR" --body-file /tmp/pr-body.md
+            echo "Updated existing deploy PR #$EXISTING_PR"
+          else
+            # Create label if it doesn't exist
+            gh label create deploy --color 0E8A16 --description "Production deployment" 2>/dev/null || true
+            gh pr create \
+              --base deploy/production \
+              --head main \
+              --title "🚀 Deploy to Production" \
+              --body-file /tmp/pr-body.md \
+              --label "deploy"
+            echo "Created new deploy PR"
+          fi
+
+      - name: Close deploy PR if nothing pending
+        if: steps.check.outputs.has_changes == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --base deploy/production --head main --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            gh pr close "$EXISTING_PR" --comment "All changesets have been deployed. Closing."
+            echo "Closed deploy PR #$EXISTING_PR"
+          fi
