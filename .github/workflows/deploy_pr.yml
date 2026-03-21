@@ -1,0 +1,104 @@
+name: Create/Update Deploy PR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for unreleased changes
+        id: check
+        run: |
+          git fetch origin deploy/production
+          COMMITS=$(git log --oneline origin/deploy/production..origin/main -- . 2>/dev/null)
+          if [ -z "$COMMITS" ]; then
+            echo "No new commits to deploy"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build PR body
+        if: steps.check.outputs.has_changes == 'true'
+        id: body
+        run: |
+          git fetch origin deploy/production
+
+          BODY="## 🚀 Pending Deployment\n\n"
+          BODY+="Changes on \`main\` not yet deployed to \`deploy/production\`.\n\n"
+          BODY+="### Commits\n\n"
+
+          # Get commit list with PR links
+          while IFS= read -r line; do
+            SHA=$(echo "$line" | cut -d' ' -f1)
+            MSG=$(echo "$line" | cut -d' ' -f2-)
+            BODY+="- [\`${SHA}\`](https://github.com/${{ github.repository }}/commit/${SHA}) ${MSG}\n"
+          done <<< "$(git log --oneline origin/deploy/production..origin/main)"
+
+          BODY+="\n### Changed Apps/Packages\n\n"
+
+          # Get affected top-level dirs
+          CHANGED=$(git diff --name-only origin/deploy/production..origin/main | grep -oE '^(apps|packages)/[^/]+' | sort -u)
+          if [ -n "$CHANGED" ]; then
+            while IFS= read -r dir; do
+              BODY+="- \`${dir}\`\n"
+            done <<< "$CHANGED"
+          else
+            BODY+="- _(root/config changes only)_\n"
+          fi
+
+          BODY+="\n### Diff Stats\n\n\`\`\`\n"
+          BODY+="$(git diff --stat origin/deploy/production..origin/main | tail -1)\n"
+          BODY+="\`\`\`\n"
+
+          BODY+="\n---\n"
+          BODY+="_Merge this PR to deploy all changes to production._\n"
+          BODY+="_This PR is auto-updated on every push to main._"
+
+          # Write to file to avoid escaping issues
+          echo -e "$BODY" > /tmp/pr-body.md
+
+      - name: Create or update deploy PR
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if deploy PR already exists
+          EXISTING_PR=$(gh pr list --base deploy/production --head main --json number --jq '.[0].number' 2>/dev/null)
+
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            # Update existing PR body
+            gh pr edit "$EXISTING_PR" --body-file /tmp/pr-body.md
+            echo "Updated existing deploy PR #$EXISTING_PR"
+          else
+            # Create new PR
+            gh pr create \
+              --base deploy/production \
+              --head main \
+              --title "🚀 Deploy to Production" \
+              --body-file /tmp/pr-body.md \
+              --label "deploy"
+            echo "Created new deploy PR"
+          fi
+
+      - name: Close deploy PR if nothing to deploy
+        if: steps.check.outputs.has_changes == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --base deploy/production --head main --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            gh pr close "$EXISTING_PR" --comment "All changes have been deployed. Closing."
+            echo "Closed deploy PR #$EXISTING_PR"
+          fi
