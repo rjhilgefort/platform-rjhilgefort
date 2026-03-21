@@ -1,0 +1,16 @@
+{
+  "name": "@repo/slack-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "check": "node src/index.js --check",
+    "poll": "node src/index.js --poll",
+    "sync-users": "node src/index.js --sync-users",
+    "unread": "node src/index.js --unread"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
