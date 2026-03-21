@@ -33,6 +33,19 @@ const {
 const SILENCE_MS = parseInt(SILENCE_THRESHOLD_MS, 10);
 const SAMPLE_RATE = 48000;
 const CHANNELS = 2;
+const API_TIMEOUT_MS = 30_000;
+
+// ── Whisper Hallucination Filter ────────────────────────────────────
+// Whisper returns phantom text on silence/noise — filter these out
+const WHISPER_HALLUCINATIONS = new Set([
+  "thank you.", "thank you", "thanks.", "thanks",
+  "thanks for watching.", "thanks for watching!",
+  "thanks for watching", "thank you for watching.",
+  "thank you for watching", "subscribe to my channel.",
+  "subscribe.", "you", "bye.", "bye!", "bye",
+  "the end.", "the end", "...", "so",
+  "i'm sorry.", "okay.", "oh.",
+]);
 
 // ── Discord Client ──────────────────────────────────────────────────
 const client = new Client({
@@ -47,9 +60,9 @@ const client = new Client({
 let voiceConnection = null;
 let audioPlayer = null;
 let logChannel = null;
-let isProcessing = false;
+let isProcessing = false; // prevent overlapping pipeline runs
 const conversationHistory = []; // rolling message history
-const MAX_HISTORY = 60; // keep last 20 messages (10 exchanges) // prevent overlapping pipeline runs
+const MAX_HISTORY = 60; // keep last 60 messages (30 exchanges)
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
@@ -83,10 +96,19 @@ async function transcribe(wavBuffer) {
     method: "POST",
     headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
     body: formData,
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`Whisper ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  return data.text?.trim() || "";
+  const text = data.text?.trim() || "";
+
+  // Filter Whisper hallucinations
+  if (WHISPER_HALLUCINATIONS.has(text.toLowerCase())) {
+    console.log(`[whisper] Filtered hallucination: "${text}"`);
+    return "";
+  }
+
+  return text;
 }
 
 async function askOpenClaw(text, history = []) {
@@ -95,11 +117,14 @@ async function askOpenClaw(text, history = []) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENCLAW_GATEWAY_TOKEN}`,
+      "x-openclaw-agent-id": OPENCLAW_AGENT_ID,
+      "x-openclaw-session-key": `agent:${OPENCLAW_AGENT_ID}:discord:channel:${VOICE_LOG_CHANNEL_ID}`,
     },
     body: JSON.stringify({
-      model: OPENCLAW_AGENT_ID,
+      model: "openclaw",
       messages: [...history, { role: "user", content: text }],
     }),
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`OpenClaw ${res.status}: ${await res.text()}`);
   const data = await res.json();
@@ -119,6 +144,7 @@ async function generateTTS(text) {
       input: text.slice(0, 4096), // TTS limit
       response_format: "mp3",
     }),
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`TTS ${res.status}: ${await res.text()}`);
 
@@ -232,7 +258,9 @@ function setupReceiver(connection) {
       try {
         const decoded = decoder.decode(packet);
         pcmChunks.push(Buffer.from(decoded));
-      } catch {}
+      } catch (err) {
+        console.warn(`[opus] Decode error for ${userId}:`, err.message);
+      }
     });
 
     opusStream.on("end", () => {
@@ -244,6 +272,28 @@ function setupReceiver(connection) {
       console.error(`[stream] ${userId}:`, err.message);
       activeStreams.delete(userId);
     });
+  });
+}
+
+// ── Voice Connection Recovery ───────────────────────────────────────
+
+function setupConnectionRecovery(connection) {
+  connection.on(VoiceConnectionStatus.Disconnected, async () => {
+    console.warn("[bot] Voice connection disconnected, attempting recovery...");
+    try {
+      // Try to reconnect (handles Discord server migration)
+      await Promise.race([
+        entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+        entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+      ]);
+      console.log("[bot] Reconnecting automatically...");
+    } catch {
+      // Genuine disconnect — destroy and let auto-join handle it
+      console.warn("[bot] Recovery failed, destroying connection");
+      connection.destroy();
+      voiceConnection = null;
+      audioPlayer = null;
+    }
   });
 }
 
@@ -272,6 +322,7 @@ async function autoJoin(guild) {
   try {
     await entersState(voiceConnection, VoiceConnectionStatus.Ready, 30_000);
     setupReceiver(voiceConnection);
+    setupConnectionRecovery(voiceConnection);
     console.log("[bot] Connected and listening!");
   } catch (err) {
     console.error("[bot] Failed:", err.message);
@@ -303,6 +354,7 @@ client.on(Events.MessageCreate, async (message) => {
     try {
       await entersState(voiceConnection, VoiceConnectionStatus.Ready, 30_000);
       setupReceiver(voiceConnection);
+      setupConnectionRecovery(voiceConnection);
       await message.reply("🦞 Listening!");
     } catch {
       await message.reply("Failed to connect.");
@@ -326,12 +378,16 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     await autoJoin(newState.guild);
   }
   if (oldState.channel && voiceConnection) {
-    const humans = oldState.channel.members.filter((m) => !m.user.bot);
-    if (humans.size === 0) {
-      console.log("[bot] Everyone left, disconnecting");
-      voiceConnection.destroy();
-      voiceConnection = null;
-      audioPlayer = null;
+    // Only auto-leave if the bot is in the channel that just lost a member
+    const botChannelId = voiceConnection.joinConfig?.channelId;
+    if (oldState.channel.id === botChannelId) {
+      const humans = oldState.channel.members.filter((m) => !m.user.bot);
+      if (humans.size === 0) {
+        console.log("[bot] Everyone left, disconnecting");
+        voiceConnection.destroy();
+        voiceConnection = null;
+        audioPlayer = null;
+      }
     }
   }
 });
