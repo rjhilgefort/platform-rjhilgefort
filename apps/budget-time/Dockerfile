@@ -21,10 +21,6 @@ WORKDIR /app
 COPY --from=builder /app/out/json/ .
 RUN npm install
 
-# Fix: explicitly install @tailwindcss/oxide native binding for Alpine/musl
-# npm has a bug with optional deps (https://github.com/npm/cli/issues/4828)
-RUN npm install @tailwindcss/oxide-linux-x64-musl --no-save || true
-
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN npm run build
