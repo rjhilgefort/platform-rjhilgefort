@@ -107,12 +107,6 @@ async function cmdPoll() {
     );
     console.error(`Found ${channels.length} channels`);
 
-    // Build channel info map for name resolution
-    const channelInfo = {};
-    for (const ch of channels) {
-      channelInfo[ch.id] = ch;
-    }
-
     const items = [];
 
     for (const ch of channels) {
@@ -122,8 +116,13 @@ async function cmdPoll() {
       const res = await slackAPI(ws, token, 'conversations.history', {
         channel: ch.id,
         oldest,
-        limit: '20',
+        limit: '100',
       });
+
+      if (res.has_more) {
+        const chName = resolveChannelName(ch, usersMap);
+        console.error(`Warning: #${chName} has more messages than limit, some may be missed`);
+      }
 
       if (!res.ok) {
         // Some channels may not be accessible; skip silently
@@ -196,10 +195,13 @@ function categorizeMessage(channel, msg) {
   // DM or group DM
   if (channel.is_im || channel.is_mpim) return 'dm';
 
-  // Direct mention
+  // Direct mention (in any context)
   if (msg.text?.includes(`<@${ROB_USER_ID}>`)) return 'mention';
 
-  // Thread reply (message is in a thread)
+  // Thread reply — only flag if it's a thread (not the parent message)
+  // Note: this catches all thread replies in channels Rob is in.
+  // Without an extra API call per thread, we can't know if Rob participated.
+  // The cron consumer can filter further if needed.
   if (msg.thread_ts && msg.thread_ts !== msg.ts) return 'thread_reply';
 
   return 'channel';
@@ -243,22 +245,13 @@ async function cmdUnread() {
       'channels',
     );
 
+    // Use unread counts already present on channel objects from users.conversations
+    // Falls back to unread_count if unread_count_display isn't available
     const unreadChannels = [];
-
     for (const ch of channels) {
-      await sleep(RATE_LIMIT_DELAY_MS);
-      const info = await slackAPI(ws, token, 'conversations.info', {
-        channel: ch.id,
-      });
-
-      if (!info.ok) continue;
-
-      const unread = info.channel?.unread_count_display || 0;
+      const unread = ch.unread_count_display ?? ch.unread_count ?? 0;
       if (unread > 0) {
-        const name = resolveChannelName(
-          info.channel || ch,
-          usersMap,
-        );
+        const name = resolveChannelName(ch, usersMap);
         unreadChannels.push({ channel_id: ch.id, name, unread });
       }
     }
