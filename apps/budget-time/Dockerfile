@@ -1,11 +1,11 @@
-FROM node:18-alpine AS base
+FROM node:22-alpine AS base
 
 FROM base AS builder
 RUN apk update
 RUN apk add --no-cache libc6-compat
 # Set working directory
 WORKDIR /app
-RUN yarn global add turbo@^2
+RUN npm install -g turbo@^2
 COPY . .
 
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
@@ -19,7 +19,7 @@ WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN npm install
+RUN npm ci
 
 # Build the project
 COPY --from=builder /app/out/full/ .
@@ -39,4 +39,4 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/budget-time/.next/standalo
 COPY --from=installer --chown=nextjs:nodejs /app/apps/budget-time/.next/static ./apps/budget-time/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/budget-time/public ./apps/budget-time/public
 
-CMD ["node", "--experimental-modules", "apps/budget-time/server.js"]
+CMD ["node", "apps/budget-time/server.js"]
