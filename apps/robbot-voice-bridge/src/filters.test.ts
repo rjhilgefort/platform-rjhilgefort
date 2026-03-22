@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isWhisperHallucination } from "../../src/filters.js";
+import { isWhisperHallucination } from "./filters.js";
 
 describe("isWhisperHallucination", () => {
   const knownHallucinations = [

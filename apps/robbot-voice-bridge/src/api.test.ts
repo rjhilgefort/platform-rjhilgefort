@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("../../src/config.js", () => ({
+vi.mock("./config.js", () => ({
   config: {
     openaiApiKey: "test-openai-key",
     openclawGatewayUrl: "https://openclaw.test",
@@ -12,15 +12,15 @@ vi.mock("../../src/config.js", () => ({
   },
 }));
 
-vi.mock("../../src/audio.js", () => ({
+vi.mock("./audio.js", () => ({
   saveTtsToFile: vi.fn().mockResolvedValue("/tmp/test-tts.mp3"),
 }));
 
 const fetchMock = vi.fn();
 vi.stubGlobal("fetch", fetchMock);
 
-import { transcribe, askOpenClaw, generateTTS } from "../../src/api.js";
-import { saveTtsToFile } from "../../src/audio.js";
+import { transcribe, askOpenClaw, generateTTS } from "./api.js";
+import { saveTtsToFile } from "./audio.js";
 
 beforeEach(() => {
   fetchMock.mockReset();

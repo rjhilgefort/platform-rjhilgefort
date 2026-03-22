@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Client, Guild, GuildMember, GuildMemberManager, Collection } from "discord.js";
-import type { VoiceState } from "../../src/types.js";
+import type { VoiceState } from "./types.js";
 
-vi.mock("../../src/config.js", () => ({
+vi.mock("./config.js", () => ({
   config: {
     sampleRate: 48_000,
     channels: 2,
@@ -14,7 +14,7 @@ vi.mock("../../src/config.js", () => ({
 const mockTranscribe = vi.fn();
 const mockAskOpenClaw = vi.fn();
 const mockGenerateTTS = vi.fn();
-vi.mock("../../src/api.js", () => ({
+vi.mock("./api.js", () => ({
   transcribe: (...args: Array<unknown>) => mockTranscribe(...args),
   askOpenClaw: (...args: Array<unknown>) => mockAskOpenClaw(...args),
   generateTTS: (...args: Array<unknown>) => mockGenerateTTS(...args),
@@ -22,12 +22,12 @@ vi.mock("../../src/api.js", () => ({
 
 const mockPcmToWav = vi.fn().mockReturnValue(Buffer.from("wav-data"));
 const mockPlayAudio = vi.fn().mockResolvedValue(undefined);
-vi.mock("../../src/audio.js", () => ({
+vi.mock("./audio.js", () => ({
   pcmToWav: (...args: Array<unknown>) => mockPcmToWav(...args),
   playAudio: (...args: Array<unknown>) => mockPlayAudio(...args),
 }));
 
-import { handleSpeech } from "../../src/pipeline.js";
+import { handleSpeech } from "./pipeline.js";
 
 function makeState(overrides: Partial<VoiceState> = {}): VoiceState {
   return {

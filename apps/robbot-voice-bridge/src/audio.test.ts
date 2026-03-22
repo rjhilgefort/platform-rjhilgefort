@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { pcmToWav } from "../../src/audio.js";
+import { pcmToWav } from "./audio.js";
 
 describe("pcmToWav", () => {
   const sampleRate = 48_000;
