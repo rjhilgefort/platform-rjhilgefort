@@ -1,5 +1,5 @@
 ---
-"robbot-voice-bridge": patch
+"@repo/openclaw-voice-bridge": patch
 ---
 
 Reliability and correctness improvements from code review:
