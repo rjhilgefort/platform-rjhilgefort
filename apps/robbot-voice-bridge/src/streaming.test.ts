@@ -293,6 +293,35 @@ describe("streamOpenClaw", () => {
     expect(result?.fullText).toBe("Done.");
   });
 
+  it("passes external signal to fetch", async () => {
+    const controller = new AbortController();
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      body: makeSSEStream(["data: [DONE]\n\n"]),
+    });
+
+    const gen = streamOpenClaw("test", [], controller.signal);
+    for (;;) {
+      const { done } = await gen.next();
+      if (done) break;
+    }
+
+    const [, opts] = fetchMock.mock.calls[0] as [string, RequestInit];
+    // Signal should be an AbortSignal (combined from external + timeout)
+    expect(opts.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("aborts fetch when external signal is aborted before call", async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    fetchMock.mockRejectedValue(new DOMException("The operation was aborted", "AbortError"));
+
+    const gen = streamOpenClaw("test", [], controller.signal);
+    await expect(gen.next()).rejects.toThrow("aborted");
+  });
+
   it("flushes remaining buffer as final chunk", async () => {
     const sseChunks = [
       'data: {"choices":[{"delta":{"content":"Short ending text"}}]}\n\n',

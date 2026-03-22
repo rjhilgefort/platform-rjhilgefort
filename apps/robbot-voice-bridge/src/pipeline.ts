@@ -20,6 +20,27 @@ async function logExchange(
   }
 }
 
+/**
+ * Interrupt the active pipeline — abort LLM stream, clear audio queue, stop playback.
+ */
+export function interruptPipeline(state: VoiceState): void {
+  if (state.isInterrupting) return;
+  state.isInterrupting = true;
+
+  console.log("[interrupt] Interrupting active pipeline");
+
+  state.abortController?.abort();
+  state.abortController = null;
+
+  state.activeAudioQueue?.interrupt();
+  state.activeAudioQueue = null;
+
+  state.audioPlayer?.stop();
+
+  state.isProcessing = false;
+  state.isInterrupting = false;
+}
+
 export async function handleSpeech(
   client: Client<true>,
   state: VoiceState,
@@ -41,6 +62,9 @@ export async function handleSpeech(
   }
   state.isProcessing = true;
 
+  const abortController = new AbortController();
+  state.abortController = abortController;
+
   console.log(`[speech] ${durationSec.toFixed(1)}s from ${userId}`);
 
   try {
@@ -57,10 +81,12 @@ export async function handleSpeech(
     // 2. Stream LLM + TTS pipeline
     console.log("[2/3] Streaming LLM → TTS...");
     const audioQueue = new AudioQueue();
+    state.activeAudioQueue = audioQueue;
     let fullText = "";
+    let interrupted = false;
 
     try {
-      const generator = streamOpenClaw(text, state.conversationHistory);
+      const generator = streamOpenClaw(text, state.conversationHistory, abortController.signal);
 
       for (;;) {
         const { value, done } = await generator.next();
@@ -93,35 +119,50 @@ export async function handleSpeech(
         }
       }
     } catch (streamErr) {
-      // Fallback to non-streaming path
-      console.warn("[2/3] Stream failed, falling back:", streamErr instanceof Error ? streamErr.message : streamErr);
-      const response = await askOpenClaw(text, state.conversationHistory);
-      if (!response) {
-        console.log("[2/3] Empty response");
-        return;
-      }
-      fullText = response;
+      if (abortController.signal.aborted) {
+        console.log("[2/3] Pipeline interrupted by user speech");
+        interrupted = true;
+      } else {
+        // Fallback to non-streaming path
+        console.warn("[2/3] Stream failed, falling back:", streamErr instanceof Error ? streamErr.message : streamErr);
+        const response = await askOpenClaw(text, state.conversationHistory);
+        if (!response) {
+          console.log("[2/3] Empty response");
+          return;
+        }
+        fullText = response;
 
-      const ttsPath = await generateTTS(response);
-      await playAudio(ttsPath, state.audioPlayer);
+        const ttsPath = await generateTTS(response);
+        await playAudio(ttsPath, state.audioPlayer);
+      }
     }
 
-    // 3. Wait for all audio to finish
-    console.log("[3/3] Waiting for playback...");
-    await audioQueue.waitForAll();
+    if (!interrupted) {
+      // 3. Wait for all audio to finish
+      console.log("[3/3] Waiting for playback...");
+      await audioQueue.waitForAll();
+    }
 
     if (!fullText) {
       console.log("[2/3] Empty response");
       return;
     }
 
-    // Update history
+    // Update history (even partial on interrupt)
     state.conversationHistory.push({ role: "user", content: text });
-    state.conversationHistory.push({ role: "assistant", content: fullText });
+    state.conversationHistory.push({
+      role: "assistant",
+      content: interrupted ? `${fullText} [interrupted]` : fullText,
+    });
     while (state.conversationHistory.length > config.maxHistory) {
       state.conversationHistory.shift();
     }
-    console.log(`[done] "${fullText.slice(0, 120)}..."`);
+
+    if (interrupted) {
+      console.log(`[interrupted] partial: "${fullText.slice(0, 120)}..."`);
+    } else {
+      console.log(`[done] "${fullText.slice(0, 120)}..."`);
+    }
 
     // Log transcript
     const guild = client.guilds.cache.get(config.discordGuildId);
@@ -129,8 +170,14 @@ export async function handleSpeech(
     const userName = member?.displayName ?? userId;
     await logExchange(state, userName, text, fullText);
   } catch (err) {
-    console.error("[pipeline]", err instanceof Error ? err.message : err);
+    if (abortController.signal.aborted) {
+      console.log("[pipeline] Aborted by interrupt");
+    } else {
+      console.error("[pipeline]", err instanceof Error ? err.message : err);
+    }
   } finally {
+    state.abortController = null;
+    state.activeAudioQueue = null;
     state.isProcessing = false;
   }
 }

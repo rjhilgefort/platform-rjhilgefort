@@ -133,7 +133,13 @@ const MIN_CHUNK_SIZE = 20;
 export async function* streamOpenClaw(
   text: string,
   history: Array<ChatMessage>,
+  signal?: AbortSignal,
 ): AsyncGenerator<SentenceChunk, StreamResult> {
+  const timeoutSignal = AbortSignal.timeout(config.apiTimeoutMs);
+  const combinedSignal = signal
+    ? AbortSignal.any([signal, timeoutSignal])
+    : timeoutSignal;
+
   const res = await fetch(`${config.openclawGatewayUrl}/v1/chat/completions`, {
     method: "POST",
     headers: {
@@ -147,7 +153,7 @@ export async function* streamOpenClaw(
       stream: true,
       messages: [...history, { role: "user", content: text }],
     }),
-    signal: AbortSignal.timeout(config.apiTimeoutMs),
+    signal: combinedSignal,
   });
 
   if (!res.ok) throw new Error(`OpenClaw ${res.status}: ${await res.text()}`);
@@ -162,6 +168,7 @@ export async function* streamOpenClaw(
 
   try {
     for (;;) {
+      if (combinedSignal.aborted) break;
       const { done, value } = await reader.read();
       if (done) break;
 

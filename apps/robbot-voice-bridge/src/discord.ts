@@ -10,7 +10,7 @@ import {
 } from "@discordjs/voice";
 import OpusScript from "opusscript";
 import { config } from "./config.js";
-import { handleSpeech } from "./pipeline.js";
+import { handleSpeech, interruptPipeline } from "./pipeline.js";
 import type { VoiceState } from "./types.js";
 
 const state: VoiceState = {
@@ -19,6 +19,9 @@ const state: VoiceState = {
   logChannel: null,
   isProcessing: false,
   conversationHistory: [],
+  abortController: null,
+  activeAudioQueue: null,
+  isInterrupting: false,
 };
 
 function setupReceiver(voiceState: VoiceState): void {
@@ -32,7 +35,18 @@ function setupReceiver(voiceState: VoiceState): void {
     if (userId === client.user?.id) return;
     if (activeStreams.has(userId)) return;
 
+    // Interrupt active pipeline if someone starts speaking
+    if (
+      config.interruptEnabled &&
+      voiceState.isProcessing &&
+      !voiceState.isInterrupting
+    ) {
+      console.log(`[interrupt] User ${userId} started speaking during playback`);
+      interruptPipeline(voiceState);
+    }
+
     const pcmChunks: Array<Buffer> = [];
+    const speechStartMs = Date.now();
     const opusStream = voiceConnection.receiver.subscribe(userId, {
       end: {
         behavior: EndBehaviorType.AfterSilence,
@@ -56,7 +70,12 @@ function setupReceiver(voiceState: VoiceState): void {
 
     opusStream.on("end", () => {
       activeStreams.delete(userId);
-      void handleSpeech(client as Client<true>, state, userId, pcmChunks);
+      const durationMs = Date.now() - speechStartMs;
+      if (durationMs < config.interruptMinDurationMs) {
+        console.log(`[skip] Speech too short for processing (${durationMs}ms)`);
+        return;
+      }
+      void handleSpeech(client as Client<true>, voiceState, userId, pcmChunks);
     });
 
     opusStream.on("error", (err: Error) => {
@@ -174,6 +193,10 @@ client.on(Events.MessageCreate, async (message) => {
   }
 
   if (message.content === "!leave") {
+    state.abortController?.abort();
+    state.abortController = null;
+    state.activeAudioQueue = null;
+    state.isProcessing = false;
     state.voiceConnection?.destroy();
     state.voiceConnection = null;
     state.audioPlayer = null;
@@ -191,6 +214,10 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
       const humans = oldState.channel.members.filter((m) => !m.user.bot);
       if (humans.size === 0) {
         console.log("[bot] Everyone left, disconnecting");
+        state.abortController?.abort();
+        state.abortController = null;
+        state.activeAudioQueue = null;
+        state.isProcessing = false;
         state.voiceConnection.destroy();
         state.voiceConnection = null;
         state.audioPlayer = null;

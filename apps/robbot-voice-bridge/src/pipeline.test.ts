@@ -8,6 +8,8 @@ vi.mock("./config.js", () => ({
     channels: 2,
     maxHistory: 4,
     discordGuildId: "test-guild",
+    interruptEnabled: true,
+    interruptMinDurationMs: 300,
   },
 }));
 
@@ -37,6 +39,7 @@ vi.mock("./audio.js", () => {
       void fn();
     }
     async waitForAll(): Promise<void> {}
+    interrupt(): void {}
   }
 
   return {
@@ -47,7 +50,7 @@ vi.mock("./audio.js", () => {
   };
 });
 
-import { handleSpeech } from "./pipeline.js";
+import { handleSpeech, interruptPipeline } from "./pipeline.js";
 
 function makeState(overrides: Partial<VoiceState> = {}): VoiceState {
   return {
@@ -56,6 +59,9 @@ function makeState(overrides: Partial<VoiceState> = {}): VoiceState {
     logChannel: null,
     isProcessing: false,
     conversationHistory: [],
+    abortController: null,
+    activeAudioQueue: null,
+    isInterrupting: false,
     ...overrides,
   };
 }
@@ -333,6 +339,113 @@ describe("handleSpeech", () => {
     const state = makeState({ logChannel: null });
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
+    expect(state.isProcessing).toBe(false);
+  });
+
+  it("sets abortController on state during processing", async () => {
+    let capturedController: AbortController | null = null;
+    mockTranscribe.mockImplementation(() => {
+      capturedController = state.abortController;
+      return Promise.resolve("Hello");
+    });
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    expect(capturedController).toBeInstanceOf(AbortController);
+    // Cleaned up after completion
+    expect(state.abortController).toBeNull();
+    expect(state.activeAudioQueue).toBeNull();
+  });
+
+  it("handles abort gracefully during stream", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+
+    // Generator that throws AbortError on second call
+    const abortGen = {
+      callCount: 0,
+      [Symbol.asyncIterator]() { return this; },
+      async next(): Promise<IteratorResult<SentenceChunk, { fullText: string }>> {
+        abortGen.callCount++;
+        if (abortGen.callCount === 1) {
+          return {
+            value: { text: "Partial response.", index: 0, isFinal: false },
+            done: false as const,
+          };
+        }
+        const err = new DOMException("The operation was aborted", "AbortError");
+        throw err;
+      },
+      async return(value: { fullText: string }) {
+        return { value, done: true as const };
+      },
+      async throw(err: Error) { throw err; },
+    };
+    mockStreamOpenClaw.mockReturnValue(abortGen);
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    // Simulate: pipeline starts, then abort is triggered mid-stream
+    const speechPromise = handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+    // The abort happens inside the generator mock
+    // We need to manually abort after transcribe
+    queueMicrotask(() => {
+      state.abortController?.abort();
+    });
+    await speechPromise;
+
+    expect(state.isProcessing).toBe(false);
+    expect(state.abortController).toBeNull();
+  });
+});
+
+describe("interruptPipeline", () => {
+  it("aborts controller, interrupts queue, stops player, resets state", () => {
+    const abortController = new AbortController();
+    const mockInterrupt = vi.fn();
+    const mockStop = vi.fn();
+
+    const state = makeState({
+      isProcessing: true,
+      abortController,
+      activeAudioQueue: { interrupt: mockInterrupt, enqueue: vi.fn(), waitForAll: vi.fn() } as unknown as VoiceState["activeAudioQueue"],
+      audioPlayer: { stop: mockStop } as unknown as VoiceState["audioPlayer"],
+    });
+
+    interruptPipeline(state);
+
+    expect(abortController.signal.aborted).toBe(true);
+    expect(mockInterrupt).toHaveBeenCalledOnce();
+    expect(mockStop).toHaveBeenCalledOnce();
+    expect(state.isProcessing).toBe(false);
+    expect(state.abortController).toBeNull();
+    expect(state.activeAudioQueue).toBeNull();
+  });
+
+  it("guards against re-entrant interrupts", () => {
+    const state = makeState({
+      isProcessing: true,
+      isInterrupting: true,
+    });
+
+    interruptPipeline(state);
+
+    // isProcessing unchanged because guard returned early
+    expect(state.isProcessing).toBe(true);
+  });
+
+  it("handles null controller and queue gracefully", () => {
+    const state = makeState({
+      isProcessing: true,
+      abortController: null,
+      activeAudioQueue: null,
+    });
+
+    expect(() => interruptPipeline(state)).not.toThrow();
     expect(state.isProcessing).toBe(false);
   });
 });
