@@ -20,6 +20,16 @@ export interface OpenClawResponse {
   choices: Array<OpenClawChoice>;
 }
 
+export interface SentenceChunk {
+  text: string;
+  index: number;
+  isFinal: boolean;
+}
+
+export interface StreamResult {
+  fullText: string;
+}
+
 export interface VoiceState {
   voiceConnection: VoiceConnection | null;
   audioPlayer: AudioPlayer | null;

@@ -75,3 +75,30 @@ export async function generateTTS(text: string): Promise<string> {
 
   return saveTtsToFile(await res.arrayBuffer());
 }
+
+/**
+ * Generate TTS and return the response body as a ReadableStream (Opus/OGG format).
+ * Streams directly — no temp file.
+ */
+export async function generateTTSStream(
+  text: string,
+): Promise<ReadableStream<Uint8Array>> {
+  const res = await fetch("https://api.openai.com/v1/audio/speech", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.openaiApiKey}`,
+    },
+    body: JSON.stringify({
+      model: "tts-1",
+      voice: config.ttsVoice,
+      input: text.slice(0, 4096),
+      response_format: "opus",
+    }),
+    signal: AbortSignal.timeout(config.apiTimeoutMs),
+  });
+  if (!res.ok) throw new Error(`TTS ${res.status}: ${await res.text()}`);
+  if (!res.body) throw new Error("TTS response has no body");
+
+  return res.body;
+}

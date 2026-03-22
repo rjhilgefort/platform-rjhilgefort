@@ -1,7 +1,8 @@
 import type { Client } from "discord.js";
 import { config } from "./config.js";
-import { pcmToWav, playAudio } from "./audio.js";
-import { transcribe, askOpenClaw, generateTTS } from "./api.js";
+import { pcmToWav, playAudio, playAudioStream, AudioQueue } from "./audio.js";
+import { transcribe, askOpenClaw, generateTTS, generateTTSStream } from "./api.js";
+import { streamOpenClaw } from "./streaming.js";
 import type { VoiceState } from "./types.js";
 
 async function logExchange(
@@ -45,42 +46,74 @@ export async function handleSpeech(
   try {
     // 1. Transcribe
     const wavBuffer = pcmToWav(pcmBuffer, config.sampleRate, config.channels);
-    console.log("[1/4] Transcribing...");
+    console.log("[1/3] Transcribing...");
     const text = await transcribe(wavBuffer);
     if (!text || text.length < 2) {
-      console.log("[1/4] Empty transcription");
+      console.log("[1/3] Empty transcription");
       return;
     }
-    console.log(`[1/4] "${text}"`);
+    console.log(`[1/3] "${text}"`);
 
-    // 2. Ask OpenClaw
-    console.log("[2/4] Asking OpenClaw...");
-    const response = await askOpenClaw(text, state.conversationHistory);
-    if (!response) {
-      console.log("[2/4] Empty response");
+    // 2. Stream LLM + TTS pipeline
+    console.log("[2/3] Streaming LLM → TTS...");
+    const audioQueue = new AudioQueue();
+    let fullText = "";
+
+    try {
+      const generator = streamOpenClaw(text, state.conversationHistory);
+
+      for (;;) {
+        const { value, done } = await generator.next();
+        if (done) {
+          fullText = value.fullText;
+          break;
+        }
+
+        const sentence = value;
+        console.log(`[2/3] chunk ${sentence.index}: "${sentence.text.slice(0, 60)}..."`);
+
+        // Fire off TTS + queue playback for each sentence
+        const ttsStream = await generateTTSStream(sentence.text);
+        audioQueue.enqueue(() =>
+          playAudioStream(ttsStream, state.audioPlayer),
+        );
+      }
+    } catch (streamErr) {
+      // Fallback to non-streaming path
+      console.warn("[2/3] Stream failed, falling back:", streamErr instanceof Error ? streamErr.message : streamErr);
+      const response = await askOpenClaw(text, state.conversationHistory);
+      if (!response) {
+        console.log("[2/3] Empty response");
+        return;
+      }
+      fullText = response;
+
+      const ttsPath = await generateTTS(response);
+      await playAudio(ttsPath, state.audioPlayer);
+    }
+
+    // 3. Wait for all audio to finish
+    console.log("[3/3] Waiting for playback...");
+    await audioQueue.waitForAll();
+
+    if (!fullText) {
+      console.log("[2/3] Empty response");
       return;
     }
+
+    // Update history
     state.conversationHistory.push({ role: "user", content: text });
-    state.conversationHistory.push({ role: "assistant", content: response });
+    state.conversationHistory.push({ role: "assistant", content: fullText });
     while (state.conversationHistory.length > config.maxHistory) {
       state.conversationHistory.shift();
     }
-    console.log(`[2/4] "${response.slice(0, 120)}..."`);
-
-    // 3. Generate TTS
-    console.log("[3/4] Generating TTS...");
-    const ttsPath = await generateTTS(response);
-
-    // 4. Play back
-    console.log("[4/4] Playing...");
-    await playAudio(ttsPath, state.audioPlayer);
-    console.log("[done]");
+    console.log(`[done] "${fullText.slice(0, 120)}..."`);
 
     // Log transcript
     const guild = client.guilds.cache.get(config.discordGuildId);
     const member = await guild?.members.fetch(userId).catch(() => null);
     const userName = member?.displayName ?? userId;
-    await logExchange(state, userName, text, response);
+    await logExchange(state, userName, text, fullText);
   } catch (err) {
     console.error("[pipeline]", err instanceof Error ? err.message : err);
   } finally {

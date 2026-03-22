@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Client, Guild, GuildMember, GuildMemberManager, Collection } from "discord.js";
-import type { VoiceState } from "./types.js";
+import type { Client, Guild, GuildMember, GuildMemberManager } from "discord.js";
+import type { VoiceState, SentenceChunk } from "./types.js";
 
 vi.mock("./config.js", () => ({
   config: {
@@ -14,18 +14,38 @@ vi.mock("./config.js", () => ({
 const mockTranscribe = vi.fn();
 const mockAskOpenClaw = vi.fn();
 const mockGenerateTTS = vi.fn();
+const mockGenerateTTSStream = vi.fn();
 vi.mock("./api.js", () => ({
   transcribe: (...args: Array<unknown>) => mockTranscribe(...args),
   askOpenClaw: (...args: Array<unknown>) => mockAskOpenClaw(...args),
   generateTTS: (...args: Array<unknown>) => mockGenerateTTS(...args),
+  generateTTSStream: (...args: Array<unknown>) => mockGenerateTTSStream(...args),
+}));
+
+const mockStreamOpenClaw = vi.fn();
+vi.mock("./streaming.js", () => ({
+  streamOpenClaw: (...args: Array<unknown>) => mockStreamOpenClaw(...args),
 }));
 
 const mockPcmToWav = vi.fn().mockReturnValue(Buffer.from("wav-data"));
 const mockPlayAudio = vi.fn().mockResolvedValue(undefined);
-vi.mock("./audio.js", () => ({
-  pcmToWav: (...args: Array<unknown>) => mockPcmToWav(...args),
-  playAudio: (...args: Array<unknown>) => mockPlayAudio(...args),
-}));
+const mockPlayAudioStream = vi.fn().mockResolvedValue(undefined);
+
+vi.mock("./audio.js", () => {
+  class MockAudioQueue {
+    enqueue(fn: () => Promise<void>): void {
+      void fn();
+    }
+    async waitForAll(): Promise<void> {}
+  }
+
+  return {
+    pcmToWav: (...args: Array<unknown>) => mockPcmToWav(...args),
+    playAudio: (...args: Array<unknown>) => mockPlayAudio(...args),
+    playAudioStream: (...args: Array<unknown>) => mockPlayAudioStream(...args),
+    AudioQueue: MockAudioQueue,
+  };
+});
 
 import { handleSpeech } from "./pipeline.js";
 
@@ -41,7 +61,6 @@ function makeState(overrides: Partial<VoiceState> = {}): VoiceState {
 }
 
 // 48000 Hz * 2 channels * 2 bytes = 192000 bytes/sec
-// 1 second of audio = 192000 bytes
 const BYTES_PER_SEC = 48_000 * 2 * 2;
 
 function makePcmChunks(durationSec: number): Array<Buffer> {
@@ -69,31 +88,75 @@ function makeClient(memberName?: string): Client<true> {
   } as unknown as Client<true>;
 }
 
+/**
+ * Create a mock async generator that yields sentences then returns fullText.
+ */
+function makeMockStreamGenerator(
+  sentences: Array<string>,
+  fullText: string,
+): AsyncGenerator<SentenceChunk, { fullText: string }> {
+  let index = 0;
+  return {
+    [Symbol.asyncIterator]() { return this; },
+    async next() {
+      if (index < sentences.length) {
+        const text = sentences[index] ?? "";
+        const chunk: SentenceChunk = {
+          text,
+          index,
+          isFinal: index === sentences.length - 1,
+        };
+        index++;
+        return { value: chunk, done: false as const };
+      }
+      return { value: { fullText }, done: true as const };
+    },
+    async return(value: { fullText: string }) {
+      return { value, done: true as const };
+    },
+    async throw(err: Error) {
+      throw err;
+    },
+  };
+}
+
+/** Mock ReadableStream to satisfy generateTTSStream return type */
+function makeMockTTSStream(): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    start(controller) {
+      controller.close();
+    },
+  });
+}
+
 beforeEach(() => {
   mockTranscribe.mockReset();
   mockAskOpenClaw.mockReset();
   mockGenerateTTS.mockReset();
+  mockGenerateTTSStream.mockReset();
+  mockStreamOpenClaw.mockReset();
   mockPcmToWav.mockReset().mockReturnValue(Buffer.from("wav-data"));
   mockPlayAudio.mockReset().mockResolvedValue(undefined);
+  mockPlayAudioStream.mockReset().mockResolvedValue(undefined);
 });
 
 describe("handleSpeech", () => {
-  it("completes full pipeline flow", async () => {
+  it("completes streaming pipeline flow", async () => {
     mockTranscribe.mockResolvedValue("Hello bot");
-    mockAskOpenClaw.mockResolvedValue("Hello human");
-    mockGenerateTTS.mockResolvedValue("/tmp/tts.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hello human.", "How are you?"], "Hello human. How are you?"),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
 
     const state = makeState();
     await handleSpeech(makeClient("TestUser"), state, "user-123", makePcmChunks(1));
 
     expect(mockPcmToWav).toHaveBeenCalledOnce();
     expect(mockTranscribe).toHaveBeenCalledOnce();
-    // history array is passed by reference and mutated after the call,
-    // so we verify the first arg (text) and that history was passed
-    expect(mockAskOpenClaw.mock.calls[0]?.[0]).toBe("Hello bot");
-    expect(mockAskOpenClaw.mock.calls[0]?.[1]).toBe(state.conversationHistory);
-    expect(mockGenerateTTS).toHaveBeenCalledWith("Hello human");
-    expect(mockPlayAudio).toHaveBeenCalledWith("/tmp/tts.mp3", null);
+    expect(mockStreamOpenClaw.mock.calls[0]?.[0]).toBe("Hello bot");
+    expect(mockGenerateTTSStream).toHaveBeenCalledTimes(2);
+    expect(mockGenerateTTSStream).toHaveBeenCalledWith("Hello human.");
+    expect(mockGenerateTTSStream).toHaveBeenCalledWith("How are you?");
   });
 
   it("skips audio shorter than 0.5s", async () => {
@@ -109,7 +172,7 @@ describe("handleSpeech", () => {
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
     expect(mockTranscribe).not.toHaveBeenCalled();
-    expect(state.isProcessing).toBe(true); // unchanged
+    expect(state.isProcessing).toBe(true);
   });
 
   it("handles empty transcription", async () => {
@@ -118,7 +181,7 @@ describe("handleSpeech", () => {
     const state = makeState();
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
-    expect(mockAskOpenClaw).not.toHaveBeenCalled();
+    expect(mockStreamOpenClaw).not.toHaveBeenCalled();
     expect(state.isProcessing).toBe(false);
   });
 
@@ -128,40 +191,46 @@ describe("handleSpeech", () => {
     const state = makeState();
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
-    expect(mockAskOpenClaw).not.toHaveBeenCalled();
+    expect(mockStreamOpenClaw).not.toHaveBeenCalled();
     expect(state.isProcessing).toBe(false);
   });
 
-  it("handles empty LLM response", async () => {
+  it("handles empty LLM response from stream", async () => {
     mockTranscribe.mockResolvedValue("Hello bot");
-    mockAskOpenClaw.mockResolvedValue("");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator([], ""),
+    );
 
     const state = makeState();
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
-    expect(mockGenerateTTS).not.toHaveBeenCalled();
+    expect(mockGenerateTTSStream).not.toHaveBeenCalled();
     expect(state.conversationHistory).toHaveLength(0);
     expect(state.isProcessing).toBe(false);
   });
 
   it("updates conversation history correctly", async () => {
     mockTranscribe.mockResolvedValue("Hello");
-    mockAskOpenClaw.mockResolvedValue("Hi there");
-    mockGenerateTTS.mockResolvedValue("/tmp/tts.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi there."], "Hi there."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
 
     const state = makeState();
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
     expect(state.conversationHistory).toEqual([
       { role: "user", content: "Hello" },
-      { role: "assistant", content: "Hi there" },
+      { role: "assistant", content: "Hi there." },
     ]);
   });
 
   it("trims history at maxHistory (4)", async () => {
     mockTranscribe.mockResolvedValue("msg");
-    mockAskOpenClaw.mockResolvedValue("reply");
-    mockGenerateTTS.mockResolvedValue("/tmp/tts.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["reply."], "reply."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
 
     const state = makeState({
       conversationHistory: [
@@ -174,7 +243,6 @@ describe("handleSpeech", () => {
 
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
-    // maxHistory=4, so after pushing 2 more (total 6) it shifts until 4
     expect(state.conversationHistory).toHaveLength(4);
     expect(state.conversationHistory[0]).toEqual({
       role: "user",
@@ -182,14 +250,16 @@ describe("handleSpeech", () => {
     });
     expect(state.conversationHistory[3]).toEqual({
       role: "assistant",
-      content: "reply",
+      content: "reply.",
     });
   });
 
   it("resets isProcessing on success", async () => {
     mockTranscribe.mockResolvedValue("Hello");
-    mockAskOpenClaw.mockResolvedValue("Hi");
-    mockGenerateTTS.mockResolvedValue("/tmp/tts.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
 
     const state = makeState();
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
@@ -206,10 +276,39 @@ describe("handleSpeech", () => {
     expect(state.isProcessing).toBe(false);
   });
 
+  it("falls back to non-streaming on stream error", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue({
+      [Symbol.asyncIterator]() { return this; },
+      async next(): Promise<IteratorResult<SentenceChunk, { fullText: string }>> {
+        throw new Error("stream broke");
+      },
+      async return(value: { fullText: string }) {
+        return { value, done: true };
+      },
+      async throw(err: Error) { throw err; },
+    });
+    mockAskOpenClaw.mockResolvedValue("Fallback reply");
+    mockGenerateTTS.mockResolvedValue("/tmp/fallback.mp3");
+
+    const state = makeState();
+    await handleSpeech(makeClient("Alice"), state, "user-123", makePcmChunks(1));
+
+    expect(mockAskOpenClaw).toHaveBeenCalledOnce();
+    expect(mockGenerateTTS).toHaveBeenCalledWith("Fallback reply");
+    expect(mockPlayAudio).toHaveBeenCalledWith("/tmp/fallback.mp3", null);
+    expect(state.conversationHistory).toEqual([
+      { role: "user", content: "Hello bot" },
+      { role: "assistant", content: "Fallback reply" },
+    ]);
+  });
+
   it("logs exchange to channel", async () => {
     mockTranscribe.mockResolvedValue("Hello bot");
-    mockAskOpenClaw.mockResolvedValue("Hello human");
-    mockGenerateTTS.mockResolvedValue("/tmp/tts.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hello human."], "Hello human."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
 
     const sendMock = vi.fn().mockResolvedValue(undefined);
     const logChannel = { send: sendMock } as unknown as VoiceState["logChannel"];
@@ -221,18 +320,19 @@ describe("handleSpeech", () => {
     const msg = sendMock.mock.calls[0]?.[0] as string;
     expect(msg).toContain("Alice");
     expect(msg).toContain("Hello bot");
-    expect(msg).toContain("Hello human");
+    expect(msg).toContain("Hello human.");
   });
 
   it("does not log when logChannel is null", async () => {
     mockTranscribe.mockResolvedValue("Hello bot");
-    mockAskOpenClaw.mockResolvedValue("Hello human");
-    mockGenerateTTS.mockResolvedValue("/tmp/tts.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hello human."], "Hello human."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
 
     const state = makeState({ logChannel: null });
     await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
 
-    // no error, pipeline completes
     expect(state.isProcessing).toBe(false);
   });
 });
