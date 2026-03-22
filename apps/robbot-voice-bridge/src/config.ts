@@ -13,9 +13,13 @@ export const config = {
   openclawGatewayUrl: requireEnv("OPENCLAW_GATEWAY_URL"),
   openclawGatewayToken: requireEnv("OPENCLAW_GATEWAY_TOKEN"),
   openclawAgentId: process.env["OPENCLAW_AGENT_ID"] ?? "main",
+  groqApiKey: process.env["GROQ_API_KEY"] ?? null,
+  sttProvider: (process.env["GROQ_API_KEY"] ? "groq" : "openai") as
+    | "groq"
+    | "openai",
   ttsVoice: process.env["TTS_VOICE"] ?? "nova",
   silenceMs: (() => {
-    const ms = parseInt(process.env["SILENCE_THRESHOLD_MS"] ?? "1500", 10);
+    const ms = parseInt(process.env["SILENCE_THRESHOLD_MS"] ?? "1000", 10);
     if (Number.isNaN(ms) || ms < 0)
       throw new Error("SILENCE_THRESHOLD_MS must be a positive number");
     return ms;

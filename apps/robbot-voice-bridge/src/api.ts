@@ -4,22 +4,32 @@ import { saveTtsToFile } from "./audio.js";
 import type { ChatMessage, WhisperResponse, OpenClawResponse } from "./types.js";
 
 export async function transcribe(wavBuffer: Buffer): Promise<string> {
+  const useGroq = config.sttProvider === "groq" && config.groqApiKey;
+  const baseUrl = useGroq
+    ? "https://api.groq.com/openai/v1/audio/transcriptions"
+    : "https://api.openai.com/v1/audio/transcriptions";
+  const apiKey = useGroq ? config.groqApiKey! : config.openaiApiKey;
+  const model = useGroq ? "distil-whisper-large-v3-en" : "whisper-1";
+
   const formData = new FormData();
   formData.append(
     "file",
     new Blob([wavBuffer], { type: "audio/wav" }),
     "audio.wav",
   );
-  formData.append("model", "whisper-1");
+  formData.append("model", model);
   formData.append("language", "en");
 
-  const res = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+  const res = await fetch(baseUrl, {
     method: "POST",
-    headers: { Authorization: `Bearer ${config.openaiApiKey}` },
+    headers: { Authorization: `Bearer ${apiKey}` },
     body: formData,
     signal: AbortSignal.timeout(config.apiTimeoutMs),
   });
-  if (!res.ok) throw new Error(`Whisper ${res.status}: ${await res.text()}`);
+  if (!res.ok)
+    throw new Error(
+      `${useGroq ? "Groq" : "Whisper"} ${res.status}: ${await res.text()}`,
+    );
 
   const data = (await res.json()) as WhisperResponse;
   const text = data.text?.trim() ?? "";

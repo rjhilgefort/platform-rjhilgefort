@@ -82,10 +82,10 @@ describe("config", () => {
   });
 
   describe("SILENCE_THRESHOLD_MS", () => {
-    it("defaults to 1500", async () => {
+    it("defaults to 1000", async () => {
       setRequiredEnvs();
       const { config } = await import("../../src/config.js");
-      expect(config.silenceMs).toBe(1500);
+      expect(config.silenceMs).toBe(1000);
     });
 
     it("parses custom value", async () => {
