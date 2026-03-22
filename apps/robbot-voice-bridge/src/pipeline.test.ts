@@ -401,6 +401,121 @@ describe("handleSpeech", () => {
     expect(state.isProcessing).toBe(false);
     expect(state.abortController).toBeNull();
   });
+
+  it("finally block only cleans up own state (race condition)", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    const speechPromise = handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    // Wait for pipeline to start and set its own controller
+    await vi.waitFor(() => {
+      expect(state.abortController).not.toBeNull();
+    });
+
+    // Simulate interrupt: replace state refs with new ones (as if a new pipeline started)
+    const newController = new AbortController();
+    const mockInterrupt = vi.fn();
+    const newQueue = { interrupt: mockInterrupt, enqueue: vi.fn(), waitForAll: vi.fn() };
+    state.abortController = newController;
+    state.activeAudioQueue = newQueue as unknown as VoiceState["activeAudioQueue"];
+    state.isProcessing = true;
+
+    await speechPromise;
+
+    // Finally should NOT have clobbered the new controller/queue
+    expect(state.abortController).toBe(newController);
+    expect(state.activeAudioQueue).toBe(newQueue);
+    expect(state.isProcessing).toBe(true);
+  });
+
+  it("interrupt during fallback marks response as interrupted", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue({
+      [Symbol.asyncIterator]() { return this; },
+      async next(): Promise<IteratorResult<SentenceChunk, { fullText: string }>> {
+        throw new Error("stream broke");
+      },
+      async return(value: { fullText: string }) {
+        return { value, done: true };
+      },
+      async throw(err: Error) { throw err; },
+    });
+
+    // askOpenClaw returns a response, but signal is aborted during fallback
+    mockAskOpenClaw.mockImplementation(async () => {
+      // Simulate abort happening during fallback
+      state.abortController?.abort();
+      return "Fallback reply";
+    });
+
+    const state = makeState();
+    await handleSpeech(makeClient("Alice"), state, "user-123", makePcmChunks(1));
+
+    // Response should be marked as interrupted in history
+    const assistantMsg = state.conversationHistory.find(
+      (m) => m.role === "assistant",
+    );
+    expect(assistantMsg?.content).toContain("[interrupted]");
+    expect(assistantMsg?.content).toContain("Fallback reply");
+  });
+
+  it("early interrupt with no LLM response preserves user message only", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+
+    // Generator throws AbortError immediately — no tokens generated
+    mockStreamOpenClaw.mockReturnValue({
+      [Symbol.asyncIterator]() { return this; },
+      async next(): Promise<IteratorResult<SentenceChunk, { fullText: string }>> {
+        throw new DOMException("The operation was aborted", "AbortError");
+      },
+      async return(value: { fullText: string }) {
+        return { value, done: true };
+      },
+      async throw(err: Error) { throw err; },
+    });
+
+    const state = makeState();
+    // Pre-abort the controller so signal.aborted is true when catch runs
+    queueMicrotask(() => {
+      state.abortController?.abort();
+    });
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    // User message recorded, no assistant message
+    expect(state.conversationHistory).toEqual([
+      { role: "user", content: "Hello bot" },
+    ]);
+    expect(state.isProcessing).toBe(false);
+  });
+
+  it("falls back to file-based TTS when streaming TTS fails for a sentence", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Good sentence.", "Bad sentence."], "Good sentence. Bad sentence."),
+    );
+
+    // First call succeeds (streaming), second call throws
+    mockGenerateTTSStream
+      .mockResolvedValueOnce(makeMockTTSStream())
+      .mockRejectedValueOnce(new Error("TTS stream failed"));
+
+    // File-based fallback succeeds
+    mockGenerateTTS.mockResolvedValue("/tmp/fallback.mp3");
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    // Streaming TTS called for both sentences
+    expect(mockGenerateTTSStream).toHaveBeenCalledTimes(2);
+    // File-based fallback called for the failed sentence
+    expect(mockGenerateTTS).toHaveBeenCalledWith("Bad sentence.");
+    expect(mockPlayAudio).toHaveBeenCalledWith("/tmp/fallback.mp3", null);
+  });
 });
 
 describe("interruptPipeline", () => {
