@@ -3,8 +3,10 @@ import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
+import { Readable } from "node:stream";
 import {
   createAudioResource,
+  StreamType,
   AudioPlayerStatus,
 } from "@discordjs/voice";
 import type { AudioPlayer } from "@discordjs/voice";
@@ -60,4 +62,75 @@ export function playAudio(
     audioPlayer.once(AudioPlayerStatus.Idle, cleanup);
     const timer = setTimeout(cleanup, 60_000);
   });
+}
+
+/**
+ * Play an Opus audio stream directly to the Discord audio player.
+ * The stream is piped into createAudioResource with OggOpus type.
+ */
+export function playAudioStream(
+  stream: ReadableStream<Uint8Array>,
+  audioPlayer: AudioPlayer | null,
+): Promise<void> {
+  if (!audioPlayer) return Promise.resolve();
+
+  // Cast needed: web ReadableStream vs node ReadableStream have minor type differences
+  const nodeStream = Readable.fromWeb(
+    stream as import("node:stream/web").ReadableStream,
+  );
+  const resource = createAudioResource(nodeStream, {
+    inputType: StreamType.OggOpus,
+  });
+  audioPlayer.play(resource);
+
+  return new Promise<void>((resolve, reject) => {
+    const done = () => {
+      clearTimeout(timer);
+      audioPlayer.off(AudioPlayerStatus.Idle, done);
+      nodeStream.destroy();
+      resolve();
+    };
+    nodeStream.on("error", (err) => {
+      clearTimeout(timer);
+      audioPlayer.off(AudioPlayerStatus.Idle, done);
+      nodeStream.destroy();
+      reject(err);
+    });
+    audioPlayer.once(AudioPlayerStatus.Idle, done);
+    const timer = setTimeout(done, 60_000);
+  });
+}
+
+/**
+ * Sequential audio queue — enqueue playback promises that execute one at a time.
+ */
+export class AudioQueue {
+  private queue: Array<() => Promise<void>> = [];
+  private drainPromise: Promise<void> | null = null;
+
+  enqueue(play: () => Promise<void>): void {
+    this.queue.push(play);
+    if (!this.drainPromise) {
+      this.drainPromise = this.drain();
+    }
+  }
+
+  private async drain(): Promise<void> {
+    while (this.queue.length > 0) {
+      const next = this.queue.shift();
+      if (next) {
+        try {
+          await next();
+        } catch (err) {
+          console.warn("[audio-queue] Playback failed, skipping:", err instanceof Error ? err.message : err);
+        }
+      }
+    }
+    this.drainPromise = null;
+  }
+
+  /** Resolves when all enqueued items have finished playing. */
+  async waitForAll(): Promise<void> {
+    if (this.drainPromise) await this.drainPromise;
+  }
 }
