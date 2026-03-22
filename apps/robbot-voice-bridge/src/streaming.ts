@@ -1,5 +1,5 @@
 import { config } from "./config.js";
-import type { ChatMessage, SentenceChunk } from "./types.js";
+import type { ChatMessage, SentenceChunk, StreamResult } from "./types.js";
 
 // Abbreviations that end with a period but aren't sentence boundaries
 const ABBREVIATIONS = new Set([
@@ -23,12 +23,10 @@ const NOT_SENTENCE_END = [
 ];
 
 /**
- * Parse SSE lines from a text chunk into content deltas.
- * Returns extracted text content from each `data: {...}` line.
+ * Parse an array of complete SSE lines into content deltas.
  */
-export function parseSSEChunk(chunk: string): Array<string> {
+export function parseSSELines(lines: Array<string>): Array<string> {
   const deltas: Array<string> = [];
-  const lines = chunk.split("\n");
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -47,6 +45,14 @@ export function parseSSEChunk(chunk: string): Array<string> {
   }
 
   return deltas;
+}
+
+/**
+ * Parse SSE lines from a text chunk into content deltas.
+ * Convenience wrapper that splits on newlines first.
+ */
+export function parseSSEChunk(chunk: string): Array<string> {
+  return parseSSELines(chunk.split("\n"));
 }
 
 /**
@@ -127,7 +133,7 @@ const MIN_CHUNK_SIZE = 20;
 export async function* streamOpenClaw(
   text: string,
   history: Array<ChatMessage>,
-): AsyncGenerator<SentenceChunk, { fullText: string }> {
+): AsyncGenerator<SentenceChunk, StreamResult> {
   const res = await fetch(`${config.openclawGatewayUrl}/v1/chat/completions`, {
     method: "POST",
     headers: {
@@ -149,6 +155,7 @@ export async function* streamOpenClaw(
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
+  let sseBuffer = ""; // carries incomplete SSE lines across TCP chunks
   let buffer = "";
   let fullText = "";
   let chunkIndex = 0;
@@ -158,8 +165,12 @@ export async function* streamOpenClaw(
       const { done, value } = await reader.read();
       if (done) break;
 
-      const text = decoder.decode(value, { stream: true });
-      const deltas = parseSSEChunk(text);
+      sseBuffer += decoder.decode(value, { stream: true });
+      const lines = sseBuffer.split("\n");
+      // Last element may be an incomplete line — carry it over
+      sseBuffer = lines.pop() ?? "";
+
+      const deltas = parseSSELines(lines);
 
       for (const delta of deltas) {
         buffer += delta;

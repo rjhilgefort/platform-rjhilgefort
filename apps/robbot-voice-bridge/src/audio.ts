@@ -83,12 +83,19 @@ export function playAudioStream(
   });
   audioPlayer.play(resource);
 
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve, reject) => {
     const done = () => {
       clearTimeout(timer);
       audioPlayer.off(AudioPlayerStatus.Idle, done);
+      nodeStream.destroy();
       resolve();
     };
+    nodeStream.on("error", (err) => {
+      clearTimeout(timer);
+      audioPlayer.off(AudioPlayerStatus.Idle, done);
+      nodeStream.destroy();
+      reject(err);
+    });
     audioPlayer.once(AudioPlayerStatus.Idle, done);
     const timer = setTimeout(done, 60_000);
   });
@@ -99,30 +106,31 @@ export function playAudioStream(
  */
 export class AudioQueue {
   private queue: Array<() => Promise<void>> = [];
-  private playing = false;
+  private drainPromise: Promise<void> | null = null;
 
   enqueue(play: () => Promise<void>): void {
     this.queue.push(play);
-    if (!this.playing) {
-      void this.drain();
+    if (!this.drainPromise) {
+      this.drainPromise = this.drain();
     }
   }
 
   private async drain(): Promise<void> {
-    this.playing = true;
     while (this.queue.length > 0) {
       const next = this.queue.shift();
       if (next) {
-        await next();
+        try {
+          await next();
+        } catch (err) {
+          console.warn("[audio-queue] Playback failed, skipping:", err instanceof Error ? err.message : err);
+        }
       }
     }
-    this.playing = false;
+    this.drainPromise = null;
   }
 
   /** Resolves when all enqueued items have finished playing. */
   async waitForAll(): Promise<void> {
-    while (this.playing || this.queue.length > 0) {
-      await new Promise((r) => setTimeout(r, 50));
-    }
+    if (this.drainPromise) await this.drainPromise;
   }
 }

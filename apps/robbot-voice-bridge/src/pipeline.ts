@@ -70,13 +70,27 @@ export async function handleSpeech(
         }
 
         const sentence = value;
-        console.log(`[2/3] chunk ${sentence.index}: "${sentence.text.slice(0, 60)}..."`);
+        const preview = sentence.text.length > 60
+          ? `${sentence.text.slice(0, 60)}...`
+          : sentence.text;
+        console.log(`[2/3] chunk ${sentence.index}: "${preview}"`);
 
         // Fire off TTS + queue playback for each sentence
-        const ttsStream = await generateTTSStream(sentence.text);
-        audioQueue.enqueue(() =>
-          playAudioStream(ttsStream, state.audioPlayer),
-        );
+        // Falls back to file-based TTS if streaming fails
+        try {
+          const ttsStream = await generateTTSStream(sentence.text);
+          audioQueue.enqueue(() =>
+            playAudioStream(ttsStream, state.audioPlayer),
+          );
+        } catch (ttsErr) {
+          console.warn(`[2/3] TTS stream failed for chunk ${sentence.index}, trying file-based`);
+          try {
+            const ttsPath = await generateTTS(sentence.text);
+            audioQueue.enqueue(() => playAudio(ttsPath, state.audioPlayer));
+          } catch {
+            console.warn(`[2/3] TTS failed entirely for chunk ${sentence.index}, skipping`);
+          }
+        }
       }
     } catch (streamErr) {
       // Fallback to non-streaming path
