@@ -53,7 +53,7 @@ export async function askOpenClaw(
   if (!res.ok) throw new Error(`OpenClaw ${res.status}: ${await res.text()}`);
 
   const data = (await res.json()) as OpenClawResponse;
-  return data.choices[0]?.message.content.trim() ?? "";
+  return data.choices[0]?.message?.content?.trim() ?? "";
 }
 
 export async function generateTTS(text: string): Promise<string> {

@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { ChannelType, Client, Events, GatewayIntentBits } from "discord.js";
 import type { Guild, VoiceBasedChannel } from "discord.js";
 import {
   joinVoiceChannel,
@@ -104,7 +104,10 @@ function connectToChannel(channel: VoiceBasedChannel): void {
 async function autoJoin(guild: Guild): Promise<void> {
   const vc = guild.channels.cache.find(
     (c): c is VoiceBasedChannel =>
-      c.type === 2 && "members" in c && c.members.some((m) => !m.user.bot),
+      (c.type === ChannelType.GuildVoice ||
+        c.type === ChannelType.GuildStageVoice) &&
+        "members" in c &&
+        c.members.some((m) => !m.user.bot),
   );
   if (!vc) return;
 

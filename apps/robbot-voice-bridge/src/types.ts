@@ -12,7 +12,7 @@ export interface WhisperResponse {
 
 export interface OpenClawChoice {
   message: {
-    content: string;
+    content?: string;
   };
 }
 

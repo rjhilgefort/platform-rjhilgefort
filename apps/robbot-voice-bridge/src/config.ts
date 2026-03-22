@@ -1,6 +1,7 @@
 function requireEnv(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(`Missing required env var: ${name}`);
+  if (value === undefined) throw new Error(`Missing required env var: ${name}`);
+  if (value === "") throw new Error(`Env var ${name} is set but empty`);
   return value;
 }
 
@@ -13,7 +14,12 @@ export const config = {
   openclawGatewayToken: requireEnv("OPENCLAW_GATEWAY_TOKEN"),
   openclawAgentId: process.env["OPENCLAW_AGENT_ID"] ?? "main",
   ttsVoice: process.env["TTS_VOICE"] ?? "nova",
-  silenceMs: parseInt(process.env["SILENCE_THRESHOLD_MS"] ?? "1500", 10),
+  silenceMs: (() => {
+    const ms = parseInt(process.env["SILENCE_THRESHOLD_MS"] ?? "1500", 10);
+    if (Number.isNaN(ms) || ms < 0)
+      throw new Error("SILENCE_THRESHOLD_MS must be a positive number");
+    return ms;
+  })(),
   sampleRate: 48_000,
   channels: 2,
   apiTimeoutMs: 30_000,

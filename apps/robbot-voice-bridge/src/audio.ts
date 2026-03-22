@@ -48,6 +48,8 @@ export function playAudio(
   audioPlayer.play(resource);
   return new Promise((resolve) => {
     const cleanup = () => {
+      clearTimeout(timer);
+      audioPlayer.off(AudioPlayerStatus.Idle, cleanup);
       try {
         unlinkSync(filePath);
       } catch {
@@ -56,6 +58,6 @@ export function playAudio(
       resolve();
     };
     audioPlayer.once(AudioPlayerStatus.Idle, cleanup);
-    setTimeout(cleanup, 60_000);
+    const timer = setTimeout(cleanup, 60_000);
   });
 }
