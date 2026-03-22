@@ -64,6 +64,7 @@ export async function handleSpeech(
 
   const abortController = new AbortController();
   state.abortController = abortController;
+  let audioQueue: AudioQueue | null = null;
 
   console.log(`[speech] ${durationSec.toFixed(1)}s from ${userId}`);
 
@@ -80,7 +81,7 @@ export async function handleSpeech(
 
     // 2. Stream LLM + TTS pipeline
     console.log("[2/3] Streaming LLM → TTS...");
-    const audioQueue = new AudioQueue();
+    audioQueue = new AudioQueue();
     state.activeAudioQueue = audioQueue;
     let fullText = "";
     let interrupted = false;
@@ -126,14 +127,18 @@ export async function handleSpeech(
         // Fallback to non-streaming path
         console.warn("[2/3] Stream failed, falling back:", streamErr instanceof Error ? streamErr.message : streamErr);
         const response = await askOpenClaw(text, state.conversationHistory);
-        if (!response) {
+        if (abortController.signal.aborted) {
+          console.log("[2/3] Interrupted during fallback");
+          interrupted = true;
+          fullText = response || "";
+        } else if (!response) {
           console.log("[2/3] Empty response");
           return;
+        } else {
+          fullText = response;
+          const ttsPath = await generateTTS(response);
+          await playAudio(ttsPath, state.audioPlayer);
         }
-        fullText = response;
-
-        const ttsPath = await generateTTS(response);
-        await playAudio(ttsPath, state.audioPlayer);
       }
     }
 
@@ -144,7 +149,16 @@ export async function handleSpeech(
     }
 
     if (!fullText) {
-      console.log("[2/3] Empty response");
+      if (interrupted && text) {
+        // Record user's message even though no response was generated
+        state.conversationHistory.push({ role: "user", content: text });
+        while (state.conversationHistory.length > config.maxHistory) {
+          state.conversationHistory.shift();
+        }
+        console.log("[2/3] Interrupted before any response generated");
+      } else {
+        console.log("[2/3] Empty response");
+      }
       return;
     }
 
@@ -158,10 +172,13 @@ export async function handleSpeech(
       state.conversationHistory.shift();
     }
 
+    const logPreview = fullText.length > 120
+      ? `${fullText.slice(0, 120)}...`
+      : fullText;
     if (interrupted) {
-      console.log(`[interrupted] partial: "${fullText.slice(0, 120)}..."`);
+      console.log(`[interrupted] partial: "${logPreview}"`);
     } else {
-      console.log(`[done] "${fullText.slice(0, 120)}..."`);
+      console.log(`[done] "${logPreview}"`);
     }
 
     // Log transcript
@@ -176,8 +193,17 @@ export async function handleSpeech(
       console.error("[pipeline]", err instanceof Error ? err.message : err);
     }
   } finally {
-    state.abortController = null;
-    state.activeAudioQueue = null;
-    state.isProcessing = false;
+    // Only clean up state if it still belongs to this pipeline run.
+    // After interrupt, a new pipeline may have already started with its own
+    // abortController and audioQueue — don't clobber those.
+    if (state.abortController === abortController) {
+      state.abortController = null;
+    }
+    if (state.activeAudioQueue === audioQueue) {
+      state.activeAudioQueue = null;
+    }
+    if (state.abortController === null) {
+      state.isProcessing = false;
+    }
   }
 }

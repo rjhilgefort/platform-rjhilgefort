@@ -35,16 +35,6 @@ function setupReceiver(voiceState: VoiceState): void {
     if (userId === client.user?.id) return;
     if (activeStreams.has(userId)) return;
 
-    // Interrupt active pipeline if someone starts speaking
-    if (
-      config.interruptEnabled &&
-      voiceState.isProcessing &&
-      !voiceState.isInterrupting
-    ) {
-      console.log(`[interrupt] User ${userId} started speaking during playback`);
-      interruptPipeline(voiceState);
-    }
-
     const pcmChunks: Array<Buffer> = [];
     const speechStartMs = Date.now();
     const opusStream = voiceConnection.receiver.subscribe(userId, {
@@ -55,6 +45,26 @@ function setupReceiver(voiceState: VoiceState): void {
     });
 
     activeStreams.set(userId, true);
+
+    // Debounced interrupt: only fire after minDuration of actual speech
+    // to avoid false triggers from coughs, background noise, etc.
+    let interruptTimer: ReturnType<typeof setTimeout> | null = null;
+    if (
+      config.interruptEnabled &&
+      voiceState.isProcessing &&
+      !voiceState.isInterrupting
+    ) {
+      interruptTimer = setTimeout(() => {
+        if (
+          voiceState.isProcessing &&
+          !voiceState.isInterrupting &&
+          pcmChunks.length > 0
+        ) {
+          console.log(`[interrupt] User ${userId} speaking during playback (debounced)`);
+          interruptPipeline(voiceState);
+        }
+      }, config.interruptMinDurationMs);
+    }
 
     opusStream.on("data", (packet: Buffer) => {
       try {
@@ -70,6 +80,7 @@ function setupReceiver(voiceState: VoiceState): void {
 
     opusStream.on("end", () => {
       activeStreams.delete(userId);
+      if (interruptTimer) clearTimeout(interruptTimer);
       const durationMs = Date.now() - speechStartMs;
       if (durationMs < config.interruptMinDurationMs) {
         console.log(`[skip] Speech too short for processing (${durationMs}ms)`);
@@ -195,6 +206,7 @@ client.on(Events.MessageCreate, async (message) => {
   if (message.content === "!leave") {
     state.abortController?.abort();
     state.abortController = null;
+    state.activeAudioQueue?.interrupt();
     state.activeAudioQueue = null;
     state.isProcessing = false;
     state.voiceConnection?.destroy();
@@ -216,6 +228,7 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         console.log("[bot] Everyone left, disconnecting");
         state.abortController?.abort();
         state.abortController = null;
+        state.activeAudioQueue?.interrupt();
         state.activeAudioQueue = null;
         state.isProcessing = false;
         state.voiceConnection.destroy();
