@@ -3,6 +3,7 @@ import { config } from "./config.js";
 import { pcmToWav, playAudio, playAudioStream, AudioQueue } from "./audio.js";
 import { transcribe, askOpenClaw, generateTTS, generateTTSStream } from "./api.js";
 import { streamOpenClaw } from "./streaming.js";
+import { startThinking, stopThinking } from "./thinking-indicator.js";
 import type { VoiceState } from "./types.js";
 
 async function logExchange(
@@ -28,6 +29,8 @@ export function interruptPipeline(state: VoiceState): void {
   state.isInterrupting = true;
 
   console.log("[interrupt] Interrupting active pipeline");
+
+  stopThinking();
 
   state.abortController?.abort();
   state.abortController = null;
@@ -81,6 +84,7 @@ export async function handleSpeech(
 
     // 2. Stream LLM + TTS pipeline
     console.log("[2/3] Streaming LLM → TTS...");
+    startThinking(state.audioPlayer);
     audioQueue = new AudioQueue();
     state.activeAudioQueue = audioQueue;
     let fullText = "";
@@ -106,6 +110,7 @@ export async function handleSpeech(
         // Falls back to file-based TTS if streaming fails
         try {
           const ttsStream = await generateTTSStream(sentence.text);
+          stopThinking();
           audioQueue.enqueue(() =>
             playAudioStream(ttsStream, state.audioPlayer),
           );
@@ -113,6 +118,7 @@ export async function handleSpeech(
           console.warn(`[2/3] TTS stream failed for chunk ${sentence.index}, trying file-based`);
           try {
             const ttsPath = await generateTTS(sentence.text);
+            stopThinking();
             audioQueue.enqueue(() => playAudio(ttsPath, state.audioPlayer));
           } catch {
             console.warn(`[2/3] TTS failed entirely for chunk ${sentence.index}, skipping`);
@@ -136,6 +142,7 @@ export async function handleSpeech(
           return;
         } else {
           fullText = response;
+          stopThinking();
           const ttsPath = await generateTTS(response);
           await playAudio(ttsPath, state.audioPlayer);
         }
@@ -193,6 +200,7 @@ export async function handleSpeech(
       console.error("[pipeline]", err instanceof Error ? err.message : err);
     }
   } finally {
+    stopThinking();
     // Only clean up state if it still belongs to this pipeline run.
     // After interrupt, a new pipeline may have already started with its own
     // abortController and audioQueue — don't clobber those.

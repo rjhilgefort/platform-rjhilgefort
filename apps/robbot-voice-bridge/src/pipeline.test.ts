@@ -10,7 +10,15 @@ vi.mock("./config.js", () => ({
     discordGuildId: "test-guild",
     interruptEnabled: true,
     interruptMinDurationMs: 300,
+    thinkingIndicatorEnabled: true,
   },
+}));
+
+const mockStartThinking = vi.fn();
+const mockStopThinking = vi.fn();
+vi.mock("./thinking-indicator.js", () => ({
+  startThinking: (...args: Array<unknown>) => mockStartThinking(...args),
+  stopThinking: (...args: Array<unknown>) => mockStopThinking(...args),
 }));
 
 const mockTranscribe = vi.fn();
@@ -144,6 +152,8 @@ beforeEach(() => {
   mockPcmToWav.mockReset().mockReturnValue(Buffer.from("wav-data"));
   mockPlayAudio.mockReset().mockResolvedValue(undefined);
   mockPlayAudioStream.mockReset().mockResolvedValue(undefined);
+  mockStartThinking.mockReset();
+  mockStopThinking.mockReset();
 });
 
 describe("handleSpeech", () => {
@@ -516,9 +526,39 @@ describe("handleSpeech", () => {
     expect(mockGenerateTTS).toHaveBeenCalledWith("Bad sentence.");
     expect(mockPlayAudio).toHaveBeenCalledWith("/tmp/fallback.mp3", null);
   });
+
+  it("starts thinking indicator before LLM and stops before TTS", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hello human."], "Hello human."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    expect(mockStartThinking).toHaveBeenCalledOnce();
+    expect(mockStartThinking).toHaveBeenCalledWith(null);
+    expect(mockStopThinking).toHaveBeenCalled();
+  });
+
+  it("does not start thinking on empty transcription", async () => {
+    mockTranscribe.mockResolvedValue("");
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    expect(mockStartThinking).not.toHaveBeenCalled();
+  });
 });
 
 describe("interruptPipeline", () => {
+  it("stops thinking indicator", () => {
+    const state = makeState({ isProcessing: true });
+    interruptPipeline(state);
+    expect(mockStopThinking).toHaveBeenCalledOnce();
+  });
+
   it("aborts controller, interrupts queue, stops player, resets state", () => {
     const abortController = new AbortController();
     const mockInterrupt = vi.fn();
