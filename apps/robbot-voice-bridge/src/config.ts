@@ -29,6 +29,11 @@ export const config = {
   })(),
   sampleRate: 48_000,
   channels: 2,
-  apiTimeoutMs: 30_000,
+  apiTimeoutMs: (() => {
+    const ms = parseInt(process.env["API_TIMEOUT_MS"] ?? "60000", 10);
+    if (Number.isNaN(ms) || ms < 0)
+      throw new Error("API_TIMEOUT_MS must be a positive number");
+    return ms;
+  })(),
   maxHistory: 60,
 } as const;
