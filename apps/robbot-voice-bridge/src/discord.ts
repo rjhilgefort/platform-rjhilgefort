@@ -35,6 +35,13 @@ function setupReceiver(voiceState: VoiceState): void {
     if (userId === client.user?.id) return;
     if (activeStreams.has(userId)) return;
 
+    // Check if user is muted — Discord sends speaking events even when muted
+    const guild = client.guilds.cache.get(config.discordGuildId);
+    const member = guild?.members.cache.get(userId);
+    if (member?.voice.selfMute || member?.voice.serverMute) {
+      return;
+    }
+
     const pcmChunks: Array<Buffer> = [];
     const speechStartMs = Date.now();
     const opusStream = voiceConnection.receiver.subscribe(userId, {
@@ -55,6 +62,11 @@ function setupReceiver(voiceState: VoiceState): void {
       !voiceState.isInterrupting
     ) {
       interruptTimer = setTimeout(() => {
+        // Re-check mute status — user may have muted during the debounce window
+        const freshMember = guild?.members.cache.get(userId);
+        if (freshMember?.voice.selfMute || freshMember?.voice.serverMute) {
+          return;
+        }
         if (
           voiceState.isProcessing &&
           !voiceState.isInterrupting &&
