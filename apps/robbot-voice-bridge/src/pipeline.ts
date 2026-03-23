@@ -20,6 +20,27 @@ async function logExchange(
   }
 }
 
+/**
+ * Interrupt the active pipeline — abort LLM stream, clear audio queue, stop playback.
+ */
+export function interruptPipeline(state: VoiceState): void {
+  if (state.isInterrupting) return;
+  state.isInterrupting = true;
+
+  console.log("[interrupt] Interrupting active pipeline");
+
+  state.abortController?.abort();
+  state.abortController = null;
+
+  state.activeAudioQueue?.interrupt();
+  state.activeAudioQueue = null;
+
+  state.audioPlayer?.stop();
+
+  state.isProcessing = false;
+  state.isInterrupting = false;
+}
+
 export async function handleSpeech(
   client: Client<true>,
   state: VoiceState,
@@ -41,6 +62,10 @@ export async function handleSpeech(
   }
   state.isProcessing = true;
 
+  const abortController = new AbortController();
+  state.abortController = abortController;
+  let audioQueue: AudioQueue | null = null;
+
   console.log(`[speech] ${durationSec.toFixed(1)}s from ${userId}`);
 
   try {
@@ -56,11 +81,13 @@ export async function handleSpeech(
 
     // 2. Stream LLM + TTS pipeline
     console.log("[2/3] Streaming LLM → TTS...");
-    const audioQueue = new AudioQueue();
+    audioQueue = new AudioQueue();
+    state.activeAudioQueue = audioQueue;
     let fullText = "";
+    let interrupted = false;
 
     try {
-      const generator = streamOpenClaw(text, state.conversationHistory);
+      const generator = streamOpenClaw(text, state.conversationHistory, abortController.signal);
 
       for (;;) {
         const { value, done } = await generator.next();
@@ -93,35 +120,66 @@ export async function handleSpeech(
         }
       }
     } catch (streamErr) {
-      // Fallback to non-streaming path
-      console.warn("[2/3] Stream failed, falling back:", streamErr instanceof Error ? streamErr.message : streamErr);
-      const response = await askOpenClaw(text, state.conversationHistory);
-      if (!response) {
-        console.log("[2/3] Empty response");
-        return;
+      if (abortController.signal.aborted) {
+        console.log("[2/3] Pipeline interrupted by user speech");
+        interrupted = true;
+      } else {
+        // Fallback to non-streaming path
+        console.warn("[2/3] Stream failed, falling back:", streamErr instanceof Error ? streamErr.message : streamErr);
+        const response = await askOpenClaw(text, state.conversationHistory);
+        if (abortController.signal.aborted) {
+          console.log("[2/3] Interrupted during fallback");
+          interrupted = true;
+          fullText = response || "";
+        } else if (!response) {
+          console.log("[2/3] Empty response");
+          return;
+        } else {
+          fullText = response;
+          const ttsPath = await generateTTS(response);
+          await playAudio(ttsPath, state.audioPlayer);
+        }
       }
-      fullText = response;
-
-      const ttsPath = await generateTTS(response);
-      await playAudio(ttsPath, state.audioPlayer);
     }
 
-    // 3. Wait for all audio to finish
-    console.log("[3/3] Waiting for playback...");
-    await audioQueue.waitForAll();
+    if (!interrupted) {
+      // 3. Wait for all audio to finish
+      console.log("[3/3] Waiting for playback...");
+      await audioQueue.waitForAll();
+    }
 
     if (!fullText) {
-      console.log("[2/3] Empty response");
+      if (interrupted && text) {
+        // Record user's message even though no response was generated
+        state.conversationHistory.push({ role: "user", content: text });
+        while (state.conversationHistory.length > config.maxHistory) {
+          state.conversationHistory.shift();
+        }
+        console.log("[2/3] Interrupted before any response generated");
+      } else {
+        console.log("[2/3] Empty response");
+      }
       return;
     }
 
-    // Update history
+    // Update history (even partial on interrupt)
     state.conversationHistory.push({ role: "user", content: text });
-    state.conversationHistory.push({ role: "assistant", content: fullText });
+    state.conversationHistory.push({
+      role: "assistant",
+      content: interrupted ? `${fullText} [interrupted]` : fullText,
+    });
     while (state.conversationHistory.length > config.maxHistory) {
       state.conversationHistory.shift();
     }
-    console.log(`[done] "${fullText.slice(0, 120)}..."`);
+
+    const logPreview = fullText.length > 120
+      ? `${fullText.slice(0, 120)}...`
+      : fullText;
+    if (interrupted) {
+      console.log(`[interrupted] partial: "${logPreview}"`);
+    } else {
+      console.log(`[done] "${logPreview}"`);
+    }
 
     // Log transcript
     const guild = client.guilds.cache.get(config.discordGuildId);
@@ -129,8 +187,23 @@ export async function handleSpeech(
     const userName = member?.displayName ?? userId;
     await logExchange(state, userName, text, fullText);
   } catch (err) {
-    console.error("[pipeline]", err instanceof Error ? err.message : err);
+    if (abortController.signal.aborted) {
+      console.log("[pipeline] Aborted by interrupt");
+    } else {
+      console.error("[pipeline]", err instanceof Error ? err.message : err);
+    }
   } finally {
-    state.isProcessing = false;
+    // Only clean up state if it still belongs to this pipeline run.
+    // After interrupt, a new pipeline may have already started with its own
+    // abortController and audioQueue — don't clobber those.
+    if (state.abortController === abortController) {
+      state.abortController = null;
+    }
+    if (state.activeAudioQueue === audioQueue) {
+      state.activeAudioQueue = null;
+    }
+    if (state.abortController === null) {
+      state.isProcessing = false;
+    }
   }
 }

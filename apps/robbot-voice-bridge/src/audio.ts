@@ -107,8 +107,10 @@ export function playAudioStream(
 export class AudioQueue {
   private queue: Array<() => Promise<void>> = [];
   private drainPromise: Promise<void> | null = null;
+  private interrupted = false;
 
   enqueue(play: () => Promise<void>): void {
+    if (this.interrupted) return;
     this.queue.push(play);
     if (!this.drainPromise) {
       this.drainPromise = this.drain();
@@ -116,17 +118,24 @@ export class AudioQueue {
   }
 
   private async drain(): Promise<void> {
-    while (this.queue.length > 0) {
+    while (this.queue.length > 0 && !this.interrupted) {
       const next = this.queue.shift();
       if (next) {
         try {
           await next();
         } catch (err) {
+          if (this.interrupted) break;
           console.warn("[audio-queue] Playback failed, skipping:", err instanceof Error ? err.message : err);
         }
       }
     }
     this.drainPromise = null;
+  }
+
+  /** Clear the queue and stop processing. */
+  interrupt(): void {
+    this.interrupted = true;
+    this.queue.length = 0;
   }
 
   /** Resolves when all enqueued items have finished playing. */

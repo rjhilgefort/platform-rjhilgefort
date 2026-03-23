@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { pcmToWav } from "./audio.js";
+import { describe, it, expect, vi } from "vitest";
+import { pcmToWav, AudioQueue } from "./audio.js";
 
 describe("pcmToWav", () => {
   const sampleRate = 48_000;
@@ -99,5 +99,59 @@ describe("pcmToWav", () => {
       expect(wav.readUInt32LE(24)).toBe(rate);
       expect(wav.readUInt32LE(28)).toBe(rate * 1 * 2);
     }
+  });
+});
+
+describe("AudioQueue", () => {
+  it("executes enqueued items sequentially", async () => {
+    const queue = new AudioQueue();
+    const order: Array<number> = [];
+
+    queue.enqueue(async () => { order.push(1); });
+    queue.enqueue(async () => { order.push(2); });
+    queue.enqueue(async () => { order.push(3); });
+
+    await queue.waitForAll();
+    expect(order).toEqual([1, 2, 3]);
+  });
+
+  it("interrupt() clears pending items", async () => {
+    const queue = new AudioQueue();
+    const executed: Array<number> = [];
+    let resolveFirst: () => void;
+    const firstBlocks = new Promise<void>((r) => { resolveFirst = r; });
+
+    queue.enqueue(async () => {
+      executed.push(1);
+      await firstBlocks;
+    });
+    queue.enqueue(async () => { executed.push(2); });
+    queue.enqueue(async () => { executed.push(3); });
+
+    // Let drain start (first item begins)
+    await vi.waitFor(() => expect(executed).toContain(1));
+
+    queue.interrupt();
+    resolveFirst!();
+    await queue.waitForAll();
+
+    // Only the first (already running) item executed
+    expect(executed).toEqual([1]);
+  });
+
+  it("rejects enqueue after interrupt", async () => {
+    const queue = new AudioQueue();
+    const executed: Array<number> = [];
+
+    queue.interrupt();
+    queue.enqueue(async () => { executed.push(1); });
+
+    await queue.waitForAll();
+    expect(executed).toEqual([]);
+  });
+
+  it("waitForAll resolves immediately when empty", async () => {
+    const queue = new AudioQueue();
+    await expect(queue.waitForAll()).resolves.toBeUndefined();
   });
 });

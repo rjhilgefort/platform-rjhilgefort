@@ -1,5 +1,6 @@
 import type { VoiceConnection, AudioPlayer } from "@discordjs/voice";
 import type { SendableChannels } from "discord.js";
+import type { AudioQueue } from "./audio.js";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -36,4 +37,7 @@ export interface VoiceState {
   logChannel: SendableChannels | null;
   isProcessing: boolean;
   conversationHistory: Array<ChatMessage>;
+  abortController: AbortController | null;
+  activeAudioQueue: AudioQueue | null;
+  isInterrupting: boolean;
 }

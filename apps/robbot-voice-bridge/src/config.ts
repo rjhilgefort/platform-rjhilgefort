@@ -14,6 +14,13 @@ export const config = {
   openclawGatewayToken: requireEnv("OPENCLAW_GATEWAY_TOKEN"),
   openclawAgentId: process.env["OPENCLAW_AGENT_ID"] ?? "main",
   ttsVoice: process.env["TTS_VOICE"] ?? "nova",
+  interruptEnabled: (process.env["INTERRUPT_ENABLED"] ?? "true") === "true",
+  interruptMinDurationMs: (() => {
+    const ms = parseInt(process.env["INTERRUPT_MIN_DURATION_MS"] ?? "300", 10);
+    if (Number.isNaN(ms) || ms < 0)
+      throw new Error("INTERRUPT_MIN_DURATION_MS must be a positive number");
+    return ms;
+  })(),
   silenceMs: (() => {
     const ms = parseInt(process.env["SILENCE_THRESHOLD_MS"] ?? "1500", 10);
     if (Number.isNaN(ms) || ms < 0)

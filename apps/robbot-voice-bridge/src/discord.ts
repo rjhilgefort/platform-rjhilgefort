@@ -10,7 +10,7 @@ import {
 } from "@discordjs/voice";
 import OpusScript from "opusscript";
 import { config } from "./config.js";
-import { handleSpeech } from "./pipeline.js";
+import { handleSpeech, interruptPipeline } from "./pipeline.js";
 import type { VoiceState } from "./types.js";
 
 const state: VoiceState = {
@@ -19,6 +19,9 @@ const state: VoiceState = {
   logChannel: null,
   isProcessing: false,
   conversationHistory: [],
+  abortController: null,
+  activeAudioQueue: null,
+  isInterrupting: false,
 };
 
 function setupReceiver(voiceState: VoiceState): void {
@@ -33,6 +36,7 @@ function setupReceiver(voiceState: VoiceState): void {
     if (activeStreams.has(userId)) return;
 
     const pcmChunks: Array<Buffer> = [];
+    const speechStartMs = Date.now();
     const opusStream = voiceConnection.receiver.subscribe(userId, {
       end: {
         behavior: EndBehaviorType.AfterSilence,
@@ -41,6 +45,26 @@ function setupReceiver(voiceState: VoiceState): void {
     });
 
     activeStreams.set(userId, true);
+
+    // Debounced interrupt: only fire after minDuration of actual speech
+    // to avoid false triggers from coughs, background noise, etc.
+    let interruptTimer: ReturnType<typeof setTimeout> | null = null;
+    if (
+      config.interruptEnabled &&
+      voiceState.isProcessing &&
+      !voiceState.isInterrupting
+    ) {
+      interruptTimer = setTimeout(() => {
+        if (
+          voiceState.isProcessing &&
+          !voiceState.isInterrupting &&
+          pcmChunks.length > 0
+        ) {
+          console.log(`[interrupt] User ${userId} speaking during playback (debounced)`);
+          interruptPipeline(voiceState);
+        }
+      }, config.interruptMinDurationMs);
+    }
 
     opusStream.on("data", (packet: Buffer) => {
       try {
@@ -56,7 +80,13 @@ function setupReceiver(voiceState: VoiceState): void {
 
     opusStream.on("end", () => {
       activeStreams.delete(userId);
-      void handleSpeech(client as Client<true>, state, userId, pcmChunks);
+      if (interruptTimer) clearTimeout(interruptTimer);
+      const durationMs = Date.now() - speechStartMs;
+      if (durationMs < config.interruptMinDurationMs) {
+        console.log(`[skip] Speech too short for processing (${durationMs}ms)`);
+        return;
+      }
+      void handleSpeech(client as Client<true>, voiceState, userId, pcmChunks);
     });
 
     opusStream.on("error", (err: Error) => {
@@ -174,6 +204,11 @@ client.on(Events.MessageCreate, async (message) => {
   }
 
   if (message.content === "!leave") {
+    state.abortController?.abort();
+    state.abortController = null;
+    state.activeAudioQueue?.interrupt();
+    state.activeAudioQueue = null;
+    state.isProcessing = false;
     state.voiceConnection?.destroy();
     state.voiceConnection = null;
     state.audioPlayer = null;
@@ -191,6 +226,11 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
       const humans = oldState.channel.members.filter((m) => !m.user.bot);
       if (humans.size === 0) {
         console.log("[bot] Everyone left, disconnecting");
+        state.abortController?.abort();
+        state.abortController = null;
+        state.activeAudioQueue?.interrupt();
+        state.activeAudioQueue = null;
+        state.isProcessing = false;
         state.voiceConnection.destroy();
         state.voiceConnection = null;
         state.audioPlayer = null;

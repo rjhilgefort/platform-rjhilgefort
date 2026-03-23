@@ -112,6 +112,51 @@ describe("config", () => {
     });
   });
 
+  describe("INTERRUPT_ENABLED", () => {
+    it("defaults to true", async () => {
+      setRequiredEnvs();
+      const { config } = await import("../../src/config.js");
+      expect(config.interruptEnabled).toBe(true);
+    });
+
+    it("can be disabled with 'false'", async () => {
+      setRequiredEnvs();
+      vi.stubEnv("INTERRUPT_ENABLED", "false");
+      const { config } = await import("../../src/config.js");
+      expect(config.interruptEnabled).toBe(false);
+    });
+
+    it("treats non-'true' values as false", async () => {
+      setRequiredEnvs();
+      vi.stubEnv("INTERRUPT_ENABLED", "0");
+      const { config } = await import("../../src/config.js");
+      expect(config.interruptEnabled).toBe(false);
+    });
+  });
+
+  describe("INTERRUPT_MIN_DURATION_MS", () => {
+    it("defaults to 300", async () => {
+      setRequiredEnvs();
+      const { config } = await import("../../src/config.js");
+      expect(config.interruptMinDurationMs).toBe(300);
+    });
+
+    it("parses custom value", async () => {
+      setRequiredEnvs();
+      vi.stubEnv("INTERRUPT_MIN_DURATION_MS", "500");
+      const { config } = await import("../../src/config.js");
+      expect(config.interruptMinDurationMs).toBe(500);
+    });
+
+    it("throws on NaN value", async () => {
+      setRequiredEnvs();
+      vi.stubEnv("INTERRUPT_MIN_DURATION_MS", "not-a-number");
+      await expect(import("../../src/config.js")).rejects.toThrow(
+        "INTERRUPT_MIN_DURATION_MS must be a positive number",
+      );
+    });
+  });
+
   describe("static config values", () => {
     it("has expected defaults", async () => {
       setRequiredEnvs();
@@ -120,6 +165,7 @@ describe("config", () => {
       expect(config.channels).toBe(2);
       expect(config.apiTimeoutMs).toBe(30_000);
       expect(config.maxHistory).toBe(60);
+      expect(config.interruptMinDurationMs).toBe(300);
     });
   });
 });
