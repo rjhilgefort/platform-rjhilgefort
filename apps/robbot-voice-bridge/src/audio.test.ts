@@ -154,4 +154,30 @@ describe("AudioQueue", () => {
     const queue = new AudioQueue();
     await expect(queue.waitForAll()).resolves.toBeUndefined();
   });
+
+  it("fires onPlaybackStart when first item starts playing", async () => {
+    const queue = new AudioQueue();
+    const onStart = vi.fn();
+    queue.onPlaybackStart = onStart;
+
+    queue.enqueue(async () => {});
+    queue.enqueue(async () => {});
+
+    await queue.waitForAll();
+
+    expect(onStart).toHaveBeenCalledOnce();
+  });
+
+  it("does not fire onPlaybackStart after interrupt", async () => {
+    const queue = new AudioQueue();
+    const onStart = vi.fn();
+    queue.onPlaybackStart = onStart;
+
+    queue.interrupt();
+    queue.enqueue(async () => {});
+
+    await queue.waitForAll();
+
+    expect(onStart).not.toHaveBeenCalled();
+  });
 });

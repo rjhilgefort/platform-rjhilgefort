@@ -14,6 +14,7 @@ export const config = {
   openclawGatewayToken: requireEnv("OPENCLAW_GATEWAY_TOKEN"),
   openclawAgentId: process.env["OPENCLAW_AGENT_ID"] ?? "main",
   ttsVoice: process.env["TTS_VOICE"] ?? "nova",
+  ackEnabled: (process.env["ACK_ENABLED"] ?? "true") === "true",
   interruptEnabled: (process.env["INTERRUPT_ENABLED"] ?? "true") === "true",
   interruptMinDurationMs: (() => {
     const ms = parseInt(process.env["INTERRUPT_MIN_DURATION_MS"] ?? "300", 10);
