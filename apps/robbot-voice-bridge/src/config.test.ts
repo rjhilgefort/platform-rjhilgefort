@@ -163,7 +163,7 @@ describe("config", () => {
       const { config } = await import("../../src/config.js");
       expect(config.sampleRate).toBe(48_000);
       expect(config.channels).toBe(2);
-      expect(config.apiTimeoutMs).toBe(30_000);
+      expect(config.apiTimeoutMs).toBe(60_000);
       expect(config.maxHistory).toBe(60);
       expect(config.interruptMinDurationMs).toBe(300);
     });
