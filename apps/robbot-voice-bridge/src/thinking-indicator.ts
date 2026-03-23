@@ -4,12 +4,9 @@ import { createAudioResource, AudioPlayerStatus } from "@discordjs/voice";
 import type { AudioPlayer } from "@discordjs/voice";
 import { config } from "./config.js";
 
-const THINKING_SOUND_PATH = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "assets",
-  "thinking-taps.ogg",
-);
+const ASSETS_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
+const THINKING_SOUND_PATH = join(ASSETS_DIR, "ding.ogg");
+const DING_SOUND_PATH = join(ASSETS_DIR, "ding.ogg");
 
 let active = false;
 let cleanupListener: (() => void) | null = null;
@@ -34,7 +31,12 @@ function playLoop(audioPlayer: AudioPlayer): void {
   const onIdle = () => {
     audioPlayer.off(AudioPlayerStatus.Idle, onIdle);
     cleanupListener = null;
-    playLoop(audioPlayer);
+    // Wait before repeating so it's not too frequent
+    const timer = setTimeout(() => {
+      if (active) playLoop(audioPlayer);
+    }, 5_000); // ~7s total (2s clip + 5s pause)
+    // Store timer cleanup in case stopThinking is called during the pause
+    cleanupListener = () => clearTimeout(timer);
   };
 
   cleanupListener = () => {
@@ -51,6 +53,27 @@ export function stopThinking(): void {
   active = false;
   cleanupListener?.();
   cleanupListener = null;
+}
+
+/**
+ * Play a short ding sound as acknowledgment. Returns a promise that resolves
+ * when the ding finishes playing.
+ */
+export function playDing(audioPlayer: AudioPlayer | null): Promise<void> {
+  if (!audioPlayer) return Promise.resolve();
+  const resource = createAudioResource(DING_SOUND_PATH);
+  audioPlayer.play(resource);
+  return new Promise((resolve) => {
+    const onIdle = () => {
+      audioPlayer.off(AudioPlayerStatus.Idle, onIdle);
+      resolve();
+    };
+    audioPlayer.once(AudioPlayerStatus.Idle, onIdle);
+    setTimeout(() => {
+      audioPlayer.off(AudioPlayerStatus.Idle, onIdle);
+      resolve();
+    }, 3_000);
+  });
 }
 
 /** Exposed for testing only. */

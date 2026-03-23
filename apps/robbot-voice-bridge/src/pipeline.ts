@@ -3,7 +3,7 @@ import { config } from "./config.js";
 import { pcmToWav, playAudio, playAudioStream, AudioQueue } from "./audio.js";
 import { transcribe, askOpenClaw, generateTTS, generateTTSStream } from "./api.js";
 import { streamOpenClaw } from "./streaming.js";
-import { startThinking, stopThinking } from "./thinking-indicator.js";
+import { startThinking, stopThinking, playDing } from "./thinking-indicator.js";
 import type { VoiceState } from "./types.js";
 
 async function logExchange(
@@ -81,6 +81,17 @@ export async function handleSpeech(
       return;
     }
     console.log(`[1/3] "${text}"`);
+
+    // 1.5. Acknowledge receipt with a short TTS phrase
+    if (config.ackEnabled) {
+      try {
+        console.log("[ack] On it");
+        const ackPath = await generateTTS("On it.");
+        await playAudio(ackPath, state.audioPlayer);
+      } catch {
+        // Ack failed, continue anyway
+      }
+    }
 
     // 2. Stream LLM + TTS pipeline
     console.log("[2/3] Streaming LLM → TTS...");
