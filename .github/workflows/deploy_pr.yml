@@ -1,0 +1,67 @@
+name: Create/Update Deploy PR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check for pending changesets
+        id: check
+        run: |
+          CHANGESETS=$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null)
+          if [ -z "$CHANGESETS" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build PR body
+        if: steps.check.outputs.has_changes == 'true'
+        run: node .github/scripts/build-deploy-pr-body.mjs
+
+      - name: Create or update deploy PR
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --base deploy/production --head main --json number --jq '.[0].number' 2>/dev/null)
+
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            gh pr edit "$EXISTING_PR" --body-file /tmp/pr-body.md
+            echo "Updated existing deploy PR #$EXISTING_PR"
+          else
+            gh label create deploy --color 0E8A16 --description "Production deployment" 2>/dev/null || true
+            gh pr create \
+              --base deploy/production \
+              --head main \
+              --title "🚀 Deploy to Production" \
+              --body-file /tmp/pr-body.md \
+              --label "deploy"
+            echo "Created new deploy PR"
+          fi
+
+      - name: Close deploy PR if nothing pending
+        if: steps.check.outputs.has_changes == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --base deploy/production --head main --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            gh pr close "$EXISTING_PR" --comment "All changesets have been deployed. Closing."
+          fi

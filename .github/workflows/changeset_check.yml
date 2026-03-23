@@ -1,0 +1,42 @@
+name: Changeset Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  changeset-check:
+    name: Require changeset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for changeset
+        run: |
+          # Get list of changesets added in this PR
+          CHANGESETS=$(git diff --name-only origin/main...HEAD -- '.changeset/*.md' | grep -v README.md || true)
+
+          if [ -z "$CHANGESETS" ]; then
+            echo "::error::No changeset found. Please run 'npx changeset' and add a changeset describing your changes."
+            echo ""
+            echo "To add a changeset:"
+            echo "  npx changeset"
+            echo ""
+            echo "This will prompt you to select which packages changed and the type of version bump (patch/minor/major)."
+            exit 1
+          fi
+
+          echo "✅ Found changeset(s):"
+          echo "$CHANGESETS"
