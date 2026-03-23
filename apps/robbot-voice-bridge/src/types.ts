@@ -36,6 +36,7 @@ export interface VoiceState {
   audioPlayer: AudioPlayer | null;
   logChannel: SendableChannels | null;
   isProcessing: boolean;
+  isPlaying: boolean;
   conversationHistory: Array<ChatMessage>;
   abortController: AbortController | null;
   activeAudioQueue: AudioQueue | null;

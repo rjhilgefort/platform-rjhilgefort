@@ -5,6 +5,18 @@ import { transcribe, askOpenClaw, generateTTS, generateTTSStream } from "./api.j
 import { streamOpenClaw } from "./streaming.js";
 import type { VoiceState } from "./types.js";
 
+function randomAckPhrase(): string {
+  const phrases = [
+    "On it.",
+    "Got it.",
+    "Let me check.",
+    "One sec.",
+    "Working on it.",
+    "Hmm, let me think.",
+  ];
+  return phrases[Math.floor(Math.random() * phrases.length)] ?? "Got it.";
+}
+
 async function logExchange(
   state: VoiceState,
   userName: string,
@@ -38,6 +50,7 @@ export function interruptPipeline(state: VoiceState): void {
   state.audioPlayer?.stop();
 
   state.isProcessing = false;
+  state.isPlaying = false;
   state.isInterrupting = false;
 }
 
@@ -79,10 +92,28 @@ export async function handleSpeech(
     }
     console.log(`[1/3] "${text}"`);
 
+    // Ack: short TTS feedback before LLM call
+    if (config.ackEnabled) {
+      const phrase = randomAckPhrase();
+      console.log(`[ack] "${phrase}"`);
+      try {
+        const ackPath = await generateTTS(phrase);
+        state.isPlaying = true;
+        await playAudio(ackPath, state.audioPlayer);
+        state.isPlaying = false;
+      } catch (err) {
+        console.warn("[ack] TTS failed:", err instanceof Error ? err.message : err);
+        state.isPlaying = false;
+      }
+    }
+
     // 2. Stream LLM + TTS pipeline
     console.log("[2/3] Streaming LLM → TTS...");
     audioQueue = new AudioQueue();
     state.activeAudioQueue = audioQueue;
+    audioQueue.onPlaybackStart = () => {
+      state.isPlaying = true;
+    };
     let fullText = "";
     let interrupted = false;
 
@@ -204,6 +235,7 @@ export async function handleSpeech(
     }
     if (state.abortController === null) {
       state.isProcessing = false;
+      state.isPlaying = false;
     }
   }
 }

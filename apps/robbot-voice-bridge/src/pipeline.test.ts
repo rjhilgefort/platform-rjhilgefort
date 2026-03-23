@@ -10,6 +10,7 @@ vi.mock("./config.js", () => ({
     discordGuildId: "test-guild",
     interruptEnabled: true,
     interruptMinDurationMs: 300,
+    ackEnabled: false,
   },
 }));
 
@@ -51,6 +52,7 @@ vi.mock("./audio.js", () => {
 });
 
 import { handleSpeech, interruptPipeline } from "./pipeline.js";
+import { config } from "./config.js";
 
 function makeState(overrides: Partial<VoiceState> = {}): VoiceState {
   return {
@@ -58,6 +60,7 @@ function makeState(overrides: Partial<VoiceState> = {}): VoiceState {
     audioPlayer: null,
     logChannel: null,
     isProcessing: false,
+    isPlaying: false,
     conversationHistory: [],
     abortController: null,
     activeAudioQueue: null,
@@ -537,8 +540,21 @@ describe("interruptPipeline", () => {
     expect(mockInterrupt).toHaveBeenCalledOnce();
     expect(mockStop).toHaveBeenCalledOnce();
     expect(state.isProcessing).toBe(false);
+    expect(state.isPlaying).toBe(false);
     expect(state.abortController).toBeNull();
     expect(state.activeAudioQueue).toBeNull();
+  });
+
+  it("resets isPlaying on interrupt", () => {
+    const state = makeState({
+      isProcessing: true,
+      isPlaying: true,
+      abortController: new AbortController(),
+    });
+
+    interruptPipeline(state);
+
+    expect(state.isPlaying).toBe(false);
   });
 
   it("guards against re-entrant interrupts", () => {
@@ -562,5 +578,104 @@ describe("interruptPipeline", () => {
 
     expect(() => interruptPipeline(state)).not.toThrow();
     expect(state.isProcessing).toBe(false);
+  });
+});
+
+describe("isPlaying state transitions", () => {
+  it("isPlaying resets to false after successful pipeline", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    expect(state.isPlaying).toBe(false);
+  });
+
+  it("isPlaying resets to false on error", async () => {
+    mockTranscribe.mockRejectedValue(new Error("network fail"));
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    expect(state.isPlaying).toBe(false);
+  });
+});
+
+describe("ack playback", () => {
+  it("plays ack before LLM stream when ackEnabled", async () => {
+    const mutableConfig = config as { ackEnabled: boolean };
+    mutableConfig.ackEnabled = true;
+
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockGenerateTTS.mockResolvedValue("/tmp/ack.mp3");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    // generateTTS called for ack phrase
+    expect(mockGenerateTTS).toHaveBeenCalled();
+    // playAudio called for ack
+    expect(mockPlayAudio).toHaveBeenCalledWith("/tmp/ack.mp3", null);
+
+    mutableConfig.ackEnabled = false;
+  });
+
+  it("skips ack when ackEnabled is false", async () => {
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    // generateTTS not called (ack disabled, no fallback triggered)
+    expect(mockGenerateTTS).not.toHaveBeenCalled();
+  });
+
+  it("continues pipeline if ack TTS fails", async () => {
+    const mutableConfig = config as { ackEnabled: boolean };
+    mutableConfig.ackEnabled = true;
+
+    mockTranscribe.mockResolvedValue("Hello bot");
+    mockGenerateTTS.mockRejectedValueOnce(new Error("TTS down"));
+    mockStreamOpenClaw.mockReturnValue(
+      makeMockStreamGenerator(["Hi."], "Hi."),
+    );
+    mockGenerateTTSStream.mockResolvedValue(makeMockTTSStream());
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    // Pipeline still completed
+    expect(state.conversationHistory).toEqual([
+      { role: "user", content: "Hello bot" },
+      { role: "assistant", content: "Hi." },
+    ]);
+
+    mutableConfig.ackEnabled = false;
+  });
+
+  it("does not ack empty transcriptions", async () => {
+    const mutableConfig = config as { ackEnabled: boolean };
+    mutableConfig.ackEnabled = true;
+
+    mockTranscribe.mockResolvedValue("");
+
+    const state = makeState();
+    await handleSpeech(makeClient(), state, "user-123", makePcmChunks(1));
+
+    expect(mockGenerateTTS).not.toHaveBeenCalled();
+
+    mutableConfig.ackEnabled = false;
   });
 });

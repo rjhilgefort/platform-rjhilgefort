@@ -157,13 +157,35 @@ describe("config", () => {
     });
   });
 
+  describe("ACK_ENABLED", () => {
+    it("defaults to true", async () => {
+      setRequiredEnvs();
+      const { config } = await import("../../src/config.js");
+      expect(config.ackEnabled).toBe(true);
+    });
+
+    it("can be disabled with 'false'", async () => {
+      setRequiredEnvs();
+      vi.stubEnv("ACK_ENABLED", "false");
+      const { config } = await import("../../src/config.js");
+      expect(config.ackEnabled).toBe(false);
+    });
+
+    it("treats non-'true' values as false", async () => {
+      setRequiredEnvs();
+      vi.stubEnv("ACK_ENABLED", "0");
+      const { config } = await import("../../src/config.js");
+      expect(config.ackEnabled).toBe(false);
+    });
+  });
+
   describe("static config values", () => {
     it("has expected defaults", async () => {
       setRequiredEnvs();
       const { config } = await import("../../src/config.js");
       expect(config.sampleRate).toBe(48_000);
       expect(config.channels).toBe(2);
-      expect(config.apiTimeoutMs).toBe(30_000);
+      expect(config.apiTimeoutMs).toBe(60_000);
       expect(config.maxHistory).toBe(60);
       expect(config.interruptMinDurationMs).toBe(300);
     });

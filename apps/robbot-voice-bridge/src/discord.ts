@@ -18,6 +18,7 @@ const state: VoiceState = {
   audioPlayer: null,
   logChannel: null,
   isProcessing: false,
+  isPlaying: false,
   conversationHistory: [],
   abortController: null,
   activeAudioQueue: null,
@@ -59,6 +60,7 @@ function setupReceiver(voiceState: VoiceState): void {
     if (
       config.interruptEnabled &&
       voiceState.isProcessing &&
+      voiceState.isPlaying &&
       !voiceState.isInterrupting
     ) {
       interruptTimer = setTimeout(() => {
@@ -69,6 +71,7 @@ function setupReceiver(voiceState: VoiceState): void {
         }
         if (
           voiceState.isProcessing &&
+          voiceState.isPlaying &&
           !voiceState.isInterrupting &&
           pcmChunks.length > 0
         ) {
@@ -221,6 +224,7 @@ client.on(Events.MessageCreate, async (message) => {
     state.activeAudioQueue?.interrupt();
     state.activeAudioQueue = null;
     state.isProcessing = false;
+    state.isPlaying = false;
     state.voiceConnection?.destroy();
     state.voiceConnection = null;
     state.audioPlayer = null;
@@ -243,6 +247,7 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         state.activeAudioQueue?.interrupt();
         state.activeAudioQueue = null;
         state.isProcessing = false;
+        state.isPlaying = false;
         state.voiceConnection.destroy();
         state.voiceConnection = null;
         state.audioPlayer = null;

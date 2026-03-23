@@ -108,6 +108,12 @@ export class AudioQueue {
   private queue: Array<() => Promise<void>> = [];
   private drainPromise: Promise<void> | null = null;
   private interrupted = false;
+  private started = false;
+  private _onPlaybackStart: (() => void) | null = null;
+
+  set onPlaybackStart(cb: (() => void) | null) {
+    this._onPlaybackStart = cb;
+  }
 
   enqueue(play: () => Promise<void>): void {
     if (this.interrupted) return;
@@ -121,6 +127,10 @@ export class AudioQueue {
     while (this.queue.length > 0 && !this.interrupted) {
       const next = this.queue.shift();
       if (next) {
+        if (!this.started) {
+          this.started = true;
+          this._onPlaybackStart?.();
+        }
         try {
           await next();
         } catch (err) {
